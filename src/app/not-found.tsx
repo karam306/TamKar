@@ -1,0 +1,13 @@
+import Link from "next/link";
+
+export default function NotFound() {
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center gap-4 p-8 text-center">
+      <h1 className="text-3xl font-bold">الصفحة غير موجودة</h1>
+      <p className="text-gray-500">ممكن الرابط غلط أو المتجر مش متوفر حالياً.</p>
+      <Link href="/" className="btn">
+        الرئيسية
+      </Link>
+    </div>
+  );
+}

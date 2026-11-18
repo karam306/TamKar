@@ -1,69 +1,70 @@
-import Image from "next/image";
+import Link from "next/link";
+import { demoStores } from "@/lib/demo-data";
 
-export default function Home() {
+const platform = process.env.NEXT_PUBLIC_PLATFORM_NAME || "Stora";
+
+const features = [
+  { icon: "⚡", title: "متجرك جاهز بدقائق", text: "اختار قالب، ضيف منتجاتك، وابدأ تبيع. بدون مبرمج وبدون تعقيد." },
+  { icon: "💵", title: "الدفع عند الاستلام", text: "زبونك بيطلب من الموبايل وبيدفع لما يوصله الطلب." },
+  { icon: "💬", title: "الطلبات على واتساب", text: "كل طلب بيوصلك مرتب على واتساب، بالاسم والعنوان والمجموع." },
+  { icon: "📱", title: "سريع على الموبايل", text: "مصمم ليفتح بسرعة حتى على إنترنت ضعيف." },
+  { icon: "🎨", title: "قوالب جاهزة", text: "غيّر الألوان والصور والنصوص وترتيب الأقسام بكبسة زر." },
+  { icon: "🌐", title: "دومينك الخاص", text: "ابدأ برابط مجاني، واربط دومينك الخاص وقت ما بدك." },
+];
+
+const themeNames: Record<string, string> = { classic: "القالب الكلاسيكي", bold: "القالب الجريء", soft: "القالب الناعم" };
+
+export default function PlatformHome() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div data-theme="classic" className="font-sans">
+      <header className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
+        <div className="text-2xl font-bold text-primary">{platform}</div>
+        <a href="#demos" className="btn !py-2 text-sm">
+          شوف متاجر تجريبية
+        </a>
+      </header>
+
+      <section className="mx-auto max-w-4xl px-4 py-20 text-center">
+        <h1 className="mb-5 text-4xl leading-tight sm:text-6xl">افتح متجرك أونلاين، وخلّي الطلبات توصلك</h1>
+        <p className="mx-auto mb-8 max-w-2xl text-lg leading-8 text-muted">
+          منصة سورية لبناء المتاجر الإلكترونية. متجر كامل بالعربي، دفع عند الاستلام، والطلبات بتوصلك على واتساب.
+        </p>
+        <a href="#demos" className="btn text-lg">
+          جرّب متجر تجريبي
+        </a>
+      </section>
+
+      <section className="bg-surface py-16">
+        <div className="mx-auto grid max-w-6xl gap-4 px-4 sm:grid-cols-2 lg:grid-cols-3">
+          {features.map((f) => (
+            <div key={f.title} className="rounded-theme bg-white p-6">
+              <div className="mb-3 text-3xl">{f.icon}</div>
+              <h3 className="mb-2 text-lg">{f.title}</h3>
+              <p className="leading-7 text-muted">{f.text}</p>
+            </div>
+          ))}
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      <section id="demos" className="mx-auto max-w-6xl px-4 py-16">
+        <h2 className="mb-2 text-center text-3xl">متاجر تجريبية</h2>
+        <p className="mb-8 text-center text-muted">نفس المنصة، ثلاث قوالب مختلفة. افتح أي واحد وجرب تطلب.</p>
+        <div className="grid gap-4 sm:grid-cols-3">
+          {demoStores.map((s) => (
+            <Link key={s.slug} href={`/s/${s.slug}`} data-theme={s.theme} className="group overflow-hidden rounded-theme border border-black/10 bg-bg">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={(s.sections.find((x) => x.type === "hero") as { image?: string } | undefined)?.image} alt="" className="aspect-[2/1] w-full object-cover" />
+              <div className="p-5 font-sans">
+                <div className="text-xs text-muted">{themeNames[s.theme]}</div>
+                <div className="text-xl font-bold text-primary">{s.name}</div>
+                <div className="text-sm text-muted">{s.tagline}</div>
+              </div>
+            </Link>
+          ))}
         </div>
-      </main>
+      </section>
+
+      <footer className="border-t border-black/5 py-8 text-center text-sm text-muted">© {platform}</footer>
     </div>
   );
 }

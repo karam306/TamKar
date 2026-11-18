@@ -1,26 +1,91 @@
 @import "tailwindcss";
+@import "@fontsource/ibm-plex-sans-arabic/arabic-400.css";
+@import "@fontsource/ibm-plex-sans-arabic/arabic-600.css";
+@import "@fontsource/ibm-plex-sans-arabic/latin-400.css";
+@import "@fontsource/cairo/arabic-400.css";
+@import "@fontsource/cairo/arabic-700.css";
+@import "@fontsource/cairo/arabic-900.css";
+@import "@fontsource/tajawal/400.css";
+@import "@fontsource/tajawal/700.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Store themes. Every template uses the same sections; these variables change the look. */
+:root,
+[data-theme="classic"] {
+  --primary: #0f5c4d;
+  --bg: #ffffff;
+  --surface: #f6f7f6;
+  --text: #1c1f1e;
+  --muted: #6b7270;
+  --radius: 10px;
+  --font: "IBM Plex Sans Arabic", system-ui, sans-serif;
+  --heading-weight: 600;
+}
+[data-theme="bold"] {
+  --primary: #c2185b;
+  --bg: #ffffff;
+  --surface: #f4f4f4;
+  --text: #111111;
+  --muted: #666666;
+  --radius: 0px;
+  --font: "Cairo", system-ui, sans-serif;
+  --heading-weight: 900;
+}
+[data-theme="soft"] {
+  --primary: #8d5a2b;
+  --bg: #fffaf4;
+  --surface: #f6ecdf;
+  --text: #3b2a1d;
+  --muted: #8a7563;
+  --radius: 22px;
+  --font: "Tajawal", system-ui, sans-serif;
+  --heading-weight: 700;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-primary: var(--primary);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --radius-theme: var(--radius);
+  --font-sans: var(--font);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
 }
+
+h1, h2, h3 {
+  font-weight: var(--heading-weight);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: var(--primary);
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius);
+  font-weight: 600;
+  transition: opacity 0.15s;
+}
+.btn:hover { opacity: 0.9; }
+.btn:disabled { opacity: 0.5; }
+.btn-outline {
+  background: transparent;
+  color: var(--primary);
+  border: 1.5px solid var(--primary);
+}
+.input {
+  width: 100%;
+  border: 1px solid #d9dcdb;
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 0.7rem 0.9rem;
+  outline: none;
+}
+.input:focus { border-color: var(--primary); }

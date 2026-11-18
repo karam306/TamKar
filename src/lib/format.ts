@@ -1,0 +1,33 @@
+import type { Currency, OrderLine, Store } from "./types";
+
+export function formatPrice(amount: number, currency: Currency): string {
+  if (currency === "SYP") {
+    return `${new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(amount)} ل.س`;
+  }
+  return `$${new Intl.NumberFormat("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(amount)}`;
+}
+
+/** Order summary message the customer sends to the merchant on WhatsApp. */
+export function whatsappOrderLink(
+  store: Pick<Store, "whatsapp" | "name" | "currency">,
+  order: { number: number; customer_name: string; phone: string; city: string; address: string; notes?: string | null; items: OrderLine[]; total: number },
+): string {
+  const lines = [
+    `طلب جديد رقم #${order.number} من متجر ${store.name}`,
+    "",
+    ...order.items.map((i) => `• ${i.title} × ${i.qty} = ${formatPrice(i.price * i.qty, store.currency)}`),
+    "",
+    `المجموع: ${formatPrice(order.total, store.currency)}`,
+    "الدفع: عند الاستلام",
+    "",
+    `الاسم: ${order.customer_name}`,
+    `الهاتف: ${order.phone}`,
+    `العنوان: ${order.city}، ${order.address}`,
+    order.notes ? `ملاحظات: ${order.notes}` : "",
+  ].filter((l, i, a) => !(l === "" && a[i - 1] === ""));
+  return `https://wa.me/${store.whatsapp}?text=${encodeURIComponent(lines.join("\n").trim())}`;
+}
+
+export function whatsappLink(phone: string, text?: string): string {
+  return `https://wa.me/${phone}${text ? `?text=${encodeURIComponent(text)}` : ""}`;
+}
