@@ -19,9 +19,14 @@ export default function PlatformHome() {
     <div data-theme="classic" className="font-sans">
       <header className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
         <div className="text-2xl font-bold text-primary">{platform}</div>
-        <a href="#demos" className="btn !py-2 text-sm">
-          شوف متاجر تجريبية
-        </a>
+        <div className="flex items-center gap-2 text-sm">
+          <Link href="/login" className="px-3 py-2 text-muted hover:text-text">
+            دخول
+          </Link>
+          <Link href="/signup" className="btn !py-2 text-sm">
+            افتح متجرك
+          </Link>
+        </div>
       </header>
 
       <section className="mx-auto max-w-4xl px-4 py-20 text-center">
@@ -29,9 +34,14 @@ export default function PlatformHome() {
         <p className="mx-auto mb-8 max-w-2xl text-lg leading-8 text-muted">
           منصة سورية لبناء المتاجر الإلكترونية. متجر كامل بالعربي، دفع عند الاستلام، والطلبات بتوصلك على واتساب.
         </p>
-        <a href="#demos" className="btn text-lg">
-          جرّب متجر تجريبي
-        </a>
+        <div className="flex flex-wrap justify-center gap-3">
+          <Link href="/signup" className="btn text-lg">
+            افتح متجرك مجاناً
+          </Link>
+          <a href="#demos" className="btn btn-outline text-lg">
+            شوف متاجر تجريبية
+          </a>
+        </div>
       </section>
 
       <section className="bg-surface py-16">

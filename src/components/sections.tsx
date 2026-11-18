@@ -7,7 +7,7 @@ import { ProductCard, StoreLink } from "./store-ui";
 export function Sections({ store, products }: { store: Store; products: Product[] }) {
   return (
     <>
-      {store.sections.map((section, i) => (
+      {store.sections.filter((s) => !s.hidden).map((section, i) => (
         <SectionView key={i} section={section} store={store} products={products} />
       ))}
     </>

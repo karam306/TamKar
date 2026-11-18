@@ -27,7 +27,8 @@ create table public.stores (
 
 -- Reserved subdomains nobody can take
 alter table public.stores add constraint slug_not_reserved
-  check (slug not in ('www', 'app', 'admin', 'api', 'dashboard', 'mail', 'help', 'support', 'blog', 's'));
+  check (slug not in ('www', 'app', 'admin', 'api', 'dashboard', 'mail', 'help', 'support', 'blog', 's',
+    'login', 'signup', 'tamkar', 'demo', 'lamar', 'halawet', 'test', 'shop', 'store'));
 
 -- ───────────── Products ─────────────
 create table public.products (
@@ -89,19 +90,30 @@ create policy "owner reads own orders" on public.orders
 create policy "owner updates own orders" on public.orders
   for update to authenticated using (exists (select 1 from public.stores s where s.id = store_id and s.owner_id = auth.uid()));
 
--- Merchants may not change billing fields themselves; only the platform (service role) can.
-create or replace function public.protect_billing_fields() returns trigger language plpgsql as $$
+-- Merchants may not change billing, address or domain fields themselves; only the platform (service role) can.
+create or replace function public.protect_store_fields() returns trigger language plpgsql as $$
 begin
   if auth.role() <> 'service_role' then
-    new.status := old.status;
-    new.plan := old.plan;
-    new.paid_until := old.paid_until;
-    new.custom_domain_verified := old.custom_domain_verified;
+    if tg_op = 'INSERT' then
+      new.status := 'active';
+      new.plan := 'trial';
+      new.paid_until := null;
+      new.custom_domain := null;
+      new.custom_domain_verified := false;
+    else
+      new.owner_id := old.owner_id;
+      new.slug := old.slug;
+      new.status := old.status;
+      new.plan := old.plan;
+      new.paid_until := old.paid_until;
+      new.custom_domain := old.custom_domain;
+      new.custom_domain_verified := old.custom_domain_verified;
+    end if;
   end if;
   return new;
 end $$;
-create trigger stores_protect_billing before update on public.stores
-  for each row execute function public.protect_billing_fields();
+create trigger stores_protect_fields before insert or update on public.stores
+  for each row execute function public.protect_store_fields();
 
 -- Shoppers never insert orders directly: the website does it on the server
 -- after checking real prices, using the service role key.
@@ -110,3 +122,8 @@ create trigger stores_protect_billing before update on public.stores
 revoke select on public.stores from anon;
 grant select (id, slug, name, tagline, logo_url, whatsapp, city, currency, theme, primary_color,
   sections, delivery_note, custom_domain, custom_domain_verified, status) on public.stores to anon;
+
+-- ───────────── Image storage ─────────────
+-- Private bucket: images are served through the website (/api/media/...), never directly.
+insert into storage.buckets (id, name, public) values ('media', 'media', false)
+on conflict (id) do nothing;

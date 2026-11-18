@@ -4,6 +4,8 @@ import { demoProducts, demoStores } from "./demo-data";
 import { hasSupabase, supabaseAdmin, supabasePublic } from "./supabase";
 import type { Order, OrderInput, OrderLine, Product, Store } from "./types";
 
+export const isDemoStore = (storeId: string) => storeId.startsWith("s-");
+
 // Must match the columns granted to "anon" in supabase/schema.sql
 const STORE_COLUMNS =
   "id, slug, name, tagline, logo_url, whatsapp, city, currency, theme, primary_color, sections, delivery_note, status";
@@ -15,9 +17,10 @@ const PRODUCT_COLUMNS = "id, store_id, title, description, price, compare_at_pri
  */
 export const getStore = cache(async (key: string): Promise<Store | null> => {
   const k = decodeURIComponent(key).toLowerCase();
-  if (!hasSupabase) {
-    return demoStores.find((s) => s.slug === k) ?? null;
-  }
+  // Sample stores always exist, so the public demo keeps working.
+  const demo = demoStores.find((s) => s.slug === k);
+  if (demo) return demo;
+  if (!hasSupabase) return null;
   const query = supabasePublic().from("stores").select(STORE_COLUMNS).eq("status", "active");
   const { data, error } = k.includes(".")
     ? await query.eq("custom_domain", k).eq("custom_domain_verified", true).maybeSingle()
@@ -30,7 +33,7 @@ export const getStore = cache(async (key: string): Promise<Store | null> => {
 });
 
 export const getProducts = cache(async (storeId: string): Promise<Product[]> => {
-  if (!hasSupabase) return demoProducts.filter((p) => p.store_id === storeId && p.active);
+  if (isDemoStore(storeId) || !hasSupabase) return demoProducts.filter((p) => p.store_id === storeId && p.active);
   const { data, error } = await supabasePublic()
     .from("products")
     .select(PRODUCT_COLUMNS)
@@ -95,8 +98,8 @@ export async function createOrder(store: Store, input: OrderInput): Promise<Crea
   const total = Math.round(lines.reduce((s, l) => s + l.price * l.qty, 0) * 100) / 100;
   const base = { customer_name, phone, city, address, notes, items: lines, total };
 
-  if (!hasSupabase) {
-    // Demo mode: nothing is saved.
+  if (!hasSupabase || isDemoStore(store.id)) {
+    // Demo stores: nothing is saved.
     return { ok: true, order: { ...base, number: 1000 + Math.floor(Math.random() * 9000) } };
   }
 

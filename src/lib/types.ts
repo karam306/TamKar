@@ -1,14 +1,15 @@
 export type ThemeId = "classic" | "bold" | "soft";
 export type Currency = "USD" | "SYP";
 
-export type Section =
+export type Section = (
   | { type: "announcement"; text: string }
   | { type: "hero"; title: string; subtitle?: string; image?: string; buttonText?: string }
   | { type: "categories"; title?: string }
   | { type: "featured_products"; title?: string; limit?: number }
   | { type: "image_text"; title: string; text: string; image?: string }
   | { type: "testimonials"; title?: string; items: { name: string; text: string }[] }
-  | { type: "whatsapp_cta"; title: string; text?: string };
+  | { type: "whatsapp_cta"; title: string; text?: string }
+) & { hidden?: boolean };
 
 export type SectionType = Section["type"];
 
