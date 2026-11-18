@@ -28,7 +28,11 @@ export async function signup(_: FormState, form: FormData): Promise<FormState> {
   if (!/^\d{9,15}$/.test(whatsapp)) return { error: "رقم واتساب غير صحيح" };
 
   const admin = supabaseAdmin();
-  const { data: taken } = await admin.from("stores").select("id").eq("slug", slug).maybeSingle();
+  const { data: taken, error: checkError } = await admin.from("stores").select("id").eq("slug", slug).maybeSingle();
+  if (checkError) {
+    console.error("signup: stores check failed", checkError.code, checkError.message);
+    return { error: "قاعدة البيانات مش جاهزة (رمز: DB)، تواصل مع الدعم" };
+  }
   if (taken) return { error: "هالرابط مستخدم، اختار رابط تاني" };
 
   const { data: created, error: userError } = await admin.auth.admin.createUser({
@@ -38,6 +42,7 @@ export async function signup(_: FormState, form: FormData): Promise<FormState> {
   });
   if (userError || !created.user) {
     const msg = userError?.message ?? "";
+    console.error("signup: createUser failed", userError?.status, userError?.code, msg);
     return { error: /already|registered|exists/i.test(msg) ? "في حساب بهالإيميل، سجّل دخول" : "ما قدرنا ننشئ الحساب، جرب مرة تانية" };
   }
 
@@ -51,6 +56,7 @@ export async function signup(_: FormState, form: FormData): Promise<FormState> {
     delivery_note: "الدفع عند الاستلام",
   });
   if (storeError) {
+    console.error("signup: store insert failed", storeError.code, storeError.message);
     await admin.auth.admin.deleteUser(created.user.id);
     return { error: storeError.code === "23505" ? "هالرابط مستخدم، اختار رابط تاني" : "ما قدرنا ننشئ المتجر، جرب مرة تانية" };
   }
