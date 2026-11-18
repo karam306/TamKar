@@ -1,4 +1,4 @@
--- Stora database schema. Paste all of this into Supabase: SQL Editor > New query > Run.
+-- TamKar database schema. Paste all of this into Supabase: SQL Editor > New query > Run.
 -- Safe to run once on a new project.
 
 

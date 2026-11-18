@@ -2,8 +2,8 @@ import { NextResponse, type NextRequest } from "next/server";
 
 /**
  * Routes every request to the right store based on the address:
- *   stora.co / www.stora.co / *.vercel.app  -> platform pages (stores at /s/<slug>)
- *   ahmad.stora.co                          -> store "ahmad"
+ *   tamkar.com / www.tamkar.com / *.vercel.app  -> platform pages (stores at /s/<slug>)
+ *   ahmad.tamkar.com                          -> store "ahmad"
  *   ahmadstore.com (custom domain)          -> store with that verified domain
  */
 const ROOT = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || "localhost:3000").toLowerCase();
