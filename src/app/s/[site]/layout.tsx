@@ -22,7 +22,7 @@ export default async function StoreLayout({ children, params }: Props) {
   const onOwnHost = (await headers()).get("x-store-host") === "1";
   const base = onOwnHost ? "" : `/s/${store.slug}`;
   const style = store.primary_color ? ({ "--primary": store.primary_color } as React.CSSProperties) : undefined;
-  const platform = process.env.NEXT_PUBLIC_PLATFORM_NAME || "Stora";
+  const platform = process.env.NEXT_PUBLIC_PLATFORM_NAME || "TamKar";
 
   return (
     <div data-theme={store.theme} style={style} className="flex min-h-screen flex-col bg-bg font-sans text-text">

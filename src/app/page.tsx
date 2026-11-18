@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { demoStores } from "@/lib/demo-data";
 
-const platform = process.env.NEXT_PUBLIC_PLATFORM_NAME || "Stora";
+const platform = process.env.NEXT_PUBLIC_PLATFORM_NAME || "TamKar";
 
 const features = [
   { icon: "⚡", title: "متجرك جاهز بدقائق", text: "اختار قالب، ضيف منتجاتك، وابدأ تبيع. بدون مبرمج وبدون تعقيد." },
