@@ -3,7 +3,12 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 // All Supabase traffic happens on the server. Browsers only ever talk to our
 // own domain, so the site keeps working even if supabase.co is blocked somewhere.
-export const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+/** Accepts the URL with or without "/rest/v1" or a trailing slash. */
+export function cleanSupabaseUrl(raw: string): string {
+  return raw.trim().replace(/\/+$/, "").replace(/\/(rest|auth|storage)\/v1$/, "").replace(/\/+$/, "");
+}
+
+export const SUPABASE_URL = cleanSupabaseUrl(process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "");
 export const SUPABASE_PUBLIC_KEY =
   process.env.SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 const SUPABASE_SECRET_KEY = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || "";

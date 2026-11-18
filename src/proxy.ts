@@ -8,7 +8,10 @@ import { NextResponse, type NextRequest } from "next/server";
  *   ahmadstore.com (custom domain)              -> store with that verified domain
  */
 const ROOT = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || "localhost:3000").toLowerCase();
-const SB_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const SB_URL = (process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "")
+  .trim()
+  .replace(/\/+$/, "")
+  .replace(/\/(rest|auth|storage)\/v1$/, "");
 const SB_KEY = process.env.SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
 export async function proxy(request: NextRequest) {
