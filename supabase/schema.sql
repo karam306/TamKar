@@ -65,6 +65,16 @@ create table public.orders (
 );
 create index orders_store_idx on public.orders (store_id, created_at desc);
 
+-- ───────────── Table access ─────────────
+-- Newer Supabase projects do not open new tables automatically, so we grant access here.
+-- Row Level Security below still decides which rows each person can see.
+grant usage on schema public to anon, authenticated, service_role;
+grant all on public.stores, public.products, public.orders to service_role;
+grant usage, select on sequence public.order_number_seq to service_role;
+grant select, insert, update, delete on public.stores, public.products to authenticated;
+grant select, update on public.orders to authenticated;
+grant select on public.products to anon;
+
 -- ───────────── Store isolation (Row Level Security) ─────────────
 -- Every table is locked by default. These rules decide who sees what.
 alter table public.stores enable row level security;
