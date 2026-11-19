@@ -3,7 +3,9 @@
 import { redirect } from "next/navigation";
 import type { FormState } from "@/components/form-ui";
 import { supabaseUser } from "@/lib/auth";
+import { isAdminEmail } from "@/lib/platform-admin";
 import { hasSupabase, supabaseAdmin } from "@/lib/supabase";
+import { trialEnd } from "@/lib/subscription";
 import { defaultSections, normalizeWhatsapp, RESERVED_SLUGS } from "@/lib/templates";
 
 const str = (f: FormData, k: string, max = 200) => String(f.get(k) ?? "").trim().slice(0, max);
@@ -54,6 +56,8 @@ export async function signup(_: FormState, form: FormData): Promise<FormState> {
     city: city || null,
     sections: defaultSections(storeName),
     delivery_note: "الدفع عند الاستلام",
+    plan: "trial",
+    paid_until: trialEnd(),
   });
   if (storeError) {
     console.error("signup: store insert failed", storeError.code, storeError.message);
@@ -69,12 +73,12 @@ export async function signup(_: FormState, form: FormData): Promise<FormState> {
 export async function login(_: FormState, form: FormData): Promise<FormState> {
   if (!hasSupabase) return { error: "قاعدة البيانات غير مربوطة بعد" };
   const db = await supabaseUser();
-  const { error } = await db.auth.signInWithPassword({
+  const { data, error } = await db.auth.signInWithPassword({
     email: str(form, "email", 120).toLowerCase(),
     password: String(form.get("password") ?? ""),
   });
   if (error) return { error: "الإيميل أو كلمة السر غلط" };
-  redirect("/dashboard");
+  redirect(isAdminEmail(data.user?.email) ? "/admin" : "/dashboard");
 }
 
 export async function logout() {

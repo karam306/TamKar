@@ -4,6 +4,7 @@ import { after } from "next/server";
 import { eventContext, sendPurchaseEvent } from "@/lib/meta";
 import { createOrder, getProductsByIds, getStore, quote } from "@/lib/data";
 import { whatsappOrderLink } from "@/lib/format";
+import { isOpen } from "@/lib/subscription";
 import type { CartItem, OrderInput, Pricing } from "@/lib/types";
 
 export type PlaceOrderResult =
@@ -13,6 +14,7 @@ export type PlaceOrderResult =
 export async function placeOrder(site: string, input: OrderInput): Promise<PlaceOrderResult> {
   const store = await getStore(site);
   if (!store) return { ok: false, error: "المتجر غير موجود" };
+  if (!isOpen(store)) return { ok: false, error: "المتجر متوقف مؤقتاً" };
   const result = await createOrder(
     store,
     { name: input.customerName, phone: input.phone, city: input.city, address: input.address, notes: input.notes },

@@ -9,7 +9,7 @@ export const isDemoStore = (storeId: string) => storeId.startsWith("s-");
 
 // Must match the columns granted to "anon" in supabase/schema.sql
 const STORE_COLUMNS =
-  "id, slug, name, tagline, logo_url, whatsapp, city, currency, theme, primary_color, sections, delivery_note, status, shipping, meta_pixel_id";
+  "id, slug, name, tagline, logo_url, whatsapp, city, currency, theme, primary_color, sections, delivery_note, status, shipping, meta_pixel_id, plan, paid_until";
 const PRODUCT_COLUMNS =
   "id, store_id, title, description, price, compare_at_price, images, category, stock, active, sku, options, variants, collection_ids";
 

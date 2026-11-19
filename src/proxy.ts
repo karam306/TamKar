@@ -26,7 +26,7 @@ export async function proxy(request: NextRequest) {
     host === "";
 
   if (isPlatform) {
-    if (pathname.startsWith("/dashboard") || pathname === "/login" || pathname === "/signup") {
+    if (pathname.startsWith("/dashboard") || pathname.startsWith("/admin") || pathname === "/login" || pathname === "/signup") {
       return refreshSession(request);
     }
     return NextResponse.next();

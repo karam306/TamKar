@@ -29,6 +29,8 @@ export type Store = {
   status: "active" | "suspended";
   shipping?: ShippingSettings;
   meta_pixel_id?: string | null;
+  plan?: string | null;
+  paid_until?: string | null;
 };
 
 export type ShippingSettings = {

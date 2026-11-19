@@ -6,6 +6,7 @@ import { CartButton, StoreLink } from "@/components/store-ui";
 import { StoreTracking } from "@/components/tracking";
 import { getStore } from "@/lib/data";
 import { whatsappLink } from "@/lib/format";
+import { isOpen } from "@/lib/subscription";
 
 type Props = { children: React.ReactNode; params: Promise<{ site: string }> };
 
@@ -19,6 +20,17 @@ export default async function StoreLayout({ children, params }: Props) {
   const { site } = await params;
   const store = await getStore(site);
   if (!store) notFound();
+  if (!isOpen(store)) {
+    return (
+      <div data-theme={store.theme} className="flex min-h-screen flex-col items-center justify-center gap-3 bg-bg p-8 text-center font-sans text-text">
+        <h1 className="text-2xl">{store.name}</h1>
+        <p className="text-muted">المتجر متوقف مؤقتاً. تواصل معنا على واتساب للطلب.</p>
+        <a href={whatsappLink(store.whatsapp)} className="btn" target="_blank" rel="noopener noreferrer">
+          واتساب
+        </a>
+      </div>
+    );
+  }
 
   const onOwnHost = (await headers()).get("x-store-host") === "1";
   const base = onOwnHost ? "" : `/s/${store.slug}`;
