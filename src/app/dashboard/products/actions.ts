@@ -79,7 +79,7 @@ export async function saveProduct(_: FormState, form: FormData): Promise<FormSta
   const compare = toNum(form.get("compare_at_price"));
   const stockRaw = toNum(form.get("stock"));
   const images = parseJSON<string[]>(form.get("images"), [])
-    .filter((u) => typeof u === "string" && u.startsWith(`/api/media/${store.id}/`))
+    .filter((u) => typeof u === "string" && (u.startsWith(`/api/media/${store.id}/`) || /^\/demo\/[a-z0-9-]+\.svg$/.test(u)))
     .slice(0, 10);
 
   const v = cleanVariants(parseJSON(form.get("options"), []), parseJSON(form.get("variants"), []));

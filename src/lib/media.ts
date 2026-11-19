@@ -43,3 +43,12 @@ export async function deleteImages(storeId: string, urls: string[]) {
     .map((u) => u.replace("/api/media/", ""));
   if (paths.length) await supabaseAdmin().storage.from(MEDIA_BUCKET).remove(paths);
 }
+
+/** Stores an image we already have in memory (used for sample stores). */
+export async function saveImageBuffer(storeId: string, input: Buffer, maxSize = 1200): Promise<string> {
+  const output = await sharp(input, { density: 150 }).resize({ width: maxSize, height: maxSize, fit: "inside" }).webp({ quality: 82 }).toBuffer();
+  const path = `${storeId}/${randomUUID()}.webp`;
+  const { error } = await supabaseAdmin().storage.from(MEDIA_BUCKET).upload(path, output, { contentType: "image/webp", cacheControl: "31536000", upsert: false });
+  if (error) throw new Error(error.message);
+  return `/api/media/${path}`;
+}
