@@ -1,5 +1,5 @@
 import "server-only";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { supabaseUser } from "./auth";
 import { hasSupabase } from "./supabase";
 
@@ -11,21 +11,27 @@ const ADMINS = (process.env.PLATFORM_ADMIN_EMAILS || "")
 
 export const isAdminEmail = (email?: string | null) => Boolean(email && ADMINS.includes(email.toLowerCase()));
 
-export async function getPlatformAdmin(): Promise<{ email: string } | null> {
-  if (!hasSupabase || ADMINS.length === 0) return null;
+async function currentEmail(): Promise<string | null> {
+  if (!hasSupabase) return null;
   const db = await supabaseUser();
   const {
     data: { user },
   } = await db.auth.getUser();
-  const email = user?.email?.toLowerCase();
+  return user?.email?.toLowerCase() ?? null;
+}
+
+export async function getPlatformAdmin(): Promise<{ email: string } | null> {
+  if (ADMINS.length === 0) return null;
+  const email = await currentEmail();
   return email && ADMINS.includes(email) ? { email } : null;
 }
 
-/** Anyone else gets a plain "page not found", so the panel's existence isn't revealed. */
+/** Not signed in: go to login. Signed in as someone else: plain "page not found". */
 export async function requirePlatformAdmin() {
-  const admin = await getPlatformAdmin();
-  if (!admin) notFound();
-  return admin;
+  const email = await currentEmail();
+  if (!email) redirect("/login");
+  if (!ADMINS.includes(email)) notFound();
+  return { email };
 }
 
 export const adminConfigured = () => ADMINS.length > 0;
