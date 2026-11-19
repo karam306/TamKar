@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { refresh, revalidatePath } from "next/cache";
 import type { FormState } from "@/components/form-ui";
 import { requireMerchant } from "@/lib/auth";
 import { normalizeWhatsapp } from "@/lib/templates";
@@ -29,5 +29,6 @@ export async function saveSettings(_: FormState, form: FormData): Promise<FormSt
     .eq("id", store.id);
   if (error) return { error: "ما قدرنا نحفظ، جرب مرة تانية" };
   revalidatePath("/dashboard", "layout");
+  refresh();
   return { ok: "✓ انحفظت الإعدادات" };
 }

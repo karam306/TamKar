@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { refresh, revalidatePath } from "next/cache";
 import { requireMerchant } from "@/lib/auth";
 import { readProductSheet } from "@/lib/sheets";
 
@@ -84,6 +84,8 @@ export async function importProducts(_: ImportResult, form: FormData): Promise<I
   }
 
   revalidatePath("/dashboard/products");
+
+  refresh();
   return {
     ok: `✓ انضاف ${added} منتج${updated ? ` وتحدّث ${updated}` : ""}`,
     problems: problems.slice(0, 50),

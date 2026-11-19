@@ -1,7 +1,7 @@
 "use server";
 
 import { randomInt } from "node:crypto";
-import { revalidatePath } from "next/cache";
+import { refresh, revalidatePath } from "next/cache";
 import { BUSINESS_TYPES } from "@/lib/business-types";
 import { requirePlatformAdmin } from "@/lib/platform-admin";
 import { extendDate, trialEnd } from "@/lib/subscription";
@@ -73,6 +73,7 @@ export async function createMerchant(_: CreateResult, form: FormData): Promise<C
     note: str(form, "note", 1000) || null,
   });
   revalidatePath("/admin");
+  refresh();
   return { created: { id: store.id as string, slug, email, password, name } };
 }
 
@@ -83,6 +84,7 @@ export async function setStoreStatus(form: FormData) {
   if (!["active", "suspended"].includes(status)) return;
   await supabaseAdmin().from("stores").update({ status }).eq("id", id);
   revalidatePath(`/admin/stores/${id}`);
+  refresh();
 }
 
 export async function recordPayment(_: { error?: string; ok?: string } | undefined, form: FormData) {
@@ -109,6 +111,7 @@ export async function recordPayment(_: { error?: string; ok?: string } | undefin
   if (error) return { error: "ما قدرنا نسجل الدفعة" };
   await admin.from("stores").update({ paid_until: until, plan, status: "active" }).eq("id", id);
   revalidatePath(`/admin/stores/${id}`);
+  refresh();
   return { ok: `✓ انسجلت الدفعة. الاشتراك فعّال لغاية ${until}` };
 }
 
@@ -122,6 +125,7 @@ export async function setPaidUntil(form: FormData) {
     .update({ paid_until: /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : null, ...(plan ? { plan } : {}) })
     .eq("id", id);
   revalidatePath(`/admin/stores/${id}`);
+  refresh();
 }
 
 export async function saveMerchantInfo(form: FormData) {
@@ -138,6 +142,7 @@ export async function saveMerchantInfo(form: FormData) {
     updated_at: new Date().toISOString(),
   });
   revalidatePath(`/admin/stores/${id}`);
+  refresh();
 }
 
 export async function resetPassword(_: { password?: string; error?: string } | undefined, form: FormData) {

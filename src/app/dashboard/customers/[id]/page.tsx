@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { revalidatePath } from "next/cache";
+import { refresh, revalidatePath } from "next/cache";
 import { Card, PageHeader } from "@/components/admin-ui";
 import { requireMerchant } from "@/lib/auth";
 import { formatPrice, whatsappLink } from "@/lib/format";
@@ -14,6 +14,7 @@ async function saveNote(form: FormData) {
   const id = String(form.get("id") ?? "");
   await db.from("customers").update({ note: String(form.get("note") ?? "").trim().slice(0, 1000) || null }).eq("id", id).eq("store_id", store.id);
   revalidatePath(`/dashboard/customers/${id}`);
+  refresh();
 }
 
 export default async function CustomerPage({ params }: { params: Promise<{ id: string }> }) {

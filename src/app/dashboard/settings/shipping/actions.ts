@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { refresh, revalidatePath } from "next/cache";
 import type { FormState } from "@/components/form-ui";
 import { requireMerchant } from "@/lib/auth";
 
@@ -32,5 +32,6 @@ export async function saveShipping(_: FormState, form: FormData): Promise<FormSt
     .eq("id", store.id);
   if (error) return { error: "ما قدرنا نحفظ، جرب مرة تانية" };
   revalidatePath("/dashboard/settings/shipping");
+  refresh();
   return { ok: "✓ انحفظت أسعار التوصيل" };
 }

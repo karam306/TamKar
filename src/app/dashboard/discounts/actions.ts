@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { refresh, revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import type { FormState } from "@/components/form-ui";
 import { requireMerchant } from "@/lib/auth";
@@ -56,6 +56,7 @@ export async function saveDiscount(_: FormState, form: FormData): Promise<FormSt
     : await db.from("discounts").insert(row);
   if (res.error) return { error: res.error.code === "23505" ? "في كود خصم بنفس الاسم" : "ما قدرنا نحفظ، جرب مرة تانية" };
   revalidatePath("/dashboard/discounts");
+  refresh();
   redirect("/dashboard/discounts?saved=1");
 }
 
@@ -63,5 +64,6 @@ export async function deleteDiscount(form: FormData) {
   const { store, db } = await requireMerchant();
   await db.from("discounts").delete().eq("id", String(form.get("id") ?? "")).eq("store_id", store.id);
   revalidatePath("/dashboard/discounts");
+  refresh();
   redirect("/dashboard/discounts");
 }

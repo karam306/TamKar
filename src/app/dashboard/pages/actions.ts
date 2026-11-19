@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { refresh, revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import type { FormState } from "@/components/form-ui";
 import { requireMerchant } from "@/lib/auth";
@@ -24,6 +24,7 @@ export async function savePage(_: FormState, form: FormData): Promise<FormState>
     : await db.from("pages").insert(row).select("id").single();
   if (res.error) return { error: res.error.code === "23505" ? "في صفحة تانية بنفس الرابط" : "ما قدرنا نحفظ، جرب مرة تانية" };
   revalidatePath("/dashboard/pages");
+  refresh();
   if (!id) redirect(`/dashboard/pages/${res.data.id}`);
   return { ok: "✓ انحفظت الصفحة" };
 }
@@ -32,5 +33,6 @@ export async function deletePage(form: FormData) {
   const { store, db } = await requireMerchant();
   await db.from("pages").delete().eq("id", String(form.get("id") ?? "")).eq("store_id", store.id);
   revalidatePath("/dashboard/pages");
+  refresh();
   redirect("/dashboard/pages");
 }

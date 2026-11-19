@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { refresh, revalidatePath } from "next/cache";
 import type { FormState } from "@/components/form-ui";
 import { requireMerchant } from "@/lib/auth";
 import { BUSINESS_TYPES } from "@/lib/business-types";
@@ -122,6 +122,7 @@ export async function saveDesign(_: FormState, form: FormData): Promise<FormStat
     .eq("id", store.id);
   if (error) return { error: "ما قدرنا نحفظ، جرب مرة تانية" };
   revalidatePath("/dashboard/design");
+  refresh();
   return { ok: `✓ انحفظ التصميم (${new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })})` };
 }
 
@@ -136,4 +137,5 @@ export async function applyTemplate(form: FormData) {
   await db.from("stores").update({ ...rest, ...(hasMenus ? {} : { menus }) }).eq("id", store.id);
   await createTemplatePages(store.id, type, store.name);
   revalidatePath("/dashboard", "layout");
+  refresh();
 }

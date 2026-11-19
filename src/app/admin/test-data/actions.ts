@@ -1,7 +1,7 @@
 "use server";
 
 import { headers } from "next/headers";
-import { revalidatePath } from "next/cache";
+import { refresh, revalidatePath } from "next/cache";
 import { requirePlatformAdmin } from "@/lib/platform-admin";
 import { deleteSeedStores, seedStores, type SeedResult } from "@/lib/seed-stores";
 import { normalizeWhatsapp } from "@/lib/templates";
@@ -17,6 +17,7 @@ export async function createTestStores(_: SeedState, form: FormData): Promise<Se
   const proto = h.get("x-forwarded-proto") || (host.startsWith("localhost") ? "http" : "https");
   const results = await seedStores(email, `${proto}://${host}`, wa);
   revalidatePath("/admin");
+  refresh();
   return { results };
 }
 
@@ -24,5 +25,6 @@ export async function removeTestStores(): Promise<SeedState> {
   await requirePlatformAdmin();
   const n = await deleteSeedStores();
   revalidatePath("/admin");
+  refresh();
   return { ok: n ? `✓ انحذفت ${n} متاجر تجريبية` : "ما في متاجر تجريبية" };
 }

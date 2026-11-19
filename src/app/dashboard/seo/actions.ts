@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { refresh, revalidatePath } from "next/cache";
 import type { FormState } from "@/components/form-ui";
 import { requireMerchant } from "@/lib/auth";
 
@@ -34,5 +34,6 @@ export async function saveSeo(_: FormState, form: FormData): Promise<FormState> 
     .eq("id", store.id);
   if (error) return { error: "ما قدرنا نحفظ، جرب مرة تانية" };
   revalidatePath("/dashboard/seo");
+  refresh();
   return { ok: "✓ انحفظ" };
 }

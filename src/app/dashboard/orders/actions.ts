@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { refresh, revalidatePath } from "next/cache";
 import { after } from "next/server";
 import { sendDeliveredEvent } from "@/lib/meta";
 import { redirect } from "next/navigation";
@@ -32,6 +32,7 @@ export async function setOrderStatus(form: FormData) {
     }
   }
   revalidatePath(`/dashboard/orders/${id}`);
+  refresh();
 }
 
 export async function setPaid(form: FormData) {
@@ -41,6 +42,7 @@ export async function setPaid(form: FormData) {
   const { data } = await db.from("orders").update({ payment_status: paid ? "paid" : "pending" }).eq("id", id).eq("store_id", store.id).select("id").maybeSingle();
   if (data) await addEvent(id, store.id, paid ? "تم استلام المبلغ" : "رجع الطلب لحالة غير مدفوع");
   revalidatePath(`/dashboard/orders/${id}`);
+  refresh();
 }
 
 export async function cancelOrder(form: FormData) {
@@ -50,6 +52,7 @@ export async function cancelOrder(form: FormData) {
   // The database function checks the order belongs to this store.
   await supabaseAdmin().rpc("cancel_order", { p_order: id, p_store: store.id, p_restock: form.get("restock") === "on" });
   revalidatePath(`/dashboard/orders/${id}`);
+  refresh();
 }
 
 export async function addComment(form: FormData) {
@@ -58,6 +61,7 @@ export async function addComment(form: FormData) {
   const text = String(form.get("message") ?? "").trim();
   if (text) await addEvent(id, store.id, text);
   revalidatePath(`/dashboard/orders/${id}`);
+  refresh();
 }
 
 export async function saveMerchantNote(form: FormData) {
@@ -65,6 +69,7 @@ export async function saveMerchantNote(form: FormData) {
   const id = String(form.get("id") ?? "");
   await db.from("orders").update({ merchant_note: String(form.get("note") ?? "").trim().slice(0, 1000) || null }).eq("id", id).eq("store_id", store.id);
   revalidatePath(`/dashboard/orders/${id}`);
+  refresh();
 }
 
 /** Order taken by phone or WhatsApp, entered by the merchant. */
@@ -93,5 +98,6 @@ export async function createManualOrder(_: FormState, form: FormData): Promise<F
     await db.from("orders").update({ payment_status: "paid" }).eq("id", res.order.id).eq("store_id", own.id);
   }
   revalidatePath("/dashboard/orders");
+  refresh();
   redirect(`/dashboard/orders/${res.order.id}`);
 }

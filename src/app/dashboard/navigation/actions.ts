@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { refresh, revalidatePath } from "next/cache";
 import type { FormState } from "@/components/form-ui";
 import { requireMerchant } from "@/lib/auth";
 import type { MenuLink } from "@/lib/types";
@@ -20,5 +20,6 @@ export async function saveMenus(_: FormState, form: FormData): Promise<FormState
   const { error } = await db.from("stores").update({ menus: { header: clean(raw.header), footer: clean(raw.footer) } }).eq("id", store.id);
   if (error) return { error: "ما قدرنا نحفظ، جرب مرة تانية" };
   revalidatePath("/dashboard/navigation");
+  refresh();
   return { ok: "✓ انحفظت القوائم" };
 }

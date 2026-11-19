@@ -1,7 +1,7 @@
 "use server";
 
 import { randomUUID } from "node:crypto";
-import { revalidatePath } from "next/cache";
+import { refresh, revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import type { FormState } from "@/components/form-ui";
 import { requireMerchant } from "@/lib/auth";
@@ -124,11 +124,13 @@ export async function saveProduct(_: FormState, form: FormData): Promise<FormSta
     if (error) return { error: "ما قدرنا نحفظ، جرب مرة تانية" };
     await deleteImages(store.id, ((old?.images as string[]) ?? []).filter((u) => !images.includes(u)));
     revalidatePath("/dashboard/products");
+    refresh();
     return { ok: "✓ انحفظ المنتج" };
   }
   const { data, error } = await db.from("products").insert(row).select("id").single();
   if (error || !data) return { error: "ما قدرنا نحفظ، جرب مرة تانية" };
   revalidatePath("/dashboard/products");
+  refresh();
   redirect(`/dashboard/products/${data.id}?created=1`);
 }
 
@@ -138,6 +140,7 @@ export async function deleteProduct(form: FormData) {
   const { data } = await db.from("products").delete().eq("id", id).eq("store_id", store.id).select("images").maybeSingle();
   if (data) await deleteImages(store.id, (data.images as string[]) ?? []);
   revalidatePath("/dashboard/products");
+  refresh();
   redirect("/dashboard/products");
 }
 
@@ -166,4 +169,5 @@ export async function bulkProducts(form: FormData) {
     await deleteImages(store.id, (data ?? []).flatMap((r) => (r.images as string[]) ?? []));
   }
   revalidatePath("/dashboard/products");
+  refresh();
 }
