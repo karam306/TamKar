@@ -8,8 +8,8 @@ type StoreInfo = { slug: string; base: string; currency: Currency; whatsapp: str
 type Ctx = StoreInfo & {
   cart: CartItem[];
   count: number;
-  add: (productId: string, qty?: number) => void;
-  setQty: (productId: string, qty: number) => void;
+  add: (productId: string, qty?: number, variantId?: string) => void;
+  setQty: (productId: string, qty: number, variantId?: string) => void;
   clear: () => void;
   ready: boolean;
 };
@@ -47,6 +47,9 @@ function subscribe(listener: () => void) {
   return () => listeners.delete(listener);
 }
 
+const same = (i: CartItem, productId: string, variantId?: string) =>
+  i.productId === productId && (i.variantId ?? "") === (variantId ?? "");
+
 export function StoreProvider({ info, children }: { info: StoreInfo; children: React.ReactNode }) {
   const key = `cart:${info.slug}`;
   const stored = useSyncExternalStore(
@@ -58,21 +61,26 @@ export function StoreProvider({ info, children }: { info: StoreInfo; children: R
   const cart = stored ?? EMPTY;
 
   const add = useCallback(
-    (productId: string, qty = 1) => {
+    (productId: string, qty = 1, variantId?: string) => {
       const c = readCart(key);
-      const found = c.find((i) => i.productId === productId);
+      const found = c.find((i) => same(i, productId, variantId));
       writeCart(
         key,
-        found ? c.map((i) => (i.productId === productId ? { ...i, qty: Math.min(99, i.qty + qty) } : i)) : [...c, { productId, qty }],
+        found
+          ? c.map((i) => (same(i, productId, variantId) ? { ...i, qty: Math.min(99, i.qty + qty) } : i))
+          : [...c, variantId ? { productId, variantId, qty } : { productId, qty }],
       );
     },
     [key],
   );
 
   const setQty = useCallback(
-    (productId: string, qty: number) => {
+    (productId: string, qty: number, variantId?: string) => {
       const c = readCart(key);
-      writeCart(key, qty <= 0 ? c.filter((i) => i.productId !== productId) : c.map((i) => (i.productId === productId ? { ...i, qty: Math.min(99, qty) } : i)));
+      writeCart(
+        key,
+        qty <= 0 ? c.filter((i) => !same(i, productId, variantId)) : c.map((i) => (same(i, productId, variantId) ? { ...i, qty: Math.min(99, qty) } : i)),
+      );
     },
     [key],
   );

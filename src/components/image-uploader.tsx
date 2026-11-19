@@ -27,12 +27,15 @@ export function ImageUploader({
   upload,
   max = 8,
   label = "صور المنتج",
+  single,
 }: {
   name: string;
   initial: string[];
   upload: Uploader;
   max?: number;
   label?: string;
+  /** Send just one URL instead of a list. */
+  single?: boolean;
 }) {
   const [images, setImages] = useState<string[]>(initial);
   const [busy, setBusy] = useState(0);
@@ -68,7 +71,7 @@ export function ImageUploader({
   return (
     <div className="flex flex-col gap-2 text-sm">
       <span className="font-semibold">{label}</span>
-      <input type="hidden" name={name} value={JSON.stringify(images)} />
+      <input type="hidden" name={name} value={single ? (images[0] ?? "") : JSON.stringify(images)} />
       <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
         {images.map((src, i) => (
           <div key={src} className="group relative aspect-square overflow-hidden rounded-theme bg-surface">

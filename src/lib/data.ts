@@ -1,15 +1,23 @@
 import "server-only";
 import { cache } from "react";
-import { demoProducts, demoStores } from "./demo-data";
+import { demoCollections, demoProducts, demoStores } from "./demo-data";
+import { findVariant, hasVariants } from "./product-utils";
 import { hasSupabase, supabaseAdmin, supabasePublic } from "./supabase";
-import type { Order, OrderInput, OrderLine, Product, Store } from "./types";
+import type { CartItem, Collection, Order, OrderLine, Product, Store } from "./types";
 
 export const isDemoStore = (storeId: string) => storeId.startsWith("s-");
 
 // Must match the columns granted to "anon" in supabase/schema.sql
 const STORE_COLUMNS =
   "id, slug, name, tagline, logo_url, whatsapp, city, currency, theme, primary_color, sections, delivery_note, status";
-const PRODUCT_COLUMNS = "id, store_id, title, description, price, compare_at_price, images, category, stock, active";
+const PRODUCT_COLUMNS =
+  "id, store_id, title, description, price, compare_at_price, images, category, stock, active, sku, options, variants, collection_ids";
+
+const num = (p: Product): Product => ({
+  ...p,
+  price: Number(p.price),
+  compare_at_price: p.compare_at_price == null ? null : Number(p.compare_at_price),
+});
 
 /**
  * Finds a store by its key: a slug ("demo") or, when the key contains a dot,
@@ -32,85 +40,171 @@ export const getStore = cache(async (key: string): Promise<Store | null> => {
   return (data as Store) ?? null;
 });
 
-export const getProducts = cache(async (storeId: string): Promise<Product[]> => {
-  if (isDemoStore(storeId) || !hasSupabase) return demoProducts.filter((p) => p.store_id === storeId && p.active);
-  const { data, error } = await supabasePublic()
+export type ProductQuery = { collectionId?: string; category?: string; q?: string; page?: number; perPage?: number };
+
+/** Active products of a store, filtered and paged (stores can have thousands). */
+export async function listProducts(storeId: string, f: ProductQuery = {}): Promise<{ items: Product[]; total: number }> {
+  const perPage = Math.min(f.perPage ?? 24, 100);
+  const page = Math.max(1, f.page ?? 1);
+  if (isDemoStore(storeId) || !hasSupabase) {
+    let list = demoProducts.filter((p) => p.store_id === storeId && p.active);
+    if (f.collectionId) list = list.filter((p) => p.collection_ids?.includes(f.collectionId!));
+    if (f.category) list = list.filter((p) => p.category === f.category);
+    if (f.q) list = list.filter((p) => p.title.includes(f.q!));
+    return { items: list.slice((page - 1) * perPage, page * perPage), total: list.length };
+  }
+  let q = supabasePublic()
+    .from("products")
+    .select(PRODUCT_COLUMNS, { count: "exact" })
+    .eq("store_id", storeId)
+    .eq("active", true);
+  if (f.collectionId) q = q.contains("collection_ids", [f.collectionId]);
+  if (f.category) q = q.eq("category", f.category);
+  if (f.q) q = q.ilike("title", `%${f.q.replace(/[%_,()]/g, "")}%`);
+  const { data, count, error } = await q.order("created_at", { ascending: false }).range((page - 1) * perPage, page * perPage - 1);
+  if (error) {
+    console.error("listProducts", error.message);
+    return { items: [], total: 0 };
+  }
+  return { items: ((data as Product[]) ?? []).map(num), total: count ?? 0 };
+}
+
+export const getProduct = cache(async (storeId: string, id: string): Promise<Product | null> => {
+  if (isDemoStore(storeId) || !hasSupabase) return demoProducts.find((p) => p.store_id === storeId && p.id === id && p.active) ?? null;
+  if (!/^[0-9a-f-]{36}$/.test(id)) return null;
+  const { data } = await supabasePublic()
     .from("products")
     .select(PRODUCT_COLUMNS)
     .eq("store_id", storeId)
+    .eq("id", id)
     .eq("active", true)
-    .order("created_at", { ascending: false })
-    .limit(500);
-  if (error) {
-    console.error("getProducts", error.message);
-    return [];
-  }
-  return (data as Product[]) ?? [];
+    .maybeSingle();
+  return data ? num(data as Product) : null;
 });
 
-export async function getProduct(storeId: string, id: string): Promise<Product | null> {
-  const all = await getProducts(storeId);
-  return all.find((p) => p.id === id) ?? null;
+/** Products for the cart page (only the ones in the cart). */
+export async function getProductsByIds(storeId: string, ids: string[]): Promise<Product[]> {
+  const unique = [...new Set(ids)].slice(0, 100);
+  if (unique.length === 0) return [];
+  if (isDemoStore(storeId) || !hasSupabase) return demoProducts.filter((p) => p.store_id === storeId && unique.includes(p.id));
+  const valid = unique.filter((id) => /^[0-9a-f-]{36}$/.test(id));
+  if (!valid.length) return [];
+  const { data } = await supabasePublic().from("products").select(PRODUCT_COLUMNS).eq("store_id", storeId).eq("active", true).in("id", valid);
+  return ((data as Product[]) ?? []).map(num);
 }
 
-export function categoriesOf(products: Product[]): string[] {
-  return [...new Set(products.map((p) => p.category).filter(Boolean) as string[])];
-}
+export const getCollections = cache(async (storeId: string): Promise<Collection[]> => {
+  if (isDemoStore(storeId) || !hasSupabase) return demoCollections.filter((c) => c.store_id === storeId);
+  const { data } = await supabasePublic().from("collections").select("*").eq("store_id", storeId).order("created_at");
+  return (data as Collection[]) ?? [];
+});
+
+export const getCategories = cache(async (storeId: string): Promise<string[]> => {
+  if (isDemoStore(storeId) || !hasSupabase) {
+    return [...new Set(demoProducts.filter((p) => p.store_id === storeId && p.category).map((p) => p.category!))];
+  }
+  const { data } = await supabasePublic()
+    .from("products")
+    .select("category")
+    .eq("store_id", storeId)
+    .eq("active", true)
+    .not("category", "is", null)
+    .limit(5000);
+  return [...new Set((data ?? []).map((r) => r.category as string))].slice(0, 30);
+});
 
 const clean = (v: unknown, max: number) =>
   typeof v === "string" ? v.replace(/[\u0000-\u001f]/g, " ").trim().slice(0, max) : "";
 
+export type CustomerInput = { name: string; phone: string; city: string; address: string; notes?: string };
+
 export type CreateOrderResult =
-  | { ok: true; order: Pick<Order, "number" | "items" | "total" | "customer_name" | "phone" | "city" | "address" | "notes"> }
+  | { ok: true; order: Pick<Order, "id" | "number" | "items" | "total" | "customer_name" | "phone" | "city" | "address" | "notes"> }
   | { ok: false; error: string };
 
-/**
- * Validates the cart against the store's real prices (never trusts prices
- * from the browser) and saves the order.
- */
-export async function createOrder(store: Store, input: OrderInput): Promise<CreateOrderResult> {
-  const customer_name = clean(input.customerName, 80);
+export function validateCustomer(input: CustomerInput): { ok: true; value: Required<CustomerInput> } | { ok: false; error: string } {
+  const name = clean(input.name, 80);
   const phone = clean(input.phone, 20).replace(/[^\d+]/g, "");
   const city = clean(input.city, 60);
   const address = clean(input.address, 300);
-  const notes = clean(input.notes, 500) || null;
-
-  if (customer_name.length < 2) return { ok: false, error: "اكتب اسمك من فضلك" };
+  const notes = clean(input.notes, 500);
+  if (name.length < 2) return { ok: false, error: "اكتب الاسم من فضلك" };
   if (phone.replace(/\D/g, "").length < 9) return { ok: false, error: "رقم الهاتف غير صحيح" };
   if (!city || address.length < 4) return { ok: false, error: "اكتب المدينة والعنوان بالتفصيل" };
-  if (!Array.isArray(input.items) || input.items.length === 0 || input.items.length > 50) {
-    return { ok: false, error: "السلة فاضية" };
-  }
+  return { ok: true, value: { name, phone, city, address, notes } };
+}
 
-  const products = await getProducts(store.id);
-  const lines: OrderLine[] = [];
-  for (const item of input.items) {
-    const product = products.find((p) => p.id === item.productId);
-    const qty = Math.floor(Number(item.qty));
-    if (!product || !Number.isFinite(qty) || qty < 1 || qty > 99) continue;
-    if (product.stock != null && product.stock < qty) {
-      return { ok: false, error: `الكمية المطلوبة من "${product.title}" غير متوفرة` };
-    }
-    lines.push({ productId: product.id, title: product.title, price: product.price, qty });
+/** Turns database error codes from place_order into a message for people. */
+function orderError(message: string): string {
+  const at = message.indexOf(":");
+  const code = at === -1 ? message : message.slice(0, at);
+  const detail = at === -1 ? "" : message.slice(at + 1);
+  switch (code) {
+    case "OUT_OF_STOCK":
+      return `الكمية المطلوبة من "${detail?.trim()}" غير متوفرة`;
+    case "NOT_AVAILABLE":
+      return `المنتج "${detail?.trim()}" لم يعد متوفراً`;
+    case "VARIANT_REQUIRED":
+      return `اختار المقاس أو اللون لـ "${detail?.trim()}"`;
+    case "EMPTY":
+      return "السلة فاضية";
+    default:
+      return "صار خطأ، جرب مرة تانية";
   }
-  if (lines.length === 0) return { ok: false, error: "المنتجات بالسلة لم تعد متوفرة" };
+}
 
-  const total = Math.round(lines.reduce((s, l) => s + l.price * l.qty, 0) * 100) / 100;
-  const base = { customer_name, phone, city, address, notes, items: lines, total };
+/**
+ * Saves an order. Prices and stock are checked in the database, never taken
+ * from the browser, and stock is deducted in the same step.
+ */
+export async function createOrder(
+  store: Store,
+  customer: CustomerInput,
+  items: CartItem[],
+  source: "online" | "manual" = "online",
+): Promise<CreateOrderResult> {
+  const c = validateCustomer(customer);
+  if (!c.ok) return c;
+  const clean = (Array.isArray(items) ? items : [])
+    .slice(0, 50)
+    .map((i) => ({ productId: String(i.productId), variantId: i.variantId ? String(i.variantId) : undefined, qty: Math.floor(Number(i.qty)) }))
+    .filter((i) => Number.isFinite(i.qty) && i.qty >= 1 && i.qty <= 999);
+  if (clean.length === 0) return { ok: false, error: "السلة فاضية" };
 
   if (!hasSupabase || isDemoStore(store.id)) {
     // Demo stores: nothing is saved.
-    return { ok: true, order: { ...base, number: 1000 + Math.floor(Math.random() * 9000) } };
+    const lines: OrderLine[] = [];
+    for (const i of clean) {
+      const p = demoProducts.find((x) => x.id === i.productId && x.store_id === store.id);
+      if (!p) continue;
+      const v = findVariant(p, i.variantId);
+      if (hasVariants(p) && !v) return { ok: false, error: orderError(`VARIANT_REQUIRED:${p.title}`) };
+      lines.push({ productId: p.id, variantId: v?.id, title: p.title, variantTitle: v?.title, price: v?.price ?? p.price, qty: i.qty });
+    }
+    if (!lines.length) return { ok: false, error: "السلة فاضية" };
+    const total = lines.reduce((s, l) => s + l.price * l.qty, 0);
+    const v = c.value;
+    return {
+      ok: true,
+      order: { id: "demo", number: 1000 + Math.floor(Math.random() * 9000), items: lines, total, customer_name: v.name, phone: v.phone, city: v.city, address: v.address, notes: v.notes || null },
+    };
   }
 
-  const { data, error } = await supabaseAdmin()
-    .from("orders")
-    .insert({ store_id: store.id, ...base })
-    .select("number")
-    .single();
+  const v = c.value;
+  const { data, error } = await supabaseAdmin().rpc("place_order", {
+    p_store: store.id,
+    p_customer: { name: v.name, phone: v.phone, city: v.city, address: v.address },
+    p_items: clean,
+    p_source: source,
+    p_note: v.notes || null,
+  });
   if (error || !data) {
     console.error("createOrder", error?.message);
-    return { ok: false, error: "صار خطأ، جرب مرة تانية" };
+    return { ok: false, error: orderError(error?.message ?? "") };
   }
-  return { ok: true, order: { ...base, number: data.number as number } };
+  const r = data as { id: string; number: number; total: number; items: OrderLine[] };
+  return {
+    ok: true,
+    order: { id: r.id, number: r.number, items: r.items, total: Number(r.total), customer_name: v.name, phone: v.phone, city: v.city, address: v.address, notes: v.notes || null },
+  };
 }

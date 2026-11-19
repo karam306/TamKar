@@ -17,7 +17,7 @@ export default async function SettingsPage() {
           delivery_note: store.delivery_note ?? "",
         }}
       />
-      <section className="space-y-2 rounded-theme bg-white p-5 text-sm">
+      <section className="space-y-2 card p-5 text-sm">
         <h2 className="text-lg">الحساب والاشتراك</h2>
         <p>
           الإيميل: <span dir="ltr">{user.email}</span>

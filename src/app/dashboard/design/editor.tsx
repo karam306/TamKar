@@ -41,7 +41,7 @@ export function DesignEditor({ initial, previewUrl, publicUrl }: { initial: Desi
       <div className="space-y-4">
         <h1 className="text-2xl">تصميم المتجر</h1>
 
-        <section className="space-y-3 rounded-theme bg-white p-5">
+        <section className="space-y-3 card p-5">
           <h2 className="font-semibold">القالب</h2>
           <div className="grid gap-2">
             {THEMES.map((t) => (
@@ -61,7 +61,7 @@ export function DesignEditor({ initial, previewUrl, publicUrl }: { initial: Desi
           </div>
         </section>
 
-        <section className="space-y-3 rounded-theme bg-white p-5">
+        <section className="space-y-3 card p-5">
           <h2 className="font-semibold">اللون والشعار</h2>
           <div className="flex items-center gap-3 text-sm">
             <input type="color" value={color || defaultColor} onChange={(e) => setColor(e.target.value)} className="h-10 w-14 cursor-pointer rounded border border-black/10" />
@@ -75,7 +75,7 @@ export function DesignEditor({ initial, previewUrl, publicUrl }: { initial: Desi
           <SingleImage label="الشعار (اختياري)" value={logo} onChange={setLogo} />
         </section>
 
-        <section className="space-y-3 rounded-theme bg-white p-5">
+        <section className="space-y-3 card p-5">
           <h2 className="font-semibold">أقسام الصفحة الرئيسية</h2>
           <p className="text-xs text-muted">رتّب الأقسام بالأسهم، واضغط على أي قسم لتعدّل محتواه.</p>
           <ul className="space-y-2">

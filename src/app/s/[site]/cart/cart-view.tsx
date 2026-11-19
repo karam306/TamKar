@@ -1,23 +1,35 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useStore } from "@/components/store-context";
 import { StoreLink } from "@/components/store-ui";
 import { formatPrice } from "@/lib/format";
-import { placeOrder } from "./actions";
+import { getCartLines, placeOrder, type CartLine } from "./actions";
 
-type P = { id: string; title: string; price: number; image: string; stock: number | null };
+const keyOf = (productId: string, variantId?: string) => `${productId}|${variantId ?? ""}`;
 
-export function CartView({ site, products, defaultCity }: { site: string; products: P[]; defaultCity: string }) {
+export function CartView({ site, defaultCity }: { site: string; defaultCity: string }) {
   const { cart, setQty, clear, currency, ready } = useStore();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState("");
   const [done, setDone] = useState<{ number: number; whatsappUrl: string } | null>(null);
+  const [details, setDetails] = useState<Record<string, CartLine> | null>(null);
 
-  const lines = cart
-    .map((i) => ({ ...i, product: products.find((p) => p.id === i.productId) }))
-    .filter((l): l is typeof l & { product: P } => Boolean(l.product));
-  const total = lines.reduce((s, l) => s + l.product.price * l.qty, 0);
+  // Fetch current prices for the items in the cart (only when the set of items changes).
+  const itemsKey = cart.map((i) => keyOf(i.productId, i.variantId)).sort().join(",");
+  useEffect(() => {
+    if (!ready) return;
+    let alive = true;
+    getCartLines(
+      site,
+      itemsKey ? itemsKey.split(",").map((k) => ({ productId: k.split("|")[0], variantId: k.split("|")[1] || undefined, qty: 1 })) : [],
+    ).then((lines) => {
+      if (alive) setDetails(Object.fromEntries(lines.map((l) => [keyOf(l.productId, l.variantId), l])));
+    });
+    return () => {
+      alive = false;
+    };
+  }, [site, itemsKey, ready]);
 
   if (done) {
     return (
@@ -35,7 +47,12 @@ export function CartView({ site, products, defaultCity }: { site: string; produc
     );
   }
 
-  if (!ready) return <div className="py-24 text-center text-muted">...</div>;
+  if (!ready || (cart.length > 0 && details === null)) return <div className="py-24 text-center text-muted">...</div>;
+
+  const lines = cart
+    .map((i) => ({ ...i, info: details?.[keyOf(i.productId, i.variantId)] }))
+    .filter((l): l is typeof l & { info: CartLine } => Boolean(l.info));
+  const total = lines.reduce((s, l) => s + l.info.price * l.qty, 0);
 
   if (lines.length === 0) {
     return (
@@ -57,7 +74,7 @@ export function CartView({ site, products, defaultCity }: { site: string; produc
         city: String(form.get("city") || ""),
         address: String(form.get("address") || ""),
         notes: String(form.get("notes") || ""),
-        items: cart,
+        items: lines.map((l) => ({ productId: l.productId, variantId: l.variantId, qty: l.qty })),
       });
       if (!res.ok) return setError(res.error);
       clear();
@@ -71,19 +88,21 @@ export function CartView({ site, products, defaultCity }: { site: string; produc
         <h1 className="mb-6 text-3xl">السلة</h1>
         <ul className="divide-y divide-black/5">
           {lines.map((l) => (
-            <li key={l.productId} className="flex items-center gap-4 py-4">
+            <li key={keyOf(l.productId, l.variantId)} className="flex items-center gap-4 py-4">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={l.product.image} alt="" className="h-20 w-20 rounded-theme bg-surface object-cover" />
+              <img src={l.info.image || "/demo/k1.svg"} alt="" className="h-20 w-20 rounded-theme bg-surface object-cover" />
               <div className="flex-1">
-                <div className="mb-1 text-sm leading-6">{l.product.title}</div>
-                <div className="text-sm text-primary">{formatPrice(l.product.price, currency)}</div>
+                <div className="text-sm leading-6">{l.info.title}</div>
+                {l.info.variantTitle && <div className="text-xs text-muted">{l.info.variantTitle}</div>}
+                <div className="text-sm text-primary">{formatPrice(l.info.price, currency)}</div>
+                {!l.info.available && <div className="text-xs text-red-700">نفدت الكمية</div>}
               </div>
               <div className="flex items-center rounded-theme border border-black/10">
-                <button type="button" className="px-3 py-1 text-lg" onClick={() => setQty(l.productId, l.qty + 1)} aria-label="زيادة">
+                <button type="button" className="px-3 py-1 text-lg" onClick={() => setQty(l.productId, l.qty + 1, l.variantId)} aria-label="زيادة">
                   +
                 </button>
                 <span className="w-8 text-center">{l.qty}</span>
-                <button type="button" className="px-3 py-1 text-lg" onClick={() => setQty(l.productId, l.qty - 1)} aria-label="إنقاص">
+                <button type="button" className="px-3 py-1 text-lg" onClick={() => setQty(l.productId, l.qty - 1, l.variantId)} aria-label="إنقاص">
                   −
                 </button>
               </div>

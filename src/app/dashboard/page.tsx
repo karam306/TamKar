@@ -48,13 +48,13 @@ export default async function DashboardHome({ searchParams }: { searchParams: Pr
         <Stat label="المنتجات" value={String(productCount)} href="/dashboard/products" />
       </div>
 
-      <section id="share" className="rounded-theme bg-white p-5">
+      <section id="share" className="card p-5">
         <h2 className="mb-2 text-lg">رابط متجرك</h2>
         <CopyLink url={url} />
       </section>
 
       {steps.some((s) => !s.done) && (
-        <section className="rounded-theme bg-white p-5">
+        <section className="card p-5">
           <h2 className="mb-3 text-lg">خطوات البداية</h2>
           <ul className="space-y-2">
             {steps.map((s) => (
@@ -71,7 +71,7 @@ export default async function DashboardHome({ searchParams }: { searchParams: Pr
         </section>
       )}
 
-      <section className="rounded-theme bg-white p-5">
+      <section className="card p-5">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-lg">آخر الطلبات</h2>
           <Link href="/dashboard/orders" className="text-sm text-primary">
@@ -104,7 +104,7 @@ export default async function DashboardHome({ searchParams }: { searchParams: Pr
 
 function Stat({ label, value, sub, href }: { label: string; value: string; sub?: string; href?: string }) {
   const body = (
-    <div className="rounded-theme bg-white p-5">
+    <div className="card p-5">
       <div className="text-sm text-muted">{label}</div>
       <div className="mt-1 text-2xl font-bold">{value}</div>
       {sub && <div className="text-xs text-muted">{sub}</div>}

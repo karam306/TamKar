@@ -40,9 +40,48 @@ export type Product = {
   category?: string | null;
   stock?: number | null; // null = unlimited
   active: boolean;
+  sku?: string | null;
+  options?: ProductOption[];
+  variants?: Variant[];
+  collection_ids?: string[];
 };
 
-export type CartItem = { productId: string; qty: number };
+export type ProductOption = { name: string; values: string[] };
+
+export type Variant = {
+  id: string;
+  title: string; // "M / أحمر"
+  options: string[];
+  price: number;
+  compare_at_price?: number | null;
+  stock?: number | null;
+  sku?: string | null;
+};
+
+export type Collection = {
+  id: string;
+  store_id: string;
+  title: string;
+  handle: string;
+  description?: string | null;
+  image?: string | null;
+};
+
+export type Customer = {
+  id: string;
+  store_id: string;
+  name: string;
+  phone: string;
+  city?: string | null;
+  address?: string | null;
+  note?: string | null;
+  orders_count: number;
+  total_spent: number;
+  last_order_at?: string | null;
+  created_at: string;
+};
+
+export type CartItem = { productId: string; variantId?: string; qty: number };
 
 export type OrderInput = {
   customerName: string;
@@ -53,7 +92,17 @@ export type OrderInput = {
   items: CartItem[];
 };
 
-export type OrderLine = { productId: string; title: string; price: number; qty: number };
+export type OrderLine = {
+  productId: string;
+  variantId?: string | null;
+  title: string;
+  variantTitle?: string | null;
+  price: number;
+  qty: number;
+  image?: string | null;
+};
+
+export type OrderStatus = "new" | "confirmed" | "shipped" | "delivered" | "cancelled";
 
 export type Order = {
   id: string;
@@ -66,6 +115,10 @@ export type Order = {
   notes?: string | null;
   items: OrderLine[];
   total: number;
-  status: "new" | "confirmed" | "delivered" | "cancelled";
+  status: OrderStatus;
+  payment_status?: "pending" | "paid";
+  customer_id?: string | null;
+  source?: "online" | "manual";
+  merchant_note?: string | null;
   created_at: string;
 };

@@ -1,4 +1,4 @@
-import type { Product, Store } from "./types";
+import type { Collection, Product, Store } from "./types";
 
 // Sample stores used when Supabase is not configured (demo mode).
 // Each one shows a different template so merchants can compare.
@@ -126,21 +126,38 @@ const p = (
 
 export const demoProducts: Product[] = [
   // Kitchen store
-  p("k1", "s-kitchen", "طقم صحون سيراميك 18 قطعة", 34, "صحون", "/demo/k1.svg", { compare_at_price: 42 }),
-  p("k2", "s-kitchen", "طقم ملاعق وشوك ستانلس 24 قطعة", 19, "ملاعق وشوك", "/demo/k2.svg"),
+  p("k1", "s-kitchen", "طقم صحون سيراميك 18 قطعة", 34, "صحون", "/demo/k1.svg", { compare_at_price: 42, collection_ids: ["c-sets"] }),
+  p("k2", "s-kitchen", "طقم ملاعق وشوك ستانلس 24 قطعة", 19, "ملاعق وشوك", "/demo/k2.svg", { collection_ids: ["c-sets"] }),
   p("k3", "s-kitchen", "كاسات زجاج 6 قطع", 9.5, "كاسات", "/demo/k3.svg"),
   p("k4", "s-kitchen", "طنجرة ضغط 7 لتر", 28, "طناجر", "/demo/k4.svg", { compare_at_price: 35 }),
   p("k5", "s-kitchen", "صينية تقديم خشب", 12, "تقديم", "/demo/k5.svg"),
   p("k6", "s-kitchen", "طقم فناجين قهوة عربية", 15, "كاسات", "/demo/k6.svg"),
-  p("k7", "s-kitchen", "طقم طناجر جرانيت 5 قطع", 59, "طناجر", "/demo/k7.svg"),
+  p("k7", "s-kitchen", "طقم طناجر جرانيت 5 قطع", 59, "طناجر", "/demo/k7.svg", { collection_ids: ["c-sets"] }),
   p("k8", "s-kitchen", "سكاكين مطبخ مع حامل", 22, "ملاعق وشوك", "/demo/k8.svg"),
   // Fashion store
-  p("f1", "s-fashion", "فستان صوف طويل", 38, "فساتين", "/demo/f1.svg", { compare_at_price: 48 }),
-  p("f2", "s-fashion", "جاكيت جينز", 32, "جاكيتات", "/demo/f2.svg"),
+  p("f1", "s-fashion", "فستان صوف طويل", 38, "فساتين", "/demo/f1.svg", {
+    compare_at_price: 48,
+    options: [
+      { name: "المقاس", values: ["S", "M", "L"] },
+      { name: "اللون", values: ["أسود", "خمري"] },
+    ],
+    variants: ["S", "M", "L"].flatMap((size) =>
+      ["أسود", "خمري"].map((color) => ({
+        id: `f1-${size}-${color}`,
+        title: `${size} / ${color}`,
+        options: [size, color],
+        price: size === "L" ? 42 : 38,
+        compare_at_price: 48,
+        stock: size === "S" && color === "خمري" ? 0 : null,
+      })),
+    ),
+    collection_ids: ["c-new"],
+  }),
+  p("f2", "s-fashion", "جاكيت جينز", 32, "جاكيتات", "/demo/f2.svg", { collection_ids: ["c-new"] }),
   p("f3", "s-fashion", "بلوزة قطن", 14, "بلايز", "/demo/f3.svg"),
   p("f4", "s-fashion", "بنطال واسع", 21, "بناطيل", "/demo/f4.svg"),
   p("f5", "s-fashion", "شال كشمير", 11, "إكسسوارات", "/demo/f5.svg"),
-  p("f6", "s-fashion", "معطف شتوي", 65, "جاكيتات", "/demo/f6.svg"),
+  p("f6", "s-fashion", "معطف شتوي", 65, "جاكيتات", "/demo/f6.svg", { collection_ids: ["c-new"] }),
   // Sweets store
   p("h1", "s-sweets", "معمول تمر، كيلو", 95000, "معمول", "/demo/h1.svg"),
   p("h2", "s-sweets", "بقلاوة مشكلة، كيلو", 180000, "بقلاوة", "/demo/h2.svg"),
@@ -148,4 +165,9 @@ export const demoProducts: Product[] = [
   p("h4", "s-sweets", "بلورية فستق، كيلو", 240000, "بقلاوة", "/demo/h4.svg", { compare_at_price: 260000 }),
   p("h5", "s-sweets", "علبة ضيافة مشكلة", 150000, "علب هدايا", "/demo/h5.svg"),
   p("h6", "s-sweets", "مبرومة، كيلو", 210000, "بقلاوة", "/demo/h6.svg"),
+];
+
+export const demoCollections: Collection[] = [
+  { id: "c-new", store_id: "s-fashion", title: "تشكيلة الشتاء", handle: "winter", description: "قطع دافية لموسم البرد" },
+  { id: "c-sets", store_id: "s-kitchen", title: "أطقم كاملة", handle: "sets", description: "أطقم جاهزة لسفرتك" },
 ];

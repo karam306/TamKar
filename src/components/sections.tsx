@@ -1,20 +1,23 @@
-import { categoriesOf } from "@/lib/data";
 import { whatsappLink } from "@/lib/format";
-import type { Product, Section, Store } from "@/lib/types";
+import type { Collection, Product, Section, Store } from "@/lib/types";
 import { ProductCard, StoreLink } from "./store-ui";
 
+type Data = { store: Store; products: Product[]; categories: string[]; collections: Collection[] };
+
 /** Draws a store's home page from its list of sections, in order. */
-export function Sections({ store, products }: { store: Store; products: Product[] }) {
+export function Sections(data: Data) {
   return (
     <>
-      {store.sections.filter((s) => !s.hidden).map((section, i) => (
-        <SectionView key={i} section={section} store={store} products={products} />
-      ))}
+      {data.store.sections
+        .filter((s) => !s.hidden)
+        .map((section, i) => (
+          <SectionView key={i} section={section} {...data} />
+        ))}
     </>
   );
 }
 
-function SectionView({ section, store, products }: { section: Section; store: Store; products: Product[] }) {
+function SectionView({ section, store, products, categories, collections }: Data & { section: Section }) {
   switch (section.type) {
     case "announcement":
       return <div className="bg-primary px-4 py-2 text-center text-sm text-white">{section.text}</div>;
@@ -40,18 +43,38 @@ function SectionView({ section, store, products }: { section: Section; store: St
       );
 
     case "categories": {
-      const cats = categoriesOf(products);
-      if (cats.length === 0) return null;
+      // Collections first (chosen by the merchant); otherwise product types.
+      const links = collections.length
+        ? collections.map((c) => ({ label: c.title, href: `/collections/${c.handle}`, image: c.image }))
+        : categories.map((c) => ({ label: c, href: `/products?c=${encodeURIComponent(c)}`, image: null as string | null | undefined }));
+      if (links.length === 0) return null;
+      const withImages = links.some((l) => l.image);
       return (
         <section className="mx-auto max-w-6xl px-4 pt-12">
           {section.title && <h2 className="mb-4 text-2xl">{section.title}</h2>}
-          <div className="flex flex-wrap gap-2">
-            {cats.map((c) => (
-              <StoreLink key={c} href={`/products?c=${encodeURIComponent(c)}`} className="rounded-theme border border-black/10 bg-surface px-4 py-2 text-sm hover:border-primary hover:text-primary">
-                {c}
-              </StoreLink>
-            ))}
-          </div>
+          {withImages ? (
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {links.map((l) => (
+                <StoreLink key={l.href} href={l.href} className="group overflow-hidden rounded-theme bg-surface">
+                  {l.image ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={l.image} alt="" loading="lazy" className="aspect-square w-full object-cover transition-transform group-hover:scale-105" />
+                  ) : (
+                    <div className="aspect-square w-full bg-primary/10" />
+                  )}
+                  <div className="p-3 text-center font-semibold">{l.label}</div>
+                </StoreLink>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {links.map((l) => (
+                <StoreLink key={l.href} href={l.href} className="rounded-theme border border-black/10 bg-surface px-4 py-2 text-sm hover:border-primary hover:text-primary">
+                  {l.label}
+                </StoreLink>
+              ))}
+            </div>
+          )}
         </section>
       );
     }

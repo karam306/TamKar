@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { AddToCart, Price, ProductCard, StoreLink } from "@/components/store-ui";
-import { getProduct, getProducts, getStore } from "@/lib/data";
+import { ProductGallery } from "@/components/product-gallery";
+import { ProductCard, StoreLink } from "@/components/store-ui";
+import { SimpleBuy, VariantPicker } from "@/components/variant-picker";
+import { getProduct, getStore, listProducts } from "@/lib/data";
 import { whatsappLink } from "@/lib/format";
+import { hasVariants } from "@/lib/product-utils";
 
 type Props = { params: Promise<{ site: string; id: string }> };
 
@@ -10,7 +13,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { site, id } = await params;
   const store = await getStore(site);
   const product = store ? await getProduct(store.id, id) : null;
-  return product ? { title: product.title, openGraph: { images: product.images.slice(0, 1) } } : {};
+  return product
+    ? { title: product.title, description: product.description?.slice(0, 160), openGraph: { images: product.images.slice(0, 1) } }
+    : {};
 }
 
 export default async function ProductPage({ params }: Props) {
@@ -20,8 +25,9 @@ export default async function ProductPage({ params }: Props) {
   const product = await getProduct(store.id, id);
   if (!product) notFound();
 
-  const related = (await getProducts(store.id)).filter((p) => p.id !== product.id && p.category === product.category).slice(0, 4);
-  const soldOut = product.stock === 0;
+  const related = product.category
+    ? (await listProducts(store.id, { category: product.category, perPage: 5 })).items.filter((p) => p.id !== product.id).slice(0, 4)
+    : [];
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
@@ -36,20 +42,11 @@ export default async function ProductPage({ params }: Props) {
       </nav>
 
       <div className="grid gap-8 md:grid-cols-2">
-        <div className="grid gap-3">
-          {product.images.map((src, i) => (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img key={i} src={src} alt={product.title} className="aspect-square w-full rounded-theme bg-surface object-cover" loading={i === 0 ? "eager" : "lazy"} />
-          ))}
-        </div>
+        <ProductGallery images={product.images} title={product.title} />
 
         <div className="flex flex-col gap-5">
           <h1 className="text-3xl leading-snug">{product.title}</h1>
-          <Price amount={product.price} compare={product.compare_at_price} className="text-2xl" />
-          {product.description && <p className="leading-8 text-muted">{product.description}</p>}
-          <div className="max-w-sm">
-            <AddToCart productId={product.id} disabled={soldOut} full />
-          </div>
+          {hasVariants(product) ? <VariantPicker product={product} /> : <SimpleBuy product={product} />}
           <a
             href={whatsappLink(store.whatsapp, `مرحبا، عندي سؤال عن: ${product.title}`)}
             target="_blank"
@@ -62,6 +59,7 @@ export default async function ProductPage({ params }: Props) {
             <li>💵 الدفع عند الاستلام</li>
             {store.delivery_note && <li>🚚 {store.delivery_note}</li>}
           </ul>
+          {product.description && <div className="whitespace-pre-line leading-8 text-muted">{product.description}</div>}
         </div>
       </div>
 

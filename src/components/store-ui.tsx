@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { formatPrice } from "@/lib/format";
+import { hasVariants, isSoldOut, priceRange } from "@/lib/product-utils";
 import type { Product } from "@/lib/types";
 import { useStore } from "./store-context";
 
@@ -21,7 +22,21 @@ export function CartButton() {
   );
 }
 
-export function AddToCart({ productId, disabled, full }: { productId: string; disabled?: boolean; full?: boolean }) {
+export function AddToCart({
+  productId,
+  variantId,
+  disabled,
+  full,
+  qty = 1,
+  label,
+}: {
+  productId: string;
+  variantId?: string;
+  disabled?: boolean;
+  full?: boolean;
+  qty?: number;
+  label?: string;
+}) {
   const { add } = useStore();
   const [added, setAdded] = useState(false);
   return (
@@ -29,44 +44,57 @@ export function AddToCart({ productId, disabled, full }: { productId: string; di
       type="button"
       disabled={disabled}
       onClick={() => {
-        add(productId);
+        add(productId, qty, variantId);
         setAdded(true);
         setTimeout(() => setAdded(false), 1500);
       }}
       className={`btn ${full ? "w-full" : "w-full text-sm !py-2"}`}
     >
-      {disabled ? "نفدت الكمية" : added ? "✓ انضاف للسلة" : "أضف للسلة"}
+      {added ? "✓ انضاف للسلة" : label || (disabled ? "نفدت الكمية" : "أضف للسلة")}
     </button>
   );
 }
 
-export function Price({ amount, compare, className = "" }: { amount: number; compare?: number | null; className?: string }) {
+export function Price({ amount, compare, from, className = "" }: { amount: number; compare?: number | null; from?: boolean; className?: string }) {
   const { currency } = useStore();
   return (
     <span className={`flex flex-wrap items-baseline gap-2 ${className}`}>
-      <span className="font-semibold text-primary">{formatPrice(amount, currency)}</span>
-      {compare && compare > amount ? (
-        <span className="text-sm text-muted line-through">{formatPrice(compare, currency)}</span>
-      ) : null}
+      <span className="font-semibold text-primary">
+        {from && <span className="text-sm font-normal text-muted">من </span>}
+        {formatPrice(amount, currency)}
+      </span>
+      {compare && compare > amount ? <span className="text-sm text-muted line-through">{formatPrice(compare, currency)}</span> : null}
     </span>
   );
 }
 
 export function ProductCard({ product }: { product: Product }) {
   const { base } = useStore();
-  const soldOut = product.stock === 0;
+  const soldOut = isSoldOut(product);
+  const range = priceRange(product);
+  const href = `${base}/p/${product.id}`;
   return (
     <div className="flex flex-col overflow-hidden rounded-theme bg-surface">
-      <Link href={`${base}/p/${product.id}`} className="block aspect-square overflow-hidden bg-white">
+      <Link href={href} className="relative block aspect-square overflow-hidden bg-white">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={product.images[0] || "/demo/k1.svg"} alt={product.title} loading="lazy" className="h-full w-full object-cover transition-transform duration-300 hover:scale-105" />
+        {soldOut && <span className="absolute right-2 top-2 rounded-full bg-black/70 px-2 py-0.5 text-xs text-white">نفدت الكمية</span>}
+        {!soldOut && range.compare && range.compare > range.min && (
+          <span className="absolute right-2 top-2 rounded-full bg-primary px-2 py-0.5 text-xs text-white">خصم</span>
+        )}
       </Link>
       <div className="flex flex-1 flex-col gap-2 p-3">
-        <Link href={`${base}/p/${product.id}`} className="line-clamp-2 text-sm leading-6">
+        <Link href={href} className="line-clamp-2 text-sm leading-6">
           {product.title}
         </Link>
-        <Price amount={product.price} compare={product.compare_at_price} className="mt-auto" />
-        <AddToCart productId={product.id} disabled={soldOut} />
+        <Price amount={range.min} compare={range.compare} from={range.max > range.min} className="mt-auto" />
+        {hasVariants(product) ? (
+          <Link href={href} className={`btn w-full text-sm !py-2 ${soldOut ? "pointer-events-none opacity-50" : ""}`}>
+            {soldOut ? "نفدت الكمية" : "اختار"}
+          </Link>
+        ) : (
+          <AddToCart productId={product.id} disabled={soldOut} />
+        )}
       </div>
     </div>
   );

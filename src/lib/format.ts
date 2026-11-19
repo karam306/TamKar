@@ -15,7 +15,7 @@ export function whatsappOrderLink(
   const lines = [
     `طلب جديد رقم #${order.number} من متجر ${store.name}`,
     "",
-    ...order.items.map((i) => `• ${i.title} × ${i.qty} = ${formatPrice(i.price * i.qty, store.currency)}`),
+    ...order.items.map((i) => `• ${i.title}${i.variantTitle ? ` (${i.variantTitle})` : ""} × ${i.qty} = ${formatPrice(i.price * i.qty, store.currency)}`),
     "",
     `المجموع: ${formatPrice(order.total, store.currency)}`,
     "الدفع: عند الاستلام",
