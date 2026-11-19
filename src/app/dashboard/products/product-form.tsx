@@ -6,6 +6,7 @@ import { Field, FormMessage, SubmitButton } from "@/components/form-ui";
 import { ImageUploader } from "@/components/image-uploader";
 import type { Collection, Product } from "@/lib/types";
 import { saveProduct, uploadImage } from "./actions";
+import { SpecsEditor } from "./specs-editor";
 import { VariantEditor } from "./variant-editor";
 
 export function ProductForm({
@@ -13,11 +14,15 @@ export function ProductForm({
   currency,
   categories,
   collections,
+  optionPresets,
+  specPresets,
 }: {
   product?: Product;
   currency: string;
   categories: string[];
   collections: Collection[];
+  optionPresets: string[];
+  specPresets: string[];
 }) {
   const [state, action] = useActionState(saveProduct, undefined);
   const [withVariants, setWithVariants] = useState((product?.options?.length ?? 0) > 0);
@@ -66,6 +71,8 @@ export function ProductForm({
           </>
         )}
 
+        <SpecsEditor initial={product?.specs ?? []} presets={specPresets} />
+
         <section className="card space-y-3 p-4">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-semibold">الخيارات</h2>
@@ -74,11 +81,11 @@ export function ProductForm({
           {withVariants ? (
             <>
               <input type="hidden" name="price" value={price || "0"} />
-              <VariantEditor initialOptions={product?.options ?? []} initialVariants={product?.variants ?? []} basePrice={price} />
+              <VariantEditor initialOptions={product?.options ?? []} initialVariants={product?.variants ?? []} basePrice={price} presets={optionPresets} />
             </>
           ) : (
             <button type="button" className="text-[13px] font-semibold text-[#005bd3] hover:underline" onClick={() => setWithVariants(true)}>
-              + هالمنتج إله خيارات، مثل المقاس أو اللون
+              + هالمنتج إله خيارات، مثل {optionPresets.slice(0, 2).join(" أو ")}
             </button>
           )}
         </section>

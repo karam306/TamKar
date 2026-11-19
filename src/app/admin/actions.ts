@@ -6,7 +6,8 @@ import { BUSINESS_TYPES } from "@/lib/business-types";
 import { requirePlatformAdmin } from "@/lib/platform-admin";
 import { extendDate, trialEnd } from "@/lib/subscription";
 import { supabaseAdmin } from "@/lib/supabase";
-import { defaultSections, normalizeWhatsapp, RESERVED_SLUGS } from "@/lib/templates";
+import { createTemplatePages, templateStoreFields } from "@/lib/store-setup";
+import { normalizeWhatsapp, RESERVED_SLUGS } from "@/lib/templates";
 
 const str = (f: FormData, k: string, max = 200) => String(f.get(k) ?? "").trim().slice(0, max);
 
@@ -54,9 +55,7 @@ export async function createMerchant(_: CreateResult, form: FormData): Promise<C
       whatsapp,
       city: str(form, "city", 60) || null,
       currency: str(form, "currency", 3) === "SYP" ? "SYP" : "USD",
-      business_type: type,
-      sections: defaultSections(name),
-      delivery_note: "الدفع عند الاستلام",
+      ...templateStoreFields(type, name),
       plan: plan || "trial",
       paid_until: paid,
     })
@@ -66,6 +65,7 @@ export async function createMerchant(_: CreateResult, form: FormData): Promise<C
     await admin.auth.admin.deleteUser(u.user.id);
     return { error: se?.code === "23505" ? "هالرابط مستخدم" : "ما قدرنا ننشئ المتجر" };
   }
+  await createTemplatePages(store.id as string, type, name);
   await admin.from("store_admin").insert({
     store_id: store.id,
     owner_name: str(form, "owner_name", 80) || null,

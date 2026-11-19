@@ -96,8 +96,14 @@ export async function saveProduct(_: FormState, form: FormData): Promise<FormSta
   const wanted = form.getAll("collection_ids").map(String);
   const { data: own } = wanted.length ? await db.from("collections").select("id").eq("store_id", store.id).in("id", wanted) : { data: [] };
 
+  const specs = parseJSON<{ name?: unknown; value?: unknown }[]>(form.get("specs"), [])
+    .map((x) => ({ name: txt(x?.name, 40), value: txt(x?.value, 200) }))
+    .filter((x) => x.name && x.value)
+    .slice(0, 30);
+
   const row = {
     store_id: store.id,
+    specs,
     title,
     description: txt(form.get("description"), 5000) || null,
     price,

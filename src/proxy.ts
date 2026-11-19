@@ -41,7 +41,8 @@ export async function proxy(request: NextRequest) {
   }
 
   const url = request.nextUrl.clone();
-  url.pathname = `/s/${key}${pathname === "/" ? "" : pathname}`;
+  const path = pathname === "/sitemap.xml" ? "/store-sitemap" : pathname === "/robots.txt" ? "/store-robots" : pathname;
+  url.pathname = `/s/${key}${path === "/" ? "" : path}`;
   url.search = search;
   const headers = new Headers(request.headers);
   headers.set("x-store-host", "1"); // links inside the store drop the /s/<key> prefix
@@ -67,5 +68,5 @@ async function refreshSession(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/|api/|demo/|favicon.ico|robots.txt|sitemap.xml).*)"],
+  matcher: ["/((?!_next/|api/|demo/|favicon.ico).*)"],
 };

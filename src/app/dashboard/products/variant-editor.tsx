@@ -6,10 +6,20 @@ import type { ProductOption, Variant } from "@/lib/types";
 
 type Row = Omit<Variant, "price" | "stock" | "compare_at_price"> & { price: string; stock: string; compare_at_price: string };
 
-const PRESETS = ["المقاس", "اللون", "الخامة", "الحجم", "الوزن"];
 
 /** Options (size, colour...) and one row per combination with its own price and stock. */
-export function VariantEditor({ initialOptions, initialVariants, basePrice }: { initialOptions: ProductOption[]; initialVariants: Variant[]; basePrice: string }) {
+export function VariantEditor({
+  initialOptions,
+  initialVariants,
+  basePrice,
+  presets,
+}: {
+  initialOptions: ProductOption[];
+  initialVariants: Variant[];
+  basePrice: string;
+  presets: string[];
+}) {
+  const PRESETS = [...new Set([...presets, "اللون", "الحجم"])];
   const [options, setOptions] = useState<ProductOption[]>(initialOptions);
   const [rows, setRows] = useState<Row[]>(
     initialVariants.map((v) => ({

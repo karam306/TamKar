@@ -15,7 +15,7 @@ export default async function EditProductPage({ params, searchParams }: { params
   const { data } = await m.db.from("products").select("*").eq("id", id).eq("store_id", m.store.id).maybeSingle();
   if (!data) notFound();
   const product = { ...(data as Product), price: Number(data.price), compare_at_price: data.compare_at_price == null ? null : Number(data.compare_at_price) };
-  const { categories, collections } = await formData(m);
+  const { categories, collections, optionPresets, specPresets } = await formData(m);
 
   return (
     <div>
@@ -38,7 +38,7 @@ export default async function EditProductPage({ params, searchParams }: { params
         }
       />
       {created && <p className="card mb-4 border-r-4 border-[#29845a] p-3 text-[13px]">✓ انضاف المنتج</p>}
-      <ProductForm product={product} currency={m.store.currency} categories={categories} collections={collections} />
+      <ProductForm product={product} currency={m.store.currency} categories={categories} collections={collections} optionPresets={optionPresets} specPresets={specPresets} />
       <details className="card mt-6 p-4 text-[13px]">
         <summary className="cursor-pointer font-semibold text-red-700">حذف المنتج</summary>
         <form action={deleteProduct} className="mt-3 flex items-center gap-3">

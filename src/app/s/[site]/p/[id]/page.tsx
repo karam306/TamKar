@@ -62,6 +62,21 @@ export default async function ProductPage({ params }: Props) {
             {store.delivery_note && <li>🚚 {store.delivery_note}</li>}
           </ul>
           {product.description && <div className="whitespace-pre-line leading-8 text-muted">{product.description}</div>}
+          {(product.specs?.length ?? 0) > 0 && (
+            <div>
+              <h2 className="mb-2 text-lg">المواصفات</h2>
+              <table className="w-full overflow-hidden rounded-theme text-sm">
+                <tbody>
+                  {product.specs!.map((s, i) => (
+                    <tr key={i} className={i % 2 ? "bg-bg" : "bg-surface"}>
+                      <th className="w-1/3 p-3 text-right font-semibold">{s.name}</th>
+                      <td className="p-3 text-muted">{s.value}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
 

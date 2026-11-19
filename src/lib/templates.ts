@@ -14,6 +14,11 @@ export const SECTION_LABELS: Record<SectionType, string> = {
   image_text: "صورة ونص",
   testimonials: "آراء الزبائن",
   whatsapp_cta: "زر واتساب",
+  collection_products: "منتجات من مجموعة",
+  image_banner: "بانر صورة",
+  features: "مميزات المتجر",
+  faq: "أسئلة شائعة",
+  rich_text: "نص",
 };
 
 export function newSection(type: SectionType): Section {
@@ -32,6 +37,31 @@ export function newSection(type: SectionType): Section {
       return { type, title: "شو قالوا زباينا", items: [{ name: "زبون", text: "تجربة ممتازة وتوصيل سريع" }] };
     case "whatsapp_cta":
       return { type, title: "عندك سؤال؟", text: "احكينا على واتساب ومنرد عليك بسرعة" };
+    case "collection_products":
+      return { type, title: "وصل حديثاً", limit: 8 };
+    case "image_banner":
+      return { type, title: "عرض خاص", text: "خصومات لفترة محدودة", buttonText: "شوف العرض", link: "/products" };
+    case "features":
+      return {
+        type,
+        items: [
+          { icon: "🚚", title: "توصيل سريع", text: "لكل المحافظات" },
+          { icon: "💵", title: "الدفع عند الاستلام", text: "ادفع لما يوصلك" },
+          { icon: "✅", title: "جودة مضمونة", text: "منتجات أصلية" },
+          { icon: "💬", title: "دعم على واتساب", text: "منرد بسرعة" },
+        ],
+      };
+    case "faq":
+      return {
+        type,
+        title: "أسئلة شائعة",
+        items: [
+          { q: "كيف بدفع؟", a: "الدفع نقداً عند استلام الطلب." },
+          { q: "قديش بياخد التوصيل؟", a: "عادة من يوم لـ 3 أيام حسب المدينة." },
+        ],
+      };
+    case "rich_text":
+      return { type, title: "عن متجرنا", text: "اكتب هون أي شي بدك تحكيه لزبائنك." };
   }
 }
 

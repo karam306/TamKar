@@ -5,11 +5,11 @@ import { ProductForm } from "../product-form";
 
 export default async function NewProductPage() {
   const m = await requireMerchant();
-  const { categories, collections } = await formData(m);
+  const { categories, collections, optionPresets, specPresets } = await formData(m);
   return (
     <div>
       <PageHeader title="أضف منتج" back="/dashboard/products" />
-      <ProductForm currency={m.store.currency} categories={categories} collections={collections} />
+      <ProductForm currency={m.store.currency} categories={categories} collections={collections} optionPresets={optionPresets} specPresets={specPresets} />
     </div>
   );
 }

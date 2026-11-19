@@ -11,5 +11,8 @@ export default async function StoreHome({ params }: { params: Promise<{ site: st
     getCategories(store.id),
     getCollections(store.id),
   ]);
-  return <Sections store={store} products={items} categories={categories} collections={collections} />;
+  const ids = [...new Set(store.sections.flatMap((s) => (s.type === "collection_products" && s.collectionId && !s.hidden ? [s.collectionId] : [])))];
+  const lists = await Promise.all(ids.map((id) => listProducts(store.id, { collectionId: id, perPage: 24 })));
+  const byCollection = Object.fromEntries(ids.map((id, i) => [id, lists[i].items]));
+  return <Sections store={store} products={items} categories={categories} collections={collections} byCollection={byCollection} />;
 }

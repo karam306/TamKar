@@ -1,0 +1,15 @@
+import { PageHeader } from "@/components/admin-ui";
+import { requireMerchant } from "@/lib/auth";
+import type { StoreSeo, StoreSocial } from "@/lib/types";
+import { SeoForm } from "./form";
+
+export default async function SeoPage() {
+  const { store } = await requireMerchant();
+  const s = store as typeof store & { seo?: StoreSeo; social?: StoreSocial };
+  return (
+    <div>
+      <PageHeader title="SEO والسوشال ميديا" back="/dashboard/design" />
+      <SeoForm seo={s.seo ?? {}} social={s.social ?? {}} name={store.name} tagline={store.tagline ?? ""} slug={store.slug} />
+    </div>
+  );
+}

@@ -4,13 +4,13 @@ import { useActionState, useRef, useState } from "react";
 import { Field, FormMessage, SubmitButton } from "@/components/form-ui";
 import { shrink } from "@/components/image-uploader";
 import { SECTION_LABELS, THEMES, newSection } from "@/lib/templates";
-import type { Section, SectionType, ThemeId } from "@/lib/types";
+import type { Collection, Section, SectionType, ThemeId } from "@/lib/types";
 import { uploadImage } from "../products/actions";
 import { saveDesign } from "./actions";
 
 type Design = { theme: ThemeId; primary_color: string; logo_url: string; sections: Section[] };
 
-export function DesignEditor({ initial, previewUrl, publicUrl }: { initial: Design; previewUrl: string; publicUrl: string }) {
+export function DesignEditor({ initial, previewUrl, publicUrl, collections }: { initial: Design; previewUrl: string; publicUrl: string; collections: Pick<Collection, "id" | "title">[] }) {
   const [state, action] = useActionState(saveDesign, undefined);
   const [theme, setTheme] = useState(initial.theme);
   const [color, setColor] = useState(initial.primary_color);
@@ -106,7 +106,7 @@ export function DesignEditor({ initial, previewUrl, publicUrl }: { initial: Desi
                 </div>
                 {open === i && (
                   <div className="space-y-3 border-t border-black/5 p-3">
-                    <SectionFields section={s} onChange={(p) => update(i, p)} />
+                    <SectionFields section={s} onChange={(p) => update(i, p)} collections={collections} />
                   </div>
                 )}
               </li>
@@ -179,7 +179,7 @@ function Text({ label, value, onChange, long }: { label: string; value?: string;
   );
 }
 
-function SectionFields({ section: s, onChange }: { section: Section; onChange: (p: Partial<Section>) => void }) {
+function SectionFields({ section: s, onChange, collections }: { section: Section; onChange: (p: Partial<Section>) => void; collections: Pick<Collection, "id" | "title">[] }) {
   switch (s.type) {
     case "announcement":
       return <Text label="نص الإعلان" value={s.text} onChange={(text) => onChange({ text })} />;
@@ -236,6 +236,84 @@ function SectionFields({ section: s, onChange }: { section: Section; onChange: (
         <>
           <Text label="العنوان" value={s.title} onChange={(title) => onChange({ title })} />
           <Text label="النص" value={s.text} onChange={(text) => onChange({ text })} />
+        </>
+      );
+    case "collection_products":
+      return (
+        <>
+          <Text label="العنوان" value={s.title} onChange={(title) => onChange({ title })} />
+          <Field label="المجموعة">
+            <select className="input" value={s.collectionId ?? ""} onChange={(e) => onChange({ collectionId: e.target.value || undefined })}>
+              <option value="">اختار مجموعة</option>
+              {collections.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.title}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <Field label="كم منتج يظهر">
+            <input type="number" min={2} max={24} className="input" value={s.limit ?? 8} onChange={(e) => onChange({ limit: Number(e.target.value) })} />
+          </Field>
+        </>
+      );
+    case "image_banner":
+      return (
+        <>
+          <SingleImage label="الصورة" value={s.image ?? ""} onChange={(image) => onChange({ image: image || undefined })} />
+          <Text label="العنوان" value={s.title} onChange={(title) => onChange({ title })} />
+          <Text label="النص" value={s.text} onChange={(text) => onChange({ text })} />
+          <Text label="نص الزر" value={s.buttonText} onChange={(buttonText) => onChange({ buttonText })} />
+          <Field label="الزر بيفتح" hint="مثلاً /products أو /collections/offers">
+            <input className="input" dir="ltr" value={s.link ?? ""} onChange={(e) => onChange({ link: e.target.value })} />
+          </Field>
+        </>
+      );
+    case "features":
+      return (
+        <>
+          {s.items.map((item, i) => (
+            <div key={i} className="flex items-start gap-2 rounded-theme bg-surface p-2">
+              <input className="input !w-14 text-center" value={item.icon} onChange={(e) => onChange({ items: s.items.map((x, j) => (j === i ? { ...x, icon: e.target.value } : x)) })} />
+              <div className="flex-1 space-y-1">
+                <input className="input" placeholder="العنوان" value={item.title} onChange={(e) => onChange({ items: s.items.map((x, j) => (j === i ? { ...x, title: e.target.value } : x)) })} />
+                <input className="input" placeholder="وصف قصير" value={item.text ?? ""} onChange={(e) => onChange({ items: s.items.map((x, j) => (j === i ? { ...x, text: e.target.value } : x)) })} />
+              </div>
+              <button type="button" className="text-muted" onClick={() => onChange({ items: s.items.filter((_, j) => j !== i) })} aria-label="احذف">
+                ✕
+              </button>
+            </div>
+          ))}
+          {s.items.length < 6 && (
+            <button type="button" className="text-sm text-primary" onClick={() => onChange({ items: [...s.items, { icon: "⭐", title: "", text: "" }] })}>
+              + أضف ميزة
+            </button>
+          )}
+        </>
+      );
+    case "faq":
+      return (
+        <>
+          <Text label="العنوان" value={s.title} onChange={(title) => onChange({ title })} />
+          {s.items.map((item, i) => (
+            <div key={i} className="space-y-1 rounded-theme bg-surface p-2">
+              <input className="input" placeholder="السؤال" value={item.q} onChange={(e) => onChange({ items: s.items.map((x, j) => (j === i ? { ...x, q: e.target.value } : x)) })} />
+              <textarea className="input" rows={2} placeholder="الجواب" value={item.a} onChange={(e) => onChange({ items: s.items.map((x, j) => (j === i ? { ...x, a: e.target.value } : x)) })} />
+              <button type="button" className="text-xs text-red-700" onClick={() => onChange({ items: s.items.filter((_, j) => j !== i) })}>
+                احذف السؤال
+              </button>
+            </div>
+          ))}
+          <button type="button" className="text-sm text-primary" onClick={() => onChange({ items: [...s.items, { q: "", a: "" }] })}>
+            + أضف سؤال
+          </button>
+        </>
+      );
+    case "rich_text":
+      return (
+        <>
+          <Text label="العنوان" value={s.title} onChange={(title) => onChange({ title })} />
+          <Text label="النص" value={s.text} onChange={(text) => onChange({ text })} long />
         </>
       );
   }

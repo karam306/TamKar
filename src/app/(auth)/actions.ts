@@ -6,7 +6,9 @@ import { supabaseUser } from "@/lib/auth";
 import { isAdminEmail } from "@/lib/platform-admin";
 import { hasSupabase, supabaseAdmin } from "@/lib/supabase";
 import { trialEnd } from "@/lib/subscription";
-import { defaultSections, normalizeWhatsapp, RESERVED_SLUGS } from "@/lib/templates";
+import { BUSINESS_TYPES } from "@/lib/business-types";
+import { createTemplatePages, templateStoreFields } from "@/lib/store-setup";
+import { normalizeWhatsapp, RESERVED_SLUGS } from "@/lib/templates";
 
 const str = (f: FormData, k: string, max = 200) => String(f.get(k) ?? "").trim().slice(0, max);
 
@@ -19,6 +21,8 @@ export async function signup(_: FormState, form: FormData): Promise<FormState> {
   const password = String(form.get("password") ?? "");
   const whatsapp = normalizeWhatsapp(str(form, "whatsapp", 20));
   const city = str(form, "city", 60);
+  const typeRaw = str(form, "business_type", 30);
+  const type = BUSINESS_TYPES.some((b) => b.id === typeRaw) ? typeRaw : "general";
 
   if (storeName.length < 2) return { error: "اكتب اسم المتجر" };
   if (!/^[a-z0-9-]{3,40}$/.test(slug) || slug.startsWith("-") || slug.endsWith("-")) {
@@ -48,23 +52,27 @@ export async function signup(_: FormState, form: FormData): Promise<FormState> {
     return { error: /already|registered|exists/i.test(msg) ? "في حساب بهالإيميل، سجّل دخول" : "ما قدرنا ننشئ الحساب، جرب مرة تانية" };
   }
 
-  const { error: storeError } = await admin.from("stores").insert({
-    owner_id: created.user.id,
-    slug,
-    name: storeName,
-    whatsapp,
-    city: city || null,
-    sections: defaultSections(storeName),
-    delivery_note: "الدفع عند الاستلام",
-    plan: "trial",
-    paid_until: trialEnd(),
-  });
+  const { data: newStore, error: storeError } = await admin
+    .from("stores")
+    .insert({
+      owner_id: created.user.id,
+      slug,
+      name: storeName,
+      whatsapp,
+      city: city || null,
+      ...templateStoreFields(type, storeName),
+      plan: "trial",
+      paid_until: trialEnd(),
+    })
+    .select("id")
+    .single();
   if (storeError) {
     console.error("signup: store insert failed", storeError.code, storeError.message);
     await admin.auth.admin.deleteUser(created.user.id);
     return { error: storeError.code === "23505" ? "هالرابط مستخدم، اختار رابط تاني" : "ما قدرنا ننشئ المتجر، جرب مرة تانية" };
   }
 
+  if (newStore) await createTemplatePages(newStore.id as string, type, storeName);
   const db = await supabaseUser();
   await db.auth.signInWithPassword({ email, password });
   redirect("/dashboard?welcome=1");

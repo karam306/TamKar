@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useActionState, useState } from "react";
 import { Field, FormMessage, SubmitButton } from "@/components/form-ui";
+import { BUSINESS_TYPES } from "@/lib/business-types";
 import { signup } from "../actions";
 
 const root = process.env.NEXT_PUBLIC_ROOT_DOMAIN;
@@ -29,6 +30,18 @@ export default function SignupPage() {
           value={slug}
           onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))}
         />
+      </Field>
+      <Field label="شو بتبيع؟" hint="منجهزلك متجر مناسب لنوع نشاطك">
+        <select name="business_type" required defaultValue="" className="input">
+          <option value="" disabled>
+            اختار نوع النشاط
+          </option>
+          {BUSINESS_TYPES.map((b) => (
+            <option key={b.id} value={b.id}>
+              {b.label}
+            </option>
+          ))}
+        </select>
       </Field>
       <Field label="رقم واتساب لاستقبال الطلبات" hint="مثال: 0912345678">
         <input name="whatsapp" required inputMode="tel" className="input" dir="ltr" style={{ textAlign: "right" }} />

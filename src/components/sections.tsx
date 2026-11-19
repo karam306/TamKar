@@ -1,8 +1,10 @@
 import { whatsappLink } from "@/lib/format";
 import type { Collection, Product, Section, Store } from "@/lib/types";
+import { RichText } from "./rich-text";
+import { FaqItem } from "./faq-item";
 import { ProductCard, StoreLink } from "./store-ui";
 
-type Data = { store: Store; products: Product[]; categories: string[]; collections: Collection[] };
+type Data = { store: Store; products: Product[]; categories: string[]; collections: Collection[]; byCollection?: Record<string, Product[]> };
 
 /** Draws a store's home page from its list of sections, in order. */
 export function Sections(data: Data) {
@@ -17,7 +19,7 @@ export function Sections(data: Data) {
   );
 }
 
-function SectionView({ section, store, products, categories, collections }: Data & { section: Section }) {
+function SectionView({ section, store, products, categories, collections, byCollection }: Data & { section: Section }) {
   switch (section.type) {
     case "announcement":
       return <div className="bg-primary px-4 py-2 text-center text-sm text-white">{section.text}</div>;
@@ -140,6 +142,87 @@ function SectionView({ section, store, products, categories, collections }: Data
               راسلنا على واتساب
             </a>
           </div>
+        </section>
+      );
+
+    case "collection_products": {
+      const col = collections.find((c) => c.id === section.collectionId);
+      const list = (section.collectionId ? byCollection?.[section.collectionId] : []) ?? [];
+      if (!col || list.length === 0) return null;
+      return (
+        <section className="mx-auto max-w-6xl px-4 pt-12">
+          <div className="mb-4 flex items-end justify-between">
+            <h2 className="text-2xl">{section.title || col.title}</h2>
+            <StoreLink href={`/collections/${col.handle}`} className="text-sm text-primary">
+              عرض الكل ←
+            </StoreLink>
+          </div>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+            {list.slice(0, section.limit ?? 8).map((p) => (
+              <ProductCard key={p.id} product={p} />
+            ))}
+          </div>
+        </section>
+      );
+    }
+
+    case "image_banner":
+      return (
+        <section className="mx-auto max-w-6xl px-4 pt-12">
+          <div className="relative overflow-hidden rounded-theme bg-primary">
+            {section.image && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={section.image} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+            )}
+            <div className={`relative flex min-h-[220px] flex-col items-start justify-center gap-3 p-8 text-white ${section.image ? "bg-black/35" : ""}`}>
+              {section.title && <h2 className="text-3xl">{section.title}</h2>}
+              {section.text && <p className="max-w-lg opacity-90">{section.text}</p>}
+              {section.buttonText && (
+                <StoreLink href={section.link || "/products"} className="rounded-theme bg-white px-6 py-2.5 font-semibold text-primary">
+                  {section.buttonText}
+                </StoreLink>
+              )}
+            </div>
+          </div>
+        </section>
+      );
+
+    case "features":
+      if (!section.items.length) return null;
+      return (
+        <section className="mx-auto max-w-6xl px-4 pt-10">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            {section.items.map((f, i) => (
+              <div key={i} className="flex items-center gap-3 rounded-theme bg-surface p-4">
+                <span className="text-2xl">{f.icon}</span>
+                <div>
+                  <div className="font-semibold">{f.title}</div>
+                  {f.text && <div className="text-xs text-muted">{f.text}</div>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      );
+
+    case "faq":
+      if (!section.items.length) return null;
+      return (
+        <section className="mx-auto max-w-3xl px-4 pt-16">
+          {section.title && <h2 className="mb-4 text-center text-2xl">{section.title}</h2>}
+          <div className="divide-y divide-black/10 rounded-theme bg-surface">
+            {section.items.map((f, i) => (
+              <FaqItem key={i} q={f.q} a={f.a} />
+            ))}
+          </div>
+        </section>
+      );
+
+    case "rich_text":
+      return (
+        <section className="mx-auto max-w-3xl px-4 pt-16 text-center">
+          {section.title && <h2 className="mb-3 text-2xl">{section.title}</h2>}
+          <RichText text={section.text} className="text-muted" />
         </section>
       );
 

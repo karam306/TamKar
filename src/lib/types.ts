@@ -9,6 +9,11 @@ export type Section = (
   | { type: "image_text"; title: string; text: string; image?: string }
   | { type: "testimonials"; title?: string; items: { name: string; text: string }[] }
   | { type: "whatsapp_cta"; title: string; text?: string }
+  | { type: "collection_products"; title?: string; collectionId?: string; limit?: number }
+  | { type: "image_banner"; image?: string; title?: string; text?: string; buttonText?: string; link?: string }
+  | { type: "features"; items: { icon: string; title: string; text?: string }[] }
+  | { type: "faq"; title?: string; items: { q: string; a: string }[] }
+  | { type: "rich_text"; title?: string; text: string }
 ) & { hidden?: boolean };
 
 export type SectionType = Section["type"];
@@ -31,7 +36,18 @@ export type Store = {
   meta_pixel_id?: string | null;
   plan?: string | null;
   paid_until?: string | null;
+  business_type?: string | null;
+  menus?: StoreMenus;
+  seo?: StoreSeo;
+  social?: StoreSocial;
 };
+
+export type MenuLink = { label: string; href: string };
+export type StoreMenus = { header?: MenuLink[]; footer?: MenuLink[] };
+export type StoreSeo = { title?: string; description?: string; image?: string };
+export type StoreSocial = { instagram?: string; facebook?: string; tiktok?: string; telegram?: string };
+
+export type StorePage = { id: string; store_id: string; title: string; handle: string; body: string; published: boolean; created_at?: string };
 
 export type ShippingSettings = {
   default_fee?: number | null;
@@ -73,6 +89,7 @@ export type Product = {
   options?: ProductOption[];
   variants?: Variant[];
   collection_ids?: string[];
+  specs?: { name: string; value: string }[];
 };
 
 export type ProductOption = { name: string; values: string[] };

@@ -34,7 +34,16 @@ export const NAV: Item[] = [
   { href: "/dashboard/analytics", label: "التقارير", icon: ICONS.analytics },
   { href: "/dashboard/marketing", label: "التسويق", icon: ICONS.marketing },
   { href: "/dashboard/discounts", label: "الخصومات", icon: ICONS.discounts },
-  { href: "/dashboard/design", label: "تصميم المتجر", icon: ICONS.store },
+  {
+    href: "/dashboard/design",
+    label: "تصميم المتجر",
+    icon: ICONS.store,
+    sub: [
+      { href: "/dashboard/pages", label: "الصفحات" },
+      { href: "/dashboard/navigation", label: "القوائم" },
+      { href: "/dashboard/seo", label: "SEO والسوشال ميديا" },
+    ],
+  },
 ];
 
 export const SETTINGS: Item = {

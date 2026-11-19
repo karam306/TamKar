@@ -3,15 +3,16 @@ import { cache } from "react";
 import { demoCollections, demoProducts, demoStores } from "./demo-data";
 import { findVariant, hasVariants } from "./product-utils";
 import { hasSupabase, supabaseAdmin, supabasePublic } from "./supabase";
-import type { CartItem, Collection, Order, OrderLine, Pricing, Product, Store } from "./types";
+import { templateMenus, templatePages } from "./business-templates";
+import type { CartItem, Collection, Order, OrderLine, Pricing, Product, Store, StorePage } from "./types";
 
 export const isDemoStore = (storeId: string) => storeId.startsWith("s-");
 
 // Must match the columns granted to "anon" in supabase/schema.sql
 const STORE_COLUMNS =
-  "id, slug, name, tagline, logo_url, whatsapp, city, currency, theme, primary_color, sections, delivery_note, status, shipping, meta_pixel_id, plan, paid_until";
+  "id, slug, name, tagline, logo_url, whatsapp, city, currency, theme, primary_color, sections, delivery_note, status, shipping, meta_pixel_id, plan, paid_until, business_type, menus, seo, social";
 const PRODUCT_COLUMNS =
-  "id, store_id, title, description, price, compare_at_price, images, category, stock, active, sku, options, variants, collection_ids";
+  "id, store_id, title, description, price, compare_at_price, images, category, stock, active, sku, options, variants, collection_ids, specs";
 
 const num = (p: Product): Product => ({
   ...p,
@@ -27,7 +28,7 @@ export const getStore = cache(async (key: string): Promise<Store | null> => {
   const k = decodeURIComponent(key).toLowerCase();
   // Sample stores always exist, so the public demo keeps working.
   const demo = demoStores.find((s) => s.slug === k);
-  if (demo) return demo;
+  if (demo) return { ...demo, menus: demo.menus ?? templateMenus(templatePages(demo.business_type, demo.name)) };
   if (!hasSupabase) return null;
   const query = supabasePublic().from("stores").select(STORE_COLUMNS).eq("status", "active");
   const { data, error } = k.includes(".")
@@ -282,3 +283,12 @@ export async function createOrder(
     },
   };
 }
+
+export const getPages = cache(async (storeId: string): Promise<StorePage[]> => {
+  if (isDemoStore(storeId) || !hasSupabase) {
+    const store = demoStores.find((s) => s.id === storeId);
+    return store ? templatePages(store.business_type, store.name).map((p) => ({ ...p, id: p.handle, store_id: storeId, published: true })) : [];
+  }
+  const { data } = await supabasePublic().from("pages").select("id, store_id, title, handle, body, published").eq("store_id", storeId).eq("published", true);
+  return (data as StorePage[]) ?? [];
+});
