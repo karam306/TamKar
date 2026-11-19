@@ -27,6 +27,8 @@ grant all on public.pages to service_role;
 grant select, insert, update, delete on public.pages to authenticated;
 grant select on public.pages to anon;
 
+drop policy if exists "public reads published pages" on public.pages;
+drop policy if exists "owner manages own pages" on public.pages;
 create policy "public reads published pages" on public.pages
   for select using (published and exists (select 1 from public.stores s where s.id = store_id and s.status = 'active'));
 create policy "owner manages own pages" on public.pages
