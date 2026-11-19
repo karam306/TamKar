@@ -9,5 +9,5 @@ export default async function CartPage({ params }: { params: Promise<{ site: str
   const { site } = await params;
   const store = await getStore(site);
   if (!store) notFound();
-  return <CartView site={site} defaultCity={store.city ?? ""} />;
+  return <CartView site={site} defaultCity={store.city ?? ""} cities={(store.shipping?.rates ?? []).map((r) => r.city)} />;
 }

@@ -27,7 +27,34 @@ export type Store = {
   sections: Section[];
   delivery_note?: string;
   status: "active" | "suspended";
+  shipping?: ShippingSettings;
+  meta_pixel_id?: string | null;
 };
+
+export type ShippingSettings = {
+  default_fee?: number | null;
+  free_over?: number | null;
+  rates?: { city: string; fee: number }[];
+};
+
+export type Discount = {
+  id: string;
+  store_id: string;
+  code: string | null;
+  title: string;
+  kind: "percent" | "fixed" | "free_shipping";
+  value: number;
+  min_subtotal: number | null;
+  automatic: boolean;
+  starts_at: string | null;
+  ends_at: string | null;
+  usage_limit: number | null;
+  used_count: number;
+  active: boolean;
+  created_at: string;
+};
+
+export type Pricing = { subtotal: number; discount: number; shipping: number; total: number; code: string | null; free_shipping?: boolean };
 
 export type Product = {
   id: string;
@@ -89,6 +116,7 @@ export type OrderInput = {
   city: string;
   address: string;
   notes?: string;
+  discountCode?: string;
   items: CartItem[];
 };
 
@@ -120,5 +148,9 @@ export type Order = {
   customer_id?: string | null;
   source?: "online" | "manual";
   merchant_note?: string | null;
+  subtotal?: number | null;
+  discount_code?: string | null;
+  discount_amount?: number;
+  shipping_fee?: number;
   created_at: string;
 };

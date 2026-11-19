@@ -24,12 +24,16 @@ export async function GET(req: Request) {
     o.city,
     o.address,
     o.items.map((i) => `${i.title}${i.variantTitle ? ` (${i.variantTitle})` : ""} × ${i.qty}`).join("، "),
+    Number(o.subtotal ?? o.total),
+    Number(o.discount_amount ?? 0),
+    o.discount_code ?? "",
+    Number(o.shipping_fee ?? 0),
     Number(o.total),
     o.payment_status === "paid" ? "مدفوع" : "غير مدفوع",
     STATUS[o.status] ?? o.status,
     o.notes ?? "",
   ]);
-  const file = await buildSheet("الطلبات", ["رقم الطلب", "التاريخ", "الزبون", "الهاتف", "المدينة", "العنوان", "المنتجات", "المجموع", "الدفع", "الحالة", "ملاحظات"], rows);
+  const file = await buildSheet("الطلبات", ["رقم الطلب", "التاريخ", "الزبون", "الهاتف", "المدينة", "العنوان", "المنتجات", "المجموع الفرعي", "الخصم", "كود الخصم", "التوصيل", "المجموع", "الدفع", "الحالة", "ملاحظات"], rows);
   return new Response(new Uint8Array(file), {
     headers: {
       "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

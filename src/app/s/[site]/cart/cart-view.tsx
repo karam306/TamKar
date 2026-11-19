@@ -4,16 +4,25 @@ import { useEffect, useState, useTransition } from "react";
 import { useStore } from "@/components/store-context";
 import { StoreLink } from "@/components/store-ui";
 import { formatPrice } from "@/lib/format";
-import { getCartLines, placeOrder, type CartLine } from "./actions";
+import { contentId } from "@/lib/product-utils";
+import { track } from "@/components/tracking";
+import type { Pricing } from "@/lib/types";
+import { getCartLines, placeOrder, quoteCart, type CartLine } from "./actions";
 
 const keyOf = (productId: string, variantId?: string) => `${productId}|${variantId ?? ""}`;
 
-export function CartView({ site, defaultCity }: { site: string; defaultCity: string }) {
+export function CartView({ site, defaultCity, cities }: { site: string; defaultCity: string; cities: string[] }) {
   const { cart, setQty, clear, currency, ready } = useStore();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState("");
   const [done, setDone] = useState<{ number: number; whatsappUrl: string } | null>(null);
   const [details, setDetails] = useState<Record<string, CartLine> | null>(null);
+  const [city, setCity] = useState(cities.length && !cities.includes(defaultCity) ? "" : defaultCity);
+  const [codeInput, setCodeInput] = useState("");
+  const [code, setCode] = useState("");
+  const [pricing, setPricing] = useState<Pricing | null>(null);
+  const [codeError, setCodeError] = useState("");
+  const [checkoutTracked, setCheckoutTracked] = useState(false);
 
   // Fetch current prices for the items in the cart (only when the set of items changes).
   const itemsKey = cart.map((i) => keyOf(i.productId, i.variantId)).sort().join(",");
@@ -30,6 +39,29 @@ export function CartView({ site, defaultCity }: { site: string; defaultCity: str
       alive = false;
     };
   }, [site, itemsKey, ready]);
+
+  // Price breakdown (discount + delivery) from the server, same rules as checkout.
+  const qtyKey = cart.map((i) => `${keyOf(i.productId, i.variantId)}:${i.qty}`).sort().join(",");
+  useEffect(() => {
+    if (!ready || !qtyKey) return;
+    let alive = true;
+    const t = setTimeout(() => {
+      quoteCart(site, cart, city, code).then((r) => {
+        if (!alive) return;
+        if ("error" in r) {
+          setCodeError(r.error);
+          setCode("");
+        } else {
+          setPricing(r);
+        }
+      });
+    }, 300);
+    return () => {
+      alive = false;
+      clearTimeout(t);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [site, qtyKey, city, code, ready]);
 
   if (done) {
     return (
@@ -52,7 +84,8 @@ export function CartView({ site, defaultCity }: { site: string; defaultCity: str
   const lines = cart
     .map((i) => ({ ...i, info: details?.[keyOf(i.productId, i.variantId)] }))
     .filter((l): l is typeof l & { info: CartLine } => Boolean(l.info));
-  const total = lines.reduce((s, l) => s + l.info.price * l.qty, 0);
+  const subtotal = lines.reduce((s, l) => s + l.info.price * l.qty, 0);
+  const shown = pricing && Math.abs(pricing.subtotal - subtotal) < 0.01 ? pricing : null;
 
   if (lines.length === 0) {
     return (
@@ -74,9 +107,11 @@ export function CartView({ site, defaultCity }: { site: string; defaultCity: str
         city: String(form.get("city") || ""),
         address: String(form.get("address") || ""),
         notes: String(form.get("notes") || ""),
+        discountCode: code || undefined,
         items: lines.map((l) => ({ productId: l.productId, variantId: l.variantId, qty: l.qty })),
       });
       if (!res.ok) return setError(res.error);
+      track.purchase(res.id, res.total, currency, lines.map((l) => ({ id: contentId(l.productId, l.variantId), quantity: l.qty })));
       clear();
       setDone({ number: res.number, whatsappUrl: res.whatsappUrl });
     });
@@ -113,16 +148,71 @@ export function CartView({ site, defaultCity }: { site: string; defaultCity: str
 
       <section className="h-fit rounded-theme bg-surface p-5">
         <h2 className="mb-4 text-xl">معلومات التوصيل</h2>
-        <form action={submit} className="flex flex-col gap-3">
+        <form
+          action={submit}
+          className="flex flex-col gap-3"
+          onFocus={() => {
+            if (checkoutTracked) return;
+            setCheckoutTracked(true);
+            track.initiateCheckout(subtotal, currency, lines.reduce((s, l) => s + l.qty, 0));
+          }}
+        >
           <input name="name" required placeholder="الاسم الكامل" className="input" autoComplete="name" />
           <input name="phone" required placeholder="رقم الموبايل (مثال 0912345678)" className="input" inputMode="tel" autoComplete="tel" dir="ltr" style={{ textAlign: "right" }} />
-          <input name="city" required placeholder="المدينة" defaultValue={defaultCity} className="input" />
+          {cities.length > 0 ? (
+            <select name="city" required value={city} onChange={(e) => setCity(e.target.value)} className="input">
+              <option value="" disabled>
+                اختار المدينة
+              </option>
+              {cities.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+              <option value="أخرى">مدينة تانية</option>
+            </select>
+          ) : (
+            <input name="city" required placeholder="المدينة" value={city} onChange={(e) => setCity(e.target.value)} className="input" />
+          )}
           <textarea name="address" required placeholder="العنوان بالتفصيل (الحي، الشارع، أقرب معلم)" rows={3} className="input" />
           <textarea name="notes" placeholder="ملاحظات (اختياري)" rows={2} className="input" />
 
-          <div className="my-2 flex justify-between border-t border-black/10 pt-4 text-lg">
-            <span>المجموع</span>
-            <span className="font-semibold text-primary">{formatPrice(total, currency)}</span>
+          <div className="flex gap-2">
+            <input
+              value={codeInput}
+              onChange={(e) => {
+                setCodeInput(e.target.value);
+                setCodeError("");
+              }}
+              placeholder="كود الخصم"
+              className="input"
+              dir="ltr"
+            />
+            <button type="button" className="btn btn-outline !px-4" onClick={() => setCode(codeInput.trim())} disabled={!codeInput.trim()}>
+              تطبيق
+            </button>
+          </div>
+          {codeError && <p className="text-sm text-red-700">{codeError}</p>}
+
+          <div className="mt-2 space-y-1.5 border-t border-black/10 pt-4 text-sm">
+            <div className="flex justify-between">
+              <span>المجموع الفرعي</span>
+              <span>{formatPrice(subtotal, currency)}</span>
+            </div>
+            {shown && shown.discount > 0 && (
+              <div className="flex justify-between text-green-700">
+                <span>الخصم {shown.code && `(${shown.code})`}</span>
+                <span>-{formatPrice(shown.discount, currency)}</span>
+              </div>
+            )}
+            <div className="flex justify-between">
+              <span>التوصيل</span>
+              <span>{!city ? "اختار المدينة" : shown ? (shown.shipping ? formatPrice(shown.shipping, currency) : "مجاني") : "..."}</span>
+            </div>
+            <div className="flex justify-between pt-1 text-lg">
+              <span>المجموع</span>
+              <span className="font-semibold text-primary">{formatPrice(shown ? shown.total : subtotal, currency)}</span>
+            </div>
           </div>
           <p className="text-sm text-muted">💵 الدفع عند الاستلام</p>
           {error && <p className="rounded-theme bg-red-50 p-3 text-sm text-red-700">{error}</p>}

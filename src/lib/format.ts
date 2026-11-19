@@ -10,13 +10,27 @@ export function formatPrice(amount: number, currency: Currency): string {
 /** Order summary message the customer sends to the merchant on WhatsApp. */
 export function whatsappOrderLink(
   store: Pick<Store, "whatsapp" | "name" | "currency">,
-  order: { number: number; customer_name: string; phone: string; city: string; address: string; notes?: string | null; items: OrderLine[]; total: number },
+  order: {
+    number: number;
+    customer_name: string;
+    phone: string;
+    city: string;
+    address: string;
+    notes?: string | null;
+    items: OrderLine[];
+    total: number;
+    discount?: number;
+    shipping?: number;
+    discount_code?: string | null;
+  },
 ): string {
   const lines = [
     `طلب جديد رقم #${order.number} من متجر ${store.name}`,
     "",
     ...order.items.map((i) => `• ${i.title}${i.variantTitle ? ` (${i.variantTitle})` : ""} × ${i.qty} = ${formatPrice(i.price * i.qty, store.currency)}`),
     "",
+    order.discount ? `الخصم${order.discount_code ? ` (${order.discount_code})` : ""}: -${formatPrice(order.discount, store.currency)}` : "",
+    order.shipping != null ? `التوصيل: ${order.shipping ? formatPrice(order.shipping, store.currency) : "مجاني"}` : "",
     `المجموع: ${formatPrice(order.total, store.currency)}`,
     "الدفع: عند الاستلام",
     "",

@@ -1,12 +1,14 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
+import { sendDeliveredEvent } from "@/lib/meta";
 import { redirect } from "next/navigation";
 import type { FormState } from "@/components/form-ui";
 import { requireMerchant } from "@/lib/auth";
 import { createOrder } from "@/lib/data";
 import { supabaseAdmin } from "@/lib/supabase";
-import type { CartItem, OrderStatus } from "@/lib/types";
+import type { CartItem, Order, OrderStatus } from "@/lib/types";
 import { ORDER_STATUSES } from "./status";
 
 const label = (s: string) => ORDER_STATUSES.find((x) => x.id === s)?.label ?? s;
@@ -21,8 +23,14 @@ export async function setOrderStatus(form: FormData) {
   const id = String(form.get("id") ?? "");
   const status = String(form.get("status") ?? "") as OrderStatus;
   if (!["new", "confirmed", "shipped", "delivered"].includes(status)) return;
-  const { data } = await db.from("orders").update({ status }).eq("id", id).eq("store_id", store.id).neq("status", "cancelled").select("id").maybeSingle();
-  if (data) await addEvent(id, store.id, `تغيرت الحالة إلى: ${label(status)}`);
+  const { data } = await db.from("orders").update({ status }).eq("id", id).eq("store_id", store.id).neq("status", "cancelled").select("*").maybeSingle();
+  if (data) {
+    await addEvent(id, store.id, `تغيرت الحالة إلى: ${label(status)}`);
+    if (status === "delivered") {
+      const o = data as Order;
+      after(() => sendDeliveredEvent(store, { ...o, total: Number(o.total) }));
+    }
+  }
   revalidatePath(`/dashboard/orders/${id}`);
 }
 
@@ -78,6 +86,7 @@ export async function createManualOrder(_: FormState, form: FormData): Promise<F
     },
     items,
     "manual",
+    String(form.get("discount_code") ?? "") || undefined,
   );
   if (!res.ok) return { error: res.error };
   if (form.get("paid") === "on") {

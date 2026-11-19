@@ -1,10 +1,14 @@
 "use server";
 
-import { createOrder, getProductsByIds, getStore } from "@/lib/data";
+import { after } from "next/server";
+import { eventContext, sendPurchaseEvent } from "@/lib/meta";
+import { createOrder, getProductsByIds, getStore, quote } from "@/lib/data";
 import { whatsappOrderLink } from "@/lib/format";
-import type { CartItem, OrderInput } from "@/lib/types";
+import type { CartItem, OrderInput, Pricing } from "@/lib/types";
 
-export type PlaceOrderResult = { ok: true; number: number; whatsappUrl: string } | { ok: false; error: string };
+export type PlaceOrderResult =
+  | { ok: true; id: string; number: number; total: number; whatsappUrl: string; items: { productId: string; qty: number; price: number }[] }
+  | { ok: false; error: string };
 
 export async function placeOrder(site: string, input: OrderInput): Promise<PlaceOrderResult> {
   const store = await getStore(site);
@@ -13,9 +17,21 @@ export async function placeOrder(site: string, input: OrderInput): Promise<Place
     store,
     { name: input.customerName, phone: input.phone, city: input.city, address: input.address, notes: input.notes },
     input.items,
+    "online",
+    input.discountCode,
   );
   if (!result.ok) return result;
-  return { ok: true, number: result.order.number, whatsappUrl: whatsappOrderLink(store, result.order) };
+  const o = result.order;
+  const ctx = await eventContext();
+  after(() => sendPurchaseEvent(store, o, ctx));
+  return {
+    ok: true,
+    id: o.id,
+    number: o.number,
+    total: o.total,
+    whatsappUrl: whatsappOrderLink(store, o),
+    items: o.items.map((i) => ({ productId: i.productId, qty: i.qty, price: i.price })),
+  };
 }
 
 export type CartLine = {
@@ -50,4 +66,13 @@ export async function getCartLines(site: string, items: CartItem[]): Promise<Car
       },
     ];
   });
+}
+
+/** Subtotal, discount, delivery fee and total for the cart page. */
+export async function quoteCart(site: string, items: CartItem[], city: string, code?: string): Promise<Pricing | { error: string }> {
+  const store = await getStore(site);
+  if (!store) return { error: "المتجر غير موجود" };
+  const lines = await getCartLines(site, items);
+  const subtotal = lines.reduce((s, l) => s + l.price * (items.find((i) => i.productId === l.productId && (i.variantId ?? "") === (l.variantId ?? ""))?.qty ?? 0), 0);
+  return quote(store, Math.round(subtotal * 100) / 100, city, code);
 }

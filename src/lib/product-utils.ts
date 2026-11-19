@@ -34,3 +34,6 @@ export function slugify(input: string): string {
   const s = input.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60);
   return s || `c-${Math.random().toString(36).slice(2, 8)}`;
 }
+
+/** Item id shared by the Meta catalog, Pixel and Conversions API (must match everywhere). */
+export const contentId = (productId: string, variantId?: string | null) => (variantId ? `${productId}_${variantId}` : productId);

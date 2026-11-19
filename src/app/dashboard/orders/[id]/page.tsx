@@ -92,11 +92,21 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
               <div className="flex justify-between">
                 <span>المجموع الفرعي</span>
                 <span className="text-muted">{qty} قطعة</span>
-                <span>{money(Number(o.total))}</span>
+                <span>{money(Number(o.subtotal ?? o.total))}</span>
               </div>
+              {Number(o.discount_amount ?? 0) > 0 && (
+                <div className="flex justify-between">
+                  <span>الخصم</span>
+                  <span className="text-muted" dir="ltr">
+                    {o.discount_code}
+                  </span>
+                  <span>-{money(Number(o.discount_amount))}</span>
+                </div>
+              )}
               <div className="flex justify-between">
                 <span>التوصيل</span>
-                <span>{money(0)}</span>
+                <span className="text-muted">{o.city}</span>
+                <span>{Number(o.shipping_fee ?? 0) ? money(Number(o.shipping_fee)) : "مجاني"}</span>
               </div>
               <div className="flex justify-between border-t border-black/5 pt-2 font-semibold">
                 <span>المجموع</span>

@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProductGallery } from "@/components/product-gallery";
 import { ProductCard, StoreLink } from "@/components/store-ui";
+import { TrackProductView } from "@/components/tracking";
 import { SimpleBuy, VariantPicker } from "@/components/variant-picker";
 import { getProduct, getStore, listProducts } from "@/lib/data";
 import { whatsappLink } from "@/lib/format";
-import { hasVariants } from "@/lib/product-utils";
+import { contentId, hasVariants } from "@/lib/product-utils";
 
 type Props = { params: Promise<{ site: string; id: string }> };
 
@@ -31,6 +32,7 @@ export default async function ProductPage({ params }: Props) {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
+      <TrackProductView id={hasVariants(product) ? contentId(product.id, product.variants![0].id) : product.id} title={product.title} value={product.price} currency={store.currency} />
       <nav className="mb-6 text-sm text-muted">
         <StoreLink href="/">الرئيسية</StoreLink> / <StoreLink href="/products">المنتجات</StoreLink>
         {product.category && (

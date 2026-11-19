@@ -12,6 +12,9 @@ const ICONS = {
   products: "M4 7l8-4 8 4v10l-8 4-8-4zM4 7l8 4 8-4M12 11v10",
   customers: "M16 19v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1M9.5 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM21 19v-1a4 4 0 0 0-3-3.9M15 4.1a3 3 0 0 1 0 5.8",
   store: "M3 9l1.5-5h15L21 9M3 9h18v2a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0zM5 13v7h14v-7",
+  analytics: "M4 20V10M10 20V4M16 20v-7M22 20H2",
+  marketing: "M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1zM15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13",
+  discounts: "M9 15l6-6M9.5 9.5h.01M14.5 14.5h.01M4 12l1.5-1.5L5 8.5l2-.5.5-2 2 .5L12 4l2.5 2.5 2-.5.5 2 2 .5-.5 2L20 12l-1.5 1.5.5 2-2 .5-.5 2-2-.5L12 20l-2.5-2.5-2 .5-.5-2-2-.5.5-2z",
   settings: "M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19 12a7 7 0 0 0-.1-1.2l2-1.6-2-3.4-2.4 1a7 7 0 0 0-2-1.2L14 3h-4l-.5 2.6a7 7 0 0 0-2 1.2l-2.4-1-2 3.4 2 1.6a7 7 0 0 0 0 2.4l-2 1.6 2 3.4 2.4-1a7 7 0 0 0 2 1.2L10 21h4l.5-2.6a7 7 0 0 0 2-1.2l2.4 1 2-3.4-2-1.6c.1-.4.1-.8.1-1.2z",
 };
 
@@ -28,10 +31,18 @@ export const NAV: Item[] = [
     ],
   },
   { href: "/dashboard/customers", label: "الزبائن", icon: ICONS.customers },
+  { href: "/dashboard/analytics", label: "التقارير", icon: ICONS.analytics },
+  { href: "/dashboard/marketing", label: "التسويق", icon: ICONS.marketing },
+  { href: "/dashboard/discounts", label: "الخصومات", icon: ICONS.discounts },
   { href: "/dashboard/design", label: "تصميم المتجر", icon: ICONS.store },
 ];
 
-export const SETTINGS: Item = { href: "/dashboard/settings", label: "الإعدادات", icon: ICONS.settings };
+export const SETTINGS: Item = {
+  href: "/dashboard/settings",
+  label: "الإعدادات",
+  icon: ICONS.settings,
+  sub: [{ href: "/dashboard/settings/shipping", label: "التوصيل" }],
+};
 
 function useActive() {
   const path = usePathname();

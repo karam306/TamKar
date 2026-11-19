@@ -129,6 +129,9 @@ export function ManualOrderForm({ currency, defaultCity, customer }: { currency:
           <Field label="ملاحظات">
             <textarea name="notes" rows={2} className="input" />
           </Field>
+          <Field label="كود خصم (اختياري)">
+            <input name="discount_code" className="input" dir="ltr" />
+          </Field>
           <label className="flex items-center gap-2 text-[13px]">
             <input type="checkbox" name="paid" className="h-4 w-4 accent-black" />
             الزبون دفع سلف

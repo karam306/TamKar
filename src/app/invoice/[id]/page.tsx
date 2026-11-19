@@ -83,8 +83,22 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
           ))}
         </tbody>
       </table>
-      <div className="mr-auto w-56 space-y-1">
-        <div className="flex justify-between text-lg font-bold">
+      <div className="mr-auto w-64 space-y-1">
+        <div className="flex justify-between">
+          <span>المجموع الفرعي</span>
+          <span>{money(Number(o.subtotal ?? o.total))}</span>
+        </div>
+        {Number(o.discount_amount ?? 0) > 0 && (
+          <div className="flex justify-between">
+            <span>الخصم {o.discount_code && `(${o.discount_code})`}</span>
+            <span>-{money(Number(o.discount_amount))}</span>
+          </div>
+        )}
+        <div className="flex justify-between">
+          <span>التوصيل</span>
+          <span>{Number(o.shipping_fee ?? 0) ? money(Number(o.shipping_fee)) : "مجاني"}</span>
+        </div>
+        <div className="flex justify-between border-t border-black/20 pt-1 text-lg font-bold">
           <span>المجموع</span>
           <span>{money(Number(o.total))}</span>
         </div>

@@ -3,13 +3,13 @@ import { cache } from "react";
 import { demoCollections, demoProducts, demoStores } from "./demo-data";
 import { findVariant, hasVariants } from "./product-utils";
 import { hasSupabase, supabaseAdmin, supabasePublic } from "./supabase";
-import type { CartItem, Collection, Order, OrderLine, Product, Store } from "./types";
+import type { CartItem, Collection, Order, OrderLine, Pricing, Product, Store } from "./types";
 
 export const isDemoStore = (storeId: string) => storeId.startsWith("s-");
 
 // Must match the columns granted to "anon" in supabase/schema.sql
 const STORE_COLUMNS =
-  "id, slug, name, tagline, logo_url, whatsapp, city, currency, theme, primary_color, sections, delivery_note, status";
+  "id, slug, name, tagline, logo_url, whatsapp, city, currency, theme, primary_color, sections, delivery_note, status, shipping, meta_pixel_id";
 const PRODUCT_COLUMNS =
   "id, store_id, title, description, price, compare_at_price, images, category, stock, active, sku, options, variants, collection_ids";
 
@@ -119,7 +119,15 @@ const clean = (v: unknown, max: number) =>
 export type CustomerInput = { name: string; phone: string; city: string; address: string; notes?: string };
 
 export type CreateOrderResult =
-  | { ok: true; order: Pick<Order, "id" | "number" | "items" | "total" | "customer_name" | "phone" | "city" | "address" | "notes"> }
+  | {
+      ok: true;
+      order: Pick<Order, "id" | "number" | "items" | "total" | "customer_name" | "phone" | "city" | "address" | "notes"> & {
+        subtotal: number;
+        discount: number;
+        shipping: number;
+        discount_code: string | null;
+      };
+    }
   | { ok: false; error: string };
 
 export function validateCustomer(input: CustomerInput): { ok: true; value: Required<CustomerInput> } | { ok: false; error: string } {
@@ -148,9 +156,43 @@ function orderError(message: string): string {
       return `اختار المقاس أو اللون لـ "${detail?.trim()}"`;
     case "EMPTY":
       return "السلة فاضية";
+    case "BAD_CODE":
+      return "كود الخصم غير صحيح";
+    case "CODE_EXPIRED":
+      return "كود الخصم منتهي";
+    case "CODE_USED_UP":
+      return "كود الخصم انستخدم لآخر مرة";
+    case "CODE_MIN":
+      return `كود الخصم بيشتغل على طلبات من ${detail} وفوق`;
     default:
       return "صار خطأ، جرب مرة تانية";
   }
+}
+
+/** Delivery fee and discount for demo stores (no database). */
+function demoPricing(store: Store, subtotal: number, city: string, code?: string): Pricing | { error: string } {
+  if (code?.trim()) return { error: orderError("BAD_CODE") };
+  const ship = store.shipping ?? {};
+  let fee = ship.rates?.find((r) => r.city.trim() === city.trim())?.fee ?? ship.default_fee ?? 0;
+  if (ship.free_over != null && subtotal >= ship.free_over) fee = 0;
+  return { subtotal, discount: 0, shipping: fee, total: subtotal + fee, code: null };
+}
+
+/** Discount and delivery fee for the cart preview, using the same rules as checkout. */
+export async function quote(store: Store, subtotal: number, city: string, code?: string): Promise<Pricing | { error: string }> {
+  if (!hasSupabase || isDemoStore(store.id)) return demoPricing(store, subtotal, city, code);
+  const { data, error } = await supabaseAdmin().rpc("order_pricing", {
+    p_store: store.id,
+    p_subtotal: subtotal,
+    p_city: city,
+    p_code: code?.trim() || null,
+    p_use: false,
+  });
+  if (error || !data) return { error: orderError(error?.message ?? "") };
+  const d = data as { discount: number; shipping: number; code: string | null; free_shipping: boolean };
+  const discount = Number(d.discount);
+  const shipping = Number(d.shipping);
+  return { subtotal, discount, shipping, total: subtotal - discount + shipping, code: d.code, free_shipping: d.free_shipping };
 }
 
 /**
@@ -162,6 +204,7 @@ export async function createOrder(
   customer: CustomerInput,
   items: CartItem[],
   source: "online" | "manual" = "online",
+  discountCode?: string,
 ): Promise<CreateOrderResult> {
   const c = validateCustomer(customer);
   if (!c.ok) return c;
@@ -182,11 +225,27 @@ export async function createOrder(
       lines.push({ productId: p.id, variantId: v?.id, title: p.title, variantTitle: v?.title, price: v?.price ?? p.price, qty: i.qty });
     }
     if (!lines.length) return { ok: false, error: "السلة فاضية" };
-    const total = lines.reduce((s, l) => s + l.price * l.qty, 0);
+    const subtotal = lines.reduce((s, l) => s + l.price * l.qty, 0);
     const v = c.value;
+    const pr = demoPricing(store, subtotal, v.city, discountCode);
+    if ("error" in pr) return { ok: false, error: pr.error };
     return {
       ok: true,
-      order: { id: "demo", number: 1000 + Math.floor(Math.random() * 9000), items: lines, total, customer_name: v.name, phone: v.phone, city: v.city, address: v.address, notes: v.notes || null },
+      order: {
+        id: "demo",
+        number: 1000 + Math.floor(Math.random() * 9000),
+        items: lines,
+        total: pr.total,
+        subtotal,
+        discount: 0,
+        shipping: pr.shipping,
+        discount_code: null,
+        customer_name: v.name,
+        phone: v.phone,
+        city: v.city,
+        address: v.address,
+        notes: v.notes || null,
+      },
     };
   }
 
@@ -197,14 +256,29 @@ export async function createOrder(
     p_items: clean,
     p_source: source,
     p_note: v.notes || null,
+    p_discount_code: discountCode?.trim() || null,
   });
   if (error || !data) {
     console.error("createOrder", error?.message);
     return { ok: false, error: orderError(error?.message ?? "") };
   }
-  const r = data as { id: string; number: number; total: number; items: OrderLine[] };
+  const r = data as { id: string; number: number; total: number; subtotal: number; discount: number; shipping: number; discount_code: string | null; items: OrderLine[] };
   return {
     ok: true,
-    order: { id: r.id, number: r.number, items: r.items, total: Number(r.total), customer_name: v.name, phone: v.phone, city: v.city, address: v.address, notes: v.notes || null },
+    order: {
+      id: r.id,
+      number: r.number,
+      items: r.items,
+      total: Number(r.total),
+      subtotal: Number(r.subtotal),
+      discount: Number(r.discount),
+      shipping: Number(r.shipping),
+      discount_code: r.discount_code,
+      customer_name: v.name,
+      phone: v.phone,
+      city: v.city,
+      address: v.address,
+      notes: v.notes || null,
+    },
   };
 }

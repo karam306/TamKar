@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { useState } from "react";
 import { formatPrice } from "@/lib/format";
-import { hasVariants, isSoldOut, priceRange } from "@/lib/product-utils";
+import { contentId, hasVariants, isSoldOut, priceRange } from "@/lib/product-utils";
 import type { Product } from "@/lib/types";
 import { useStore } from "./store-context";
+import { track } from "./tracking";
 
 export function CartButton() {
   const { base, count, ready } = useStore();
@@ -29,15 +30,17 @@ export function AddToCart({
   full,
   qty = 1,
   label,
+  price,
 }: {
   productId: string;
   variantId?: string;
+  price?: number;
   disabled?: boolean;
   full?: boolean;
   qty?: number;
   label?: string;
 }) {
-  const { add } = useStore();
+  const { add, currency } = useStore();
   const [added, setAdded] = useState(false);
   return (
     <button
@@ -45,6 +48,7 @@ export function AddToCart({
       disabled={disabled}
       onClick={() => {
         add(productId, qty, variantId);
+        track.addToCart(contentId(productId, variantId), price ?? 0, currency, qty);
         setAdded(true);
         setTimeout(() => setAdded(false), 1500);
       }}
@@ -93,7 +97,7 @@ export function ProductCard({ product }: { product: Product }) {
             {soldOut ? "نفدت الكمية" : "اختار"}
           </Link>
         ) : (
-          <AddToCart productId={product.id} disabled={soldOut} />
+          <AddToCart productId={product.id} disabled={soldOut} price={product.price} />
         )}
       </div>
     </div>
