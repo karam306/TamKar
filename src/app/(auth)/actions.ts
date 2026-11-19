@@ -37,7 +37,7 @@ export async function signup(_: FormState, form: FormData): Promise<FormState> {
   const { data: taken, error: checkError } = await admin.from("stores").select("id").eq("slug", slug).maybeSingle();
   if (checkError) {
     console.error("signup: stores check failed", checkError.code, checkError.message);
-    return { error: "قاعدة البيانات مش جاهزة (رمز: DB)، تواصل مع الدعم" };
+    return { error: `قاعدة البيانات مش جاهزة (رمز: DB ${checkError.code ?? ""} ${(checkError.message ?? "").slice(0, 80)})، تواصل مع الدعم` };
   }
   if (taken) return { error: "هالرابط مستخدم، اختار رابط تاني" };
 
