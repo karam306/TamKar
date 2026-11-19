@@ -1,7 +1,6 @@
 import "server-only";
 import { notFound, redirect } from "next/navigation";
-import { supabaseUser } from "./auth";
-import { hasSupabase } from "./supabase";
+import { getSessionUser } from "./auth";
 
 /** Platform owners are listed by email in the PLATFORM_ADMIN_EMAILS setting on Vercel. */
 const ADMINS = (process.env.PLATFORM_ADMIN_EMAILS || "")
@@ -12,12 +11,8 @@ const ADMINS = (process.env.PLATFORM_ADMIN_EMAILS || "")
 export const isAdminEmail = (email?: string | null) => Boolean(email && ADMINS.includes(email.toLowerCase()));
 
 async function currentEmail(): Promise<string | null> {
-  if (!hasSupabase) return null;
-  const db = await supabaseUser();
-  const {
-    data: { user },
-  } = await db.auth.getUser();
-  return user?.email?.toLowerCase() ?? null;
+  const s = await getSessionUser();
+  return s?.user.email?.toLowerCase() ?? null;
 }
 
 export async function getPlatformAdmin(): Promise<{ email: string } | null> {

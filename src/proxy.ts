@@ -63,7 +63,8 @@ async function refreshSession(request: NextRequest) {
       },
     },
   });
-  await supabase.auth.getUser();
+  // Refreshes the login token when it is about to expire; otherwise checks it locally.
+  await supabase.auth.getClaims();
   return response;
 }
 

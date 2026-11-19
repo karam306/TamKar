@@ -1,6 +1,6 @@
 import "server-only";
 import { createServerClient } from "@supabase/ssr";
-import type { SupabaseClient, User } from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
@@ -33,16 +33,27 @@ export type MerchantStore = Store & {
   created_at: string;
 };
 
-export type Merchant = { user: User; store: MerchantStore; db: SupabaseClient };
+export type SessionUser = { id: string; email: string | null };
+export type Merchant = { user: SessionUser; store: MerchantStore; db: SupabaseClient };
+
+/**
+ * Who is signed in. Checks the login token's signature locally (no trip to Supabase)
+ * and is remembered for the rest of the request.
+ */
+export const getSessionUser = cache(async (): Promise<{ user: SessionUser; db: SupabaseClient } | null> => {
+  if (!hasSupabase) return null;
+  const db = await supabaseUser();
+  const { data } = await db.auth.getClaims();
+  const c = data?.claims;
+  if (!c?.sub) return null;
+  return { user: { id: c.sub, email: typeof c.email === "string" ? c.email : null }, db };
+});
 
 /** The signed-in merchant and their store, or null. */
 export const getMerchant = cache(async (): Promise<Merchant | null> => {
-  if (!hasSupabase) return null;
-  const db = await supabaseUser();
-  const {
-    data: { user },
-  } = await db.auth.getUser();
-  if (!user) return null;
+  const session = await getSessionUser();
+  if (!session) return null;
+  const { user, db } = session;
   const { data: store } = await db.from("stores").select("*").eq("owner_id", user.id).maybeSingle();
   if (!store) return null;
   return { user, store: store as MerchantStore, db };
