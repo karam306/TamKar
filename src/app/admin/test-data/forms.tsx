@@ -3,11 +3,12 @@
 import { useActionState } from "react";
 import { Field, SubmitButton } from "@/components/form-ui";
 import { storeUrl } from "@/lib/urls";
-import { createTestStores, removeTestStores } from "./actions";
+import { createTestStores, removeTestStores, setTestPasswords } from "./actions";
 
 export function SeedForms({ existing }: { existing: string[] }) {
   const [state, create] = useActionState(createTestStores, undefined);
   const [del, remove] = useActionState(removeTestStores, undefined);
+  const [pw, setPw] = useActionState(setTestPasswords, undefined);
   return (
     <>
       <section className="card space-y-3 p-4">
@@ -52,6 +53,20 @@ export function SeedForms({ existing }: { existing: string[] }) {
             ))}
           </div>
         )}
+      </section>
+      <section className="card space-y-3 p-4">
+        <h2 className="text-sm font-semibold">كلمة سر وحدة للمتاجر التجريبية</h2>
+        <p className="text-[13px] text-muted">بتغيّر كلمة السر للمتاجر الثلاثة لكلمة وحدة بتختارها، وبتعرضلك الإيميلات.</p>
+        <form action={setPw} className="flex flex-wrap gap-2">
+          <input name="password" dir="ltr" minLength={8} required placeholder="8 أحرف على الأقل" className="input !w-56" autoComplete="new-password" />
+          <SubmitButton>غيّر</SubmitButton>
+        </form>
+        {pw?.error && <p className="text-[13px] text-[#8e1f0b]">{pw.error}</p>}
+        {pw?.results?.map((r) => (
+          <div key={r.slug} className="rounded-lg border border-black/10 p-3 text-[13px]" dir="ltr" style={{ textAlign: "right" }}>
+            <b>{r.name}</b> · {r.email} · {r.error ?? "✓"}
+          </div>
+        ))}
       </section>
       <section className="card space-y-2 p-4">
         <h2 className="text-sm font-semibold">احذف المتاجر التجريبية</h2>

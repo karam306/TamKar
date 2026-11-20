@@ -42,7 +42,8 @@ export function ResetPassword({ id }: { id: string }) {
   return (
     <form action={action} className="space-y-2 text-[13px]">
       <input type="hidden" name="id" value={id} />
-      <p className="text-muted">إذا التاجر نسي كلمة السر، اعمل وحدة جديدة وابعتله ياها.</p>
+      <p className="text-muted">إذا التاجر نسي كلمة السر: اكتب وحدة جديدة، أو اتركها فاضية ومنعملك وحدة عشوائية.</p>
+      <input name="password" dir="ltr" minLength={8} placeholder="كلمة سر جديدة (اختياري)" className="input" autoComplete="new-password" />
       {state?.password && (
         <div className="rounded-lg bg-[#f7f7f7] p-2">
           كلمة السر الجديدة:{" "}
@@ -52,7 +53,7 @@ export function ResetPassword({ id }: { id: string }) {
         </div>
       )}
       {state?.error && <p className="text-red-700">{state.error}</p>}
-      <SubmitButton pendingText="...">اعمل كلمة سر جديدة</SubmitButton>
+      <SubmitButton pendingText="...">غيّر كلمة السر</SubmitButton>
     </form>
   );
 }

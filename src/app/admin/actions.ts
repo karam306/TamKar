@@ -150,7 +150,9 @@ export async function resetPassword(_: { password?: string; error?: string } | u
   const admin = supabaseAdmin();
   const { data: s } = await admin.from("stores").select("owner_id").eq("id", str(form, "id", 40)).maybeSingle();
   if (!s) return { error: "المتجر غير موجود" };
-  const password = makePassword();
+  const typed = String(form.get("password") ?? "").trim();
+  if (typed && typed.length < 8) return { error: "كلمة السر لازم تكون 8 أحرف على الأقل" };
+  const password = typed || makePassword();
   const { error } = await admin.auth.admin.updateUserById(s.owner_id as string, { password });
   if (error) return { error: "ما قدرنا نغير كلمة السر" };
   return { password };
