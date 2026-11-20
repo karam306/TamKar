@@ -40,7 +40,7 @@ export async function setTestPasswords(_: SeedState, form: FormData): Promise<Se
   for (const s of data ?? []) {
     const { data: u } = await db.auth.admin.getUserById(s.owner_id as string);
     const { error } = await db.auth.admin.updateUserById(s.owner_id as string, { password });
-    results.push({ name: s.name as string, slug: s.slug as string, email: u.user?.email ?? "", password, orders: 0, error: error ? "ما قدرنا نغيرها" : undefined });
+    results.push({ name: s.name as string, slug: s.slug as string, email: u.user?.email ?? "", password, orders: 0, error: error ? `ما قدرنا نغيرها: ${error.message}` : undefined });
   }
   return results.length ? { results } : { error: "ما في متاجر تجريبية" };
 }
