@@ -85,7 +85,12 @@ export async function login(_: FormState, form: FormData): Promise<FormState> {
     email: str(form, "email", 120).toLowerCase(),
     password: String(form.get("password") ?? ""),
   });
-  if (error) return { error: "الإيميل أو كلمة السر غلط" };
+  if (error) {
+    console.error("login failed", error.status, error.code, error.message);
+    if (error.code === "email_not_confirmed") return { error: "الإيميل لسا ما تأكد. تواصل مع الدعم" };
+    if (error.code === "invalid_credentials") return { error: "الإيميل أو كلمة السر غلط" };
+    return { error: `ما قدرنا نسجل دخول (${error.code ?? error.status ?? ""}: ${error.message.slice(0, 80)})` };
+  }
   redirect(isAdminEmail(data.user?.email) ? "/admin" : "/dashboard");
 }
 

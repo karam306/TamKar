@@ -13,7 +13,13 @@ export default async function TestDataPage() {
   const logins = await Promise.all(
     (data ?? []).map(async (s) => {
       const { data: u } = await db.auth.admin.getUserById(s.owner_id as string);
-      return { name: s.name as string, slug: s.slug as string, email: u.user?.email ?? "?" };
+      const fmt = (d?: string | null) => (d ? new Date(d).toLocaleString("en-GB", { timeZone: "Asia/Dubai", dateStyle: "short", timeStyle: "short" }) : "never");
+      return {
+        name: s.name as string,
+        slug: s.slug as string,
+        email: u.user?.email ?? "?",
+        info: `confirmed: ${u.user?.email_confirmed_at ? "yes" : "NO"} · updated: ${fmt(u.user?.updated_at)} · last login: ${fmt(u.user?.last_sign_in_at)}`,
+      };
     }),
   );
   return (
@@ -27,6 +33,9 @@ export default async function TestDataPage() {
               <b>{l.name}</b>
               <span dir="ltr" className="select-all font-mono">
                 {l.email}
+              </span>
+              <span dir="ltr" className="w-full text-left text-xs text-muted">
+                {l.info}
               </span>
             </div>
           ))}
