@@ -19,6 +19,7 @@ export function CartView({
   delivery,
   pickupNote,
   storeCity,
+  branches,
 }: {
   site: string;
   defaultCity: string;
@@ -26,7 +27,9 @@ export function CartView({
   delivery: boolean;
   pickupNote: string;
   storeCity: string;
+  branches: { id: string; name: string; note: string }[];
 }) {
+  const [branch, setBranch] = useState("");
   // Pickup from the shop is the default; delivery only when the shop offers it.
   const [method, setMethod] = useState<Fulfillment>("pickup");
   const { cart, setQty, clear, currency, ready } = useStore();
@@ -160,6 +163,7 @@ export function CartView({
         notes: String(form.get("notes") || ""),
         discountCode: code || undefined,
         method,
+        branch: method === "pickup" && branch ? branch : undefined,
         items: lines.map((l) => ({
           productId: l.productId,
           variantId: l.variantId,
@@ -253,15 +257,24 @@ export function CartView({
             ))}
           </div>
         )}
-        {method === "pickup" && (
+        {method === "pickup" && branches.length === 0 && (
           <div className="mb-4 rounded-theme bg-white p-3 text-sm">
             <div className="font-semibold">🏪 الاستلام من المحل</div>
-            <div className="text-muted">
-              {pickupNote ||
-                (storeCity
-                  ? `من محلنا بـ${storeCity}. منتواصل معك لنحدد الوقت.`
-                  : "منتواصل معك لنحدد الوقت والمكان.")}
-            </div>
+            <div className="text-muted">{pickupNote || (storeCity ? `من محلنا بـ${storeCity}. منتواصل معك لنحدد الوقت.` : "منتواصل معك لنحدد الوقت والمكان.")}</div>
+          </div>
+        )}
+        {method === "pickup" && branches.length > 0 && (
+          <div className="mb-4 space-y-2">
+            <div className="text-sm font-semibold">🏪 من أي فرع بدك تستلم؟</div>
+            {[{ id: "", name: "الفرع الرئيسي", note: pickupNote || storeCity }, ...branches].map((b) => (
+              <label key={b.id || "main"} className={`flex cursor-pointer gap-2 rounded-theme border-2 bg-white p-3 text-sm ${branch === b.id ? "border-primary" : "border-transparent"}`}>
+                <input type="radio" name="branch_pick" checked={branch === b.id} onChange={() => setBranch(b.id)} className="mt-1" />
+                <span>
+                  <b className="block">{b.name}</b>
+                  {b.note && <span className="text-muted">{b.note}</span>}
+                </span>
+              </label>
+            ))}
           </div>
         )}
         <form

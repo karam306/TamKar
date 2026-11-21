@@ -1,0 +1,65 @@
+"use server";
+
+import { randomInt } from "node:crypto";
+import { refresh, revalidatePath } from "next/cache";
+import { requireOwner } from "@/lib/auth";
+import { isPro, LIMITS } from "@/lib/plans";
+import { supabaseAdmin } from "@/lib/supabase";
+
+export type TeamState = { error?: string; created?: { email: string; password: string } } | undefined;
+
+const makePassword = () => {
+  const chars = "abcdefghjkmnpqrstuvwxyz23456789";
+  return Array.from({ length: 10 }, () => chars[randomInt(chars.length)]).join("");
+};
+
+/** Owner adds a staff login. The password is shown once so the owner can pass it on. */
+export async function addStaff(_: TeamState, form: FormData): Promise<TeamState> {
+  const { store, user } = await requireOwner();
+  if (!isPro(store)) return { error: "حسابات الموظفين متاحة بالباقة الاحترافية" };
+  const email = String(form.get("email") ?? "").trim().toLowerCase().slice(0, 120);
+  const name = String(form.get("name") ?? "").trim().slice(0, 60);
+  if (!/^\S+@\S+\.\S+$/.test(email)) return { error: "الإيميل غير صحيح" };
+  if (email === user.email?.toLowerCase()) return { error: "هاد إيميلك إنت" };
+  const admin = supabaseAdmin();
+  const { count } = await admin.from("store_staff").select("user_id", { count: "exact", head: true }).eq("store_id", store.id);
+  if ((count ?? 0) >= LIMITS.pro.staff) return { error: `الحد ${LIMITS.pro.staff} موظفين` };
+
+  const password = makePassword();
+  const { data, error } = await admin.auth.admin.createUser({ email, password, email_confirm: true });
+  if (error || !data.user) {
+    return { error: /already|registered|exists/i.test(error?.message ?? "") ? "هالإيميل إله حساب من قبل. استعمل إيميل تاني للموظف" : "ما قدرنا ننشئ الحساب" };
+  }
+  const { error: e2 } = await admin.from("store_staff").insert({ store_id: store.id, user_id: data.user.id, email, name: name || null });
+  if (e2) {
+    await admin.auth.admin.deleteUser(data.user.id);
+    return { error: "ما قدرنا نضيف الموظف" };
+  }
+  revalidatePath("/dashboard/settings/team");
+  refresh();
+  return { created: { email, password } };
+}
+
+/** Removes the staff member and their login. */
+export async function removeStaff(form: FormData) {
+  const { store } = await requireOwner();
+  const userId = String(form.get("user_id") ?? "");
+  const admin = supabaseAdmin();
+  const { data } = await admin.from("store_staff").delete().eq("store_id", store.id).eq("user_id", userId).select("user_id").maybeSingle();
+  if (data) await admin.auth.admin.deleteUser(userId);
+  revalidatePath("/dashboard/settings/team");
+  refresh();
+}
+
+/** New password for a staff member who forgot theirs. */
+export async function resetStaffPassword(_: TeamState, form: FormData): Promise<TeamState> {
+  const { store } = await requireOwner();
+  const userId = String(form.get("user_id") ?? "");
+  const admin = supabaseAdmin();
+  const { data } = await admin.from("store_staff").select("email").eq("store_id", store.id).eq("user_id", userId).maybeSingle();
+  if (!data) return { error: "الموظف مش موجود" };
+  const password = makePassword();
+  const { error } = await admin.auth.admin.updateUserById(userId, { password });
+  if (error) return { error: "ما قدرنا نغير كلمة السر" };
+  return { created: { email: data.email as string, password } };
+}

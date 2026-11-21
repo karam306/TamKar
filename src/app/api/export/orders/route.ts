@@ -1,3 +1,4 @@
+import { isPro } from "@/lib/plans";
 import { getMerchant } from "@/lib/auth";
 import { buildSheet } from "@/lib/sheets";
 import type { Order } from "@/lib/types";
@@ -6,7 +7,8 @@ const STATUS: Record<string, string> = { new: "جديد", confirmed: "مؤكد",
 
 export async function GET(req: Request) {
   const m = await getMerchant();
-  if (!m) return new Response("Unauthorized", { status: 401 });
+  if (!m || m.role !== "owner") return new Response("Unauthorized", { status: 401 });
+  if (!isPro(m.store)) return new Response("التصدير لـ Excel متاح بالباقة الاحترافية", { status: 403, headers: { "content-type": "text/plain; charset=utf-8" } });
   const status = new URL(req.url).searchParams.get("status");
   const all: Order[] = [];
   for (let from = 0; from < 50000; from += 1000) {

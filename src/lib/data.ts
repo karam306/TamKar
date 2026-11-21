@@ -4,7 +4,8 @@ import { demoCollections, demoProducts, demoStores } from "./demo-data";
 import { findVariant, hasVariants } from "./product-utils";
 import { hasSupabase, supabaseAdmin, supabasePublic } from "./supabase";
 import { templateMenus, templatePages } from "./business-templates";
-import type { CartItem, Collection, Order, OrderLine, Pricing, Product, Store, StorePage, Fulfillment } from "./types";
+import { isPro } from "./plans";
+import type { CartItem, Collection, Order, OrderLine, Pricing, Product, Store, StorePage, Fulfillment, Branch } from "./types";
 
 export const isDemoStore = (storeId: string) => storeId.startsWith("s-");
 
@@ -117,7 +118,7 @@ export const getCategories = cache(async (storeId: string): Promise<string[]> =>
 const clean = (v: unknown, max: number) =>
   typeof v === "string" ? v.replace(/[\u0000-\u001f]/g, " ").trim().slice(0, max) : "";
 
-export type CustomerInput = { name: string; phone: string; city: string; address: string; notes?: string; method?: Fulfillment };
+export type CustomerInput = { name: string; phone: string; city: string; address: string; notes?: string; method?: Fulfillment; branch?: string };
 
 export type CreateOrderResult =
   | {
@@ -128,11 +129,13 @@ export type CreateOrderResult =
         shipping: number;
         discount_code: string | null;
         fulfillment: Fulfillment;
+        /** Pickup branch, when the store has more than one. */
+        branch?: Branch | null;
       };
     }
   | { ok: false; error: string };
 
-export function validateCustomer(input: CustomerInput): { ok: true; value: Required<CustomerInput> } | { ok: false; error: string } {
+export function validateCustomer(input: CustomerInput): { ok: true; value: Required<Omit<CustomerInput, "branch">> } | { ok: false; error: string } {
   const method: Fulfillment = input.method === "delivery" ? "delivery" : "pickup";
   const name = clean(input.name, 80);
   const phone = clean(input.phone, 20).replace(/[^\d+]/g, "");
@@ -219,6 +222,8 @@ export async function createOrder(
 ): Promise<CreateOrderResult> {
   const c = validateCustomer(customer);
   if (!c.ok) return c;
+  const branch: Branch | null =
+    c.value.method === "pickup" && customer.branch && isPro(store) ? (store.shipping?.branches ?? []).find((b) => b.id === customer.branch) ?? null : null;
   const clean = (Array.isArray(items) ? items : [])
     .slice(0, 50)
     .map((i) => ({ productId: String(i.productId), variantId: i.variantId ? String(i.variantId) : undefined, qty: Math.floor(Number(i.qty)) }))
@@ -252,6 +257,7 @@ export async function createOrder(
         shipping: pr.shipping,
         discount_code: null,
         fulfillment: v.method,
+        branch,
         customer_name: v.name,
         phone: v.phone,
         city: v.city,
@@ -274,6 +280,7 @@ export async function createOrder(
     console.error("createOrder", error?.message);
     return { ok: false, error: orderError(error?.message ?? "") };
   }
+  if (branch) await supabaseAdmin().from("orders").update({ branch: branch.name }).eq("id", (data as { id: string }).id);
   const r = data as { id: string; number: number; total: number; subtotal: number; discount: number; shipping: number; discount_code: string | null; items: OrderLine[] };
   return {
     ok: true,
@@ -287,6 +294,7 @@ export async function createOrder(
       shipping: Number(r.shipping),
       discount_code: r.discount_code,
       fulfillment: v.method,
+      branch,
       customer_name: v.name,
       phone: v.phone,
       city: v.city,

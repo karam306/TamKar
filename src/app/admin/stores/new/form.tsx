@@ -102,7 +102,7 @@ export function NewMerchantForm() {
           <select name="plan" value={plan} onChange={(e) => setPlan(e.target.value)} className="input">
             <option value="trial">تجريبي (14 يوم)</option>
             <option value="basic">أساسي</option>
-            <option value="pro">متقدم (متجر + إعلانات)</option>
+            <option value="pro">احترافي</option>
           </select>
           {plan !== "trial" && (
             <Field label="مدفوع لكم شهر" hint="0 يعني بدون تاريخ انتهاء">

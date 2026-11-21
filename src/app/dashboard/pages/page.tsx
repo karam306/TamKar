@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { EmptyState, PageHeader } from "@/components/admin-ui";
-import { requireMerchant } from "@/lib/auth";
+import { requireOwner } from "@/lib/auth";
 import type { StorePage } from "@/lib/types";
 
 export default async function PagesList() {
-  const { store, db } = await requireMerchant();
+  const { store, db } = await requireOwner();
   const { data } = await db.from("pages").select("*").eq("store_id", store.id).order("created_at");
   const pages = (data ?? []) as StorePage[];
   return (

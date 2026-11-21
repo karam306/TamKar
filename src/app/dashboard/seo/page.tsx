@@ -1,10 +1,10 @@
 import { PageHeader } from "@/components/admin-ui";
-import { requireMerchant } from "@/lib/auth";
+import { requireOwner } from "@/lib/auth";
 import type { StoreSeo, StoreSocial } from "@/lib/types";
 import { SeoForm } from "./form";
 
 export default async function SeoPage() {
-  const { store } = await requireMerchant();
+  const { store } = await requireOwner();
   const s = store as typeof store & { seo?: StoreSeo; social?: StoreSocial };
   return (
     <div>

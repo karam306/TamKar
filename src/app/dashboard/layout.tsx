@@ -22,7 +22,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
       </div>
     );
   }
-  const { store, user } = await requireMerchant();
+  const { store, user, role } = await requireMerchant();
+  const staff = role === "staff";
   const isOwner = Boolean(await getPlatformAdmin());
   const link = storeUrl(store.slug);
   const initials = store.name.trim().slice(0, 2);
@@ -32,7 +33,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       {/* Top bar */}
       <header className="flex h-14 shrink-0 items-center justify-between gap-3 px-3 text-white lg:px-4">
         <div className="flex items-center gap-2">
-          <MobileMenu storeName={store.name} storeLink={link} />
+          <MobileMenu storeName={store.name} storeLink={link} staff={staff} />
           <Link href="/dashboard" className="text-lg font-bold tracking-tight">
             {platform}
           </Link>
@@ -56,9 +57,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <a href={link} target="_blank" rel="noopener noreferrer" className="block rounded-lg px-2 py-1.5 hover:bg-surface">
               شوف متجرك ↗
             </a>
-            <Link href="/dashboard/settings" className="block rounded-lg px-2 py-1.5 hover:bg-surface">
-              الإعدادات
-            </Link>
+            {!staff && (
+              <Link href="/dashboard/settings" className="block rounded-lg px-2 py-1.5 hover:bg-surface">
+                الإعدادات
+              </Link>
+            )}
             {isOwner && (
               <Link href="/admin" className="block rounded-lg px-2 py-1.5 font-semibold hover:bg-surface">
                 لوحة المنصة ←
@@ -76,7 +79,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <div className="flex min-h-0 flex-1 overflow-hidden lg:rounded-t-xl">
         <aside className="hidden w-60 shrink-0 bg-[#ebebeb] lg:block">
           <div className="sticky top-0 h-[calc(100vh-56px)]">
-            <SideNav storeName={store.name} storeLink={link} />
+            <SideNav storeName={store.name} storeLink={link} staff={staff} />
           </div>
         </aside>
         <div className="min-w-0 flex-1 bg-[#f1f1f1]">

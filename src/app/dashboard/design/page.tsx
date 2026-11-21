@@ -1,4 +1,4 @@
-import { requireMerchant } from "@/lib/auth";
+import { requireOwner } from "@/lib/auth";
 import { BUSINESS_TYPES } from "@/lib/business-types";
 import type { Collection } from "@/lib/types";
 import { applyTemplate } from "./actions";
@@ -6,7 +6,7 @@ import { storeUrl } from "@/lib/urls";
 import { DesignEditor } from "./editor";
 
 export default async function DesignPage() {
-  const { store, db } = await requireMerchant();
+  const { store, db } = await requireOwner();
   const { data: cols } = await db.from("collections").select("id, title").eq("store_id", store.id).order("title");
   return (
     <>

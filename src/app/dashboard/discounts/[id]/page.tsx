@@ -1,12 +1,12 @@
 import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/admin-ui";
-import { requireMerchant } from "@/lib/auth";
+import { requireOwner } from "@/lib/auth";
 import type { Discount } from "@/lib/types";
 import { deleteDiscount } from "../actions";
 import { DiscountForm } from "../discount-form";
 
 export default async function EditDiscountPage({ params }: { params: Promise<{ id: string }> }) {
-  const { store, db } = await requireMerchant();
+  const { store, db } = await requireOwner();
   const { id } = await params;
   if (!/^[0-9a-f-]{36}$/.test(id)) notFound();
   const { data } = await db.from("discounts").select("*").eq("id", id).eq("store_id", store.id).maybeSingle();

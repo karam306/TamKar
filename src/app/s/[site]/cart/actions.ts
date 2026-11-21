@@ -17,7 +17,7 @@ export async function placeOrder(site: string, input: OrderInput): Promise<Place
   if (!isOpen(store)) return { ok: false, error: "المتجر متوقف مؤقتاً" };
   const result = await createOrder(
     store,
-    { name: input.customerName, phone: input.phone, city: input.city, address: input.address, notes: input.notes, method: input.method },
+    { name: input.customerName, phone: input.phone, city: input.city, address: input.address, notes: input.notes, method: input.method, branch: input.branch },
     input.items,
     "online",
     input.discountCode,

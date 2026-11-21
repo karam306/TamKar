@@ -28,7 +28,7 @@ export function PaymentForm({ id, currency }: { id: string; currency: string }) 
       <select name="plan" defaultValue="" className="input">
         <option value="">نفس الباقة</option>
         <option value="basic">أساسي</option>
-        <option value="pro">متقدم (متجر + إعلانات)</option>
+        <option value="pro">احترافي</option>
       </select>
       <input name="note" placeholder="ملاحظة (اختياري)" className="input" />
       <FormMessage state={state} />

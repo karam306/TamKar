@@ -2,13 +2,13 @@
 
 import { refresh, revalidatePath } from "next/cache";
 import type { FormState } from "@/components/form-ui";
-import { requireMerchant } from "@/lib/auth";
+import { requireOwner } from "@/lib/auth";
 import { normalizeWhatsapp } from "@/lib/templates";
 
 const str = (f: FormData, k: string, max: number) => String(f.get(k) ?? "").trim().slice(0, max);
 
 export async function saveSettings(_: FormState, form: FormData): Promise<FormState> {
-  const { store, db } = await requireMerchant();
+  const { store, db } = await requireOwner();
   const name = str(form, "name", 80);
   const whatsapp = normalizeWhatsapp(str(form, "whatsapp", 20));
   const currency = str(form, "currency", 3);

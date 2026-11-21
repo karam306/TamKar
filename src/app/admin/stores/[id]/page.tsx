@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { PLAN_LABELS } from "@/lib/plans";
 import { Card, PageHeader } from "@/components/admin-ui";
 import { BUSINESS_TYPES } from "@/lib/business-types";
 import { formatPrice, whatsappLink } from "@/lib/format";
@@ -10,7 +11,7 @@ import { saveMerchantInfo, setPaidUntil, setStoreStatus } from "../../actions";
 import { loadStores } from "../../data";
 import { PaymentForm, ResetPassword } from "./forms";
 
-const PLANS: Record<string, string> = { trial: "تجريبي", basic: "أساسي", pro: "متقدم (متجر + إعلانات)" };
+const PLANS = PLAN_LABELS;
 
 export default async function AdminStorePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

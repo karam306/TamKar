@@ -3,6 +3,7 @@ import { demoProducts } from "@/lib/demo-data";
 import { hasSupabase, supabasePublic } from "@/lib/supabase";
 import { contentId } from "@/lib/product-utils";
 import type { Product } from "@/lib/types";
+import { isPro } from "@/lib/plans";
 
 // Product catalog for Meta Commerce Manager (Data feed, scheduled every hour).
 // One row per product, or per option combination (grouped with item_group_id).
@@ -23,7 +24,7 @@ const money = (n: number, cur: string) => `${n.toFixed(2)} ${cur}`;
 export async function GET(req: Request, { params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const store = await getStore(slug.replace(/\.csv$/, ""));
-  if (!store) return new Response("Not found", { status: 404 });
+  if (!store || !isPro(store)) return new Response("Not found", { status: 404 });
 
   const origin = new URL(req.url).origin;
   const root = process.env.NEXT_PUBLIC_ROOT_DOMAIN;

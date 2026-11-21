@@ -18,7 +18,7 @@ type Pack = {
   sub: "trial" | "paid" | "expiring";
   stock: Record<string, number>;
   discounts: { code: string | null; title: string; kind: "percent" | "fixed" | "free_shipping"; value: number; min?: number; automatic?: boolean; expired?: boolean; limit?: number }[];
-  shipping: { delivery: boolean; pickup_note: string; default_fee: number; free_over?: number; rates: { city: string; fee: number }[] };
+  shipping: { delivery: boolean; pickup_note: string; branches?: { id: string; name: string; note: string; whatsapp: string }[]; default_fee: number; free_over?: number; rates: { city: string; fee: number }[] };
   orders: { c: number; items: [string, number, string?][]; code?: string; status: string; daysAgo: number; manual?: boolean; pickup?: boolean }[];
 };
 
@@ -41,7 +41,7 @@ const PACKS: Pack[] = [
     name: "بيت المطبخ",
     sub: "paid",
     stock: { k1: 12, k2: 25, k3: 40, k4: 6, k5: 15, k6: 3, k7: 4, k8: 0 },
-    shipping: { delivery: true, pickup_note: "حمص، شارع الحضارة جانب صيدلية الشفاء، من 10 الصبح لـ 9 المسا", default_fee: 3, free_over: 60, rates: [{ city: "حمص", fee: 0 }, { city: "حماة", fee: 2 }, { city: "دمشق", fee: 3 }] },
+    shipping: { delivery: true, pickup_note: "حمص، شارع الحضارة جانب صيدلية الشفاء، من 10 الصبح لـ 9 المسا", branches: [{ id: "inshaat", name: "فرع الإنشاءات", note: "حمص، الإنشاءات، جانب جامع الصحابة", whatsapp: "963933000111" }], default_fee: 3, free_over: 60, rates: [{ city: "حمص", fee: 0 }, { city: "حماة", fee: 2 }, { city: "دمشق", fee: 3 }] },
     discounts: [
       { code: "WELCOME10", title: "خصم 10% لأول طلب", kind: "percent", value: 10 },
       { code: "FREESHIP", title: "توصيل مجاني فوق 30$", kind: "free_shipping", value: 0, min: 30 },
@@ -165,7 +165,7 @@ async function seedOne(pack: Pack, email: string, password: string, origin: stri
       social: demo.social ?? {},
       shipping: pack.shipping,
       sections: [],
-      plan: pack.sub === "trial" ? "trial" : "basic",
+      plan: pack.sub === "trial" ? "trial" : pack.sub === "paid" ? "pro" : "basic",
       paid_until: paidUntil,
     })
     .select("id")

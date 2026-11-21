@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { Field, FormMessage, SubmitButton } from "@/components/form-ui";
-import type { ShippingSettings } from "@/lib/types";
+import type { Branch, ShippingSettings } from "@/lib/types";
 import { saveShipping } from "./actions";
 
 const CITIES = [
@@ -22,13 +22,8 @@ const CITIES = [
   "الحسكة",
 ];
 
-export function ShippingForm({
-  initial,
-  currency,
-}: {
-  initial: ShippingSettings;
-  currency: string;
-}) {
+export function ShippingForm({ initial, currency, pro }: { initial: ShippingSettings; currency: string; pro: boolean }) {
+  const [branches, setBranches] = useState<Branch[]>(initial.branches ?? []);
   const [state, action] = useActionState(saveShipping, undefined);
   const [delivery, setDelivery] = useState(Boolean(initial.delivery));
   const [rates, setRates] = useState<{ city: string; fee: string }[]>(
@@ -40,6 +35,7 @@ export function ShippingForm({
   return (
     <form action={action} className="space-y-4">
       <input type="hidden" name="rates" value={JSON.stringify(rates)} />
+      <input type="hidden" name="branches" value={JSON.stringify(branches)} />
       <section className="card space-y-3 p-4">
         <h2 className="text-sm font-semibold">🏪 الاستلام من المحل</h2>
         <p className="text-[13px] text-muted">
@@ -56,6 +52,34 @@ export function ShippingForm({
             className="input"
           />
         </Field>
+      </section>
+
+      <section className="card space-y-3 p-4">
+        <h2 className="text-sm font-semibold">🏬 الفروع {!pro && "🔒"}</h2>
+        {!pro ? (
+          <p className="rounded-lg bg-[#f4f0ff] p-3 text-[13px]">عندك أكتر من محل؟ بالباقة الاحترافية بتضيف لغاية 5 فروع، والزبون بيختار من وين يستلم، والطلب بيوصل لواتساب الفرع نفسه.</p>
+        ) : (
+          <>
+            <p className="text-[13px] text-muted">الزبون بيختار من أي فرع بيستلم، والطلب بيروح لواتساب هالفرع. المحل الرئيسي (فوق) بيضل أول خيار.</p>
+            {branches.map((b, i) => (
+              <div key={b.id || i} className="grid gap-2 rounded-lg border border-black/10 p-3 sm:grid-cols-3">
+                <input className="input" placeholder="اسم الفرع" value={b.name} onChange={(e) => setBranches(branches.map((x, k) => (k === i ? { ...x, name: e.target.value } : x)))} />
+                <input className="input" placeholder="العنوان والأوقات" value={b.note ?? ""} onChange={(e) => setBranches(branches.map((x, k) => (k === i ? { ...x, note: e.target.value } : x)))} />
+                <div className="flex gap-2">
+                  <input className="input" dir="ltr" placeholder="واتساب الفرع" value={b.whatsapp} onChange={(e) => setBranches(branches.map((x, k) => (k === i ? { ...x, whatsapp: e.target.value } : x)))} />
+                  <button type="button" className="px-2 text-muted hover:text-red-700" onClick={() => setBranches(branches.filter((_, k) => k !== i))} aria-label="احذف">
+                    ✕
+                  </button>
+                </div>
+              </div>
+            ))}
+            {branches.length < 4 && (
+              <button type="button" className="text-[13px] font-semibold text-[#005bd3] hover:underline" onClick={() => setBranches([...branches, { id: "", name: "", note: "", whatsapp: "" }])}>
+                + ضيف فرع
+              </button>
+            )}
+          </>
+        )}
       </section>
 
       <section className="card p-4">

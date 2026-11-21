@@ -1,10 +1,19 @@
 import { Card, PageHeader } from "@/components/admin-ui";
-import { requireMerchant } from "@/lib/auth";
+import { requireOwner } from "@/lib/auth";
 import { CopyLink } from "../copy-link";
 import { MetaForm } from "./form";
+import { isPro } from "@/lib/plans";
+import { ProGate } from "@/components/pro-gate";
 
 export default async function MarketingPage() {
-  const { store } = await requireMerchant();
+  const { store } = await requireOwner();
+  if (!isPro(store))
+    return (
+      <div className="space-y-4">
+        <PageHeader title="Meta Pixel وكتالوج المنتجات" back="/dashboard/settings/advanced" />
+        <ProGate feature="ربط إعلانات فيسبوك وانستغرام" />
+      </div>
+    );
   const s = store as typeof store & { meta_pixel_id?: string | null; meta_capi_token?: string | null };
   const feed = `/api/feed/${store.slug}.csv`;
   return (

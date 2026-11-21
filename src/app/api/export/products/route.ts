@@ -1,3 +1,4 @@
+import { isPro } from "@/lib/plans";
 import { getMerchant } from "@/lib/auth";
 import { buildSheet, PRODUCT_COLUMNS } from "@/lib/sheets";
 import type { Product } from "@/lib/types";
@@ -5,7 +6,8 @@ import type { Product } from "@/lib/types";
 // Downloads all products as an Excel file. ?template=1 gives an empty sheet with example rows.
 export async function GET(req: Request) {
   const m = await getMerchant();
-  if (!m) return new Response("Unauthorized", { status: 401 });
+  if (!m || m.role !== "owner") return new Response("Unauthorized", { status: 401 });
+  if (!isPro(m.store)) return new Response("التصدير لـ Excel متاح بالباقة الاحترافية", { status: 403, headers: { "content-type": "text/plain; charset=utf-8" } });
   const template = new URL(req.url).searchParams.get("template") === "1";
   const headers = PRODUCT_COLUMNS.map((c) => c.header);
 

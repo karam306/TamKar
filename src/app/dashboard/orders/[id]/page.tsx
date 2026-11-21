@@ -237,7 +237,7 @@ export default async function OrderPage({
                   </a>
                 </div>
                 {o.fulfillment === "pickup" ? (
-                  <div className="pt-3 font-semibold">🏪 استلام من المحل</div>
+                  <div className="pt-3 font-semibold">🏪 استلام من {o.branch || "المحل"}</div>
                 ) : (
                   <>
                     <div className="pt-3 font-semibold">🚚 عنوان التوصيل</div>

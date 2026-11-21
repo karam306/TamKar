@@ -1,9 +1,11 @@
 import Link from "next/link";
-import { requireMerchant } from "@/lib/auth";
+import { ProGate } from "@/components/pro-gate";
+import { isPro, PLAN_LABELS } from "@/lib/plans";
+import { requireOwner } from "@/lib/auth";
 import { SettingsForm } from "./form";
 
 export default async function SettingsPage() {
-  const { store, user } = await requireMerchant();
+  const { store, user } = await requireOwner();
   const paid = store.paid_until ? new Date(store.paid_until).toLocaleDateString("en-GB") : null;
   return (
     <div className="space-y-6">
@@ -14,6 +16,14 @@ export default async function SettingsPage() {
           <span className="flex-1">
             <b className="block text-sm">الاستلام والتوصيل</b>
             <span className="text-[13px] text-muted">{store.shipping?.delivery ? "استلام من المحل + توصيل" : "استلام من المحل بس"}</span>
+          </span>
+          <span className="text-muted">←</span>
+        </Link>
+        <Link href="/dashboard/settings/team" className="card flex items-center gap-3 p-4 hover:shadow-md">
+          <span className="text-2xl">👥</span>
+          <span className="flex-1">
+            <b className="block text-sm">الموظفين {!isPro(store) && "🔒"}</b>
+            <span className="text-[13px] text-muted">حسابات لموظفينك يستلموا الطلبات</span>
           </span>
           <span className="text-muted">←</span>
         </Link>
@@ -44,7 +54,8 @@ export default async function SettingsPage() {
         <p>
           رابط المتجر: <span dir="ltr">{store.slug}</span>
         </p>
-        <p>الباقة: {store.plan === "trial" ? "فترة تجريبية" : store.plan}</p>
+        <p>الباقة: {PLAN_LABELS[store.plan ?? ""] ?? store.plan}</p>
+        {!isPro(store) && <ProGate feature="الموظفين والفروع والفواتير وربط الإعلانات" compact />}
         {paid && <p>الاشتراك فعّال لغاية: {paid}</p>}
       </section>
     </div>

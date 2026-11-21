@@ -1,5 +1,6 @@
 "use server";
 
+import { LIMIT_MSG, productRoom } from "@/lib/plan-guard";
 import { randomUUID } from "node:crypto";
 import { refresh, revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -127,6 +128,7 @@ export async function saveProduct(_: FormState, form: FormData): Promise<FormSta
     refresh();
     return { ok: "✓ انحفظ المنتج" };
   }
+  if ((await productRoom(db, store)) < 1) return { error: LIMIT_MSG };
   const { data, error } = await db.from("products").insert(row).select("id").single();
   if (error || !data) return { error: "ما قدرنا نحفظ، جرب مرة تانية" };
   revalidatePath("/dashboard/products");
@@ -149,6 +151,7 @@ export async function duplicateProduct(form: FormData) {
   const id = String(form.get("id") ?? "");
   const { data: p } = await db.from("products").select("*").eq("id", id).eq("store_id", store.id).maybeSingle();
   if (!p) return;
+  if ((await productRoom(db, store)) < 1) redirect("/dashboard/products?limit=1");
   const copy = { ...p, title: `${p.title} (نسخة)`, active: false, images: [] as string[] };
   delete (copy as Record<string, unknown>).id;
   delete (copy as Record<string, unknown>).created_at;

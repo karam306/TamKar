@@ -18,6 +18,7 @@ export function whatsappOrderLink(
     address: string | null;
     notes?: string | null;
     fulfillment?: "pickup" | "delivery";
+    branch?: { name: string; note?: string | null; whatsapp: string } | null;
     items: OrderLine[];
     total: number;
     discount?: number;
@@ -41,10 +42,16 @@ export function whatsappOrderLink(
     "",
     `الاسم: ${order.customer_name}`,
     `الهاتف: ${order.phone}`,
-    order.fulfillment === "pickup" ? (store.shipping?.pickup_note ? `مكان الاستلام: ${store.shipping.pickup_note}` : "") : `العنوان: ${order.city}، ${order.address}`,
+    order.fulfillment === "pickup"
+      ? order.branch
+        ? `مكان الاستلام: ${order.branch.name}${order.branch.note ? `، ${order.branch.note}` : ""}`
+        : store.shipping?.pickup_note
+          ? `مكان الاستلام: ${store.shipping.pickup_note}`
+          : ""
+      : `العنوان: ${order.city}، ${order.address}`,
     order.notes ? `ملاحظات: ${order.notes}` : "",
   ].filter((l, i, a) => !(l === "" && a[i - 1] === ""));
-  return `https://wa.me/${store.whatsapp}?text=${encodeURIComponent(lines.join("\n").trim())}`;
+  return `https://wa.me/${order.branch?.whatsapp || store.whatsapp}?text=${encodeURIComponent(lines.join("\n").trim())}`;
 }
 
 export function whatsappLink(phone: string, text?: string): string {

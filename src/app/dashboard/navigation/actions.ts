@@ -2,7 +2,7 @@
 
 import { refresh, revalidatePath } from "next/cache";
 import type { FormState } from "@/components/form-ui";
-import { requireMerchant } from "@/lib/auth";
+import { requireOwner } from "@/lib/auth";
 import type { MenuLink } from "@/lib/types";
 
 const clean = (raw: unknown): MenuLink[] =>
@@ -12,7 +12,7 @@ const clean = (raw: unknown): MenuLink[] =>
     .filter((l) => l.label && (l.href.startsWith("/") || /^https:\/\//.test(l.href)));
 
 export async function saveMenus(_: FormState, form: FormData): Promise<FormState> {
-  const { store, db } = await requireMerchant();
+  const { store, db } = await requireOwner();
   let raw: { header?: unknown; footer?: unknown } = {};
   try {
     raw = JSON.parse(String(form.get("menus") ?? "{}"));

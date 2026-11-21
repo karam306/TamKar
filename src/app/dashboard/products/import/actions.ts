@@ -1,7 +1,8 @@
 "use server";
 
+import { isPro } from "@/lib/plans";
 import { refresh, revalidatePath } from "next/cache";
-import { requireMerchant } from "@/lib/auth";
+import { requireOwner } from "@/lib/auth";
 import { readProductSheet } from "@/lib/sheets";
 
 export type ImportResult = { ok?: string; error?: string; problems?: string[] } | undefined;
@@ -17,7 +18,8 @@ const toNum = (s?: string) => {
  * update that product (price, stock...); other rows are added as new products.
  */
 export async function importProducts(_: ImportResult, form: FormData): Promise<ImportResult> {
-  const { store, db } = await requireMerchant();
+  const { store, db } = await requireOwner();
+  if (!isPro(store)) return { error: "الاستيراد من Excel متاح بالباقة الاحترافية" };
   const file = form.get("file") as File | null;
   if (!file || file.size === 0) return { error: "اختار ملف" };
   if (file.size > 4 * 1024 * 1024) return { error: "الملف كبير كتير (الحد 4 ميغا). قسّمه لكذا ملف." };

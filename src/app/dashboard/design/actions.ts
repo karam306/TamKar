@@ -2,7 +2,7 @@
 
 import { refresh, revalidatePath } from "next/cache";
 import type { FormState } from "@/components/form-ui";
-import { requireMerchant } from "@/lib/auth";
+import { requireOwner } from "@/lib/auth";
 import { BUSINESS_TYPES } from "@/lib/business-types";
 import { createTemplatePages, templateStoreFields } from "@/lib/store-setup";
 import type { Section, ThemeId } from "@/lib/types";
@@ -100,7 +100,7 @@ function cleanSections(input: unknown, storeId: string): Section[] {
 }
 
 export async function saveDesign(_: FormState, form: FormData): Promise<FormState> {
-  const { store, db } = await requireMerchant();
+  const { store, db } = await requireOwner();
   const theme = String(form.get("theme") ?? "") as ThemeId;
   const color = String(form.get("primary_color") ?? "");
   const logo = String(form.get("logo_url") ?? "");
@@ -128,7 +128,7 @@ export async function saveDesign(_: FormState, form: FormData): Promise<FormStat
 
 /** Starts the design over from the ready-made template of a business type. */
 export async function applyTemplate(form: FormData) {
-  const { store, db } = await requireMerchant();
+  const { store, db } = await requireOwner();
   const type = String(form.get("business_type") ?? "");
   if (!BUSINESS_TYPES.some((b) => b.id === type)) return;
   const fields = templateStoreFields(type, store.name);

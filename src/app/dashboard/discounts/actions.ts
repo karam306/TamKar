@@ -3,7 +3,7 @@
 import { refresh, revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import type { FormState } from "@/components/form-ui";
-import { requireMerchant } from "@/lib/auth";
+import { requireOwner } from "@/lib/auth";
 
 const num = (v: FormDataEntryValue | null) => {
   const s = String(v ?? "").trim();
@@ -19,7 +19,7 @@ const date = (v: FormDataEntryValue | null) => {
 };
 
 export async function saveDiscount(_: FormState, form: FormData): Promise<FormState> {
-  const { store, db } = await requireMerchant();
+  const { store, db } = await requireOwner();
   const id = String(form.get("id") ?? "");
   const automatic = form.get("method") === "automatic";
   const kind = String(form.get("kind") ?? "");
@@ -61,7 +61,7 @@ export async function saveDiscount(_: FormState, form: FormData): Promise<FormSt
 }
 
 export async function deleteDiscount(form: FormData) {
-  const { store, db } = await requireMerchant();
+  const { store, db } = await requireOwner();
   await db.from("discounts").delete().eq("id", String(form.get("id") ?? "")).eq("store_id", store.id);
   revalidatePath("/dashboard/discounts");
   refresh();

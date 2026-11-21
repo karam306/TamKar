@@ -51,11 +51,15 @@ export type StorePage = { id: string; store_id: string; title: string; handle: s
 
 export type Fulfillment = "pickup" | "delivery";
 
+export type Branch = { id: string; name: string; note?: string | null; whatsapp: string };
+
 export type ShippingSettings = {
   /** Delivery is optional. When off, customers pick up from the shop. */
   delivery?: boolean;
   /** Where and when to pick up, shown at checkout and in the WhatsApp message. */
   pickup_note?: string | null;
+  /** Pro: more shops to pick up from, each with its own WhatsApp for orders. */
+  branches?: Branch[];
   default_fee?: number | null;
   free_over?: number | null;
   rates?: { city: string; fee: number }[];
@@ -143,6 +147,7 @@ export type OrderInput = {
   notes?: string;
   discountCode?: string;
   method?: Fulfillment;
+  branch?: string;
   items: CartItem[];
 };
 
@@ -179,5 +184,7 @@ export type Order = {
   discount_amount?: number;
   shipping_fee?: number;
   fulfillment?: Fulfillment;
+  branch?: string | null;
+  share_token?: string | null;
   created_at: string;
 };

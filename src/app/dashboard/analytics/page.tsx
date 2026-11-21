@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { Card, PageHeader } from "@/components/admin-ui";
-import { requireMerchant } from "@/lib/auth";
+import { requireOwner } from "@/lib/auth";
 import { formatPrice } from "@/lib/format";
 import type { Order } from "@/lib/types";
 import { BarChart } from "./bar-chart";
+import { ProGate } from "@/components/pro-gate";
+import { isPro } from "@/lib/plans";
 
 const RANGES = [
   { days: 7, label: "آخر 7 أيام" },
@@ -21,7 +23,7 @@ function rangeStart(days: number) {
 const dayKey = (d: Date) => d.toLocaleDateString("en-CA", { timeZone: "Asia/Damascus" });
 
 export default async function AnalyticsPage({ searchParams }: { searchParams: Promise<{ days?: string }> }) {
-  const { store, db } = await requireMerchant();
+  const { store, db } = await requireOwner();
   const wanted = Number((await searchParams).days);
   const days = RANGES.find((r) => r.days === wanted)?.days ?? 30;
   const since = rangeStart(days);
@@ -32,6 +34,23 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
     db.from("store_stats").select("*").eq("store_id", store.id).gte("day", sinceKey),
   ]);
   const orders = ((ordersData ?? []) as Order[]).filter((o) => o.status !== "cancelled");
+
+  // Pro: the period before this one, and the best customers.
+  const pro = isPro(store);
+  let prevSales = 0;
+  let prevOrders = 0;
+  let topCustomers: { id: string; name: string; orders_count: number; total_spent: number }[] = [];
+  if (pro) {
+    const prevKey = dayKey(new Date(since.getTime() - days * 86400000));
+    const [{ data: prev }, { data: best }] = await Promise.all([
+      db.from("orders").select("total, status").eq("store_id", store.id).gte("created_at", `${prevKey}T00:00:00+03:00`).lt("created_at", `${sinceKey}T00:00:00+03:00`).limit(10000),
+      db.from("customers").select("id, name, orders_count, total_spent").eq("store_id", store.id).order("total_spent", { ascending: false }).limit(8),
+    ]);
+    const kept = (prev ?? []).filter((o) => o.status !== "cancelled");
+    prevSales = kept.reduce((s, o) => s + Number(o.total), 0);
+    prevOrders = kept.length;
+    topCustomers = (best ?? []) as typeof topCustomers;
+  }
   const stats = (statsData ?? []) as Stat[];
   const money = (n: number) => formatPrice(n, store.currency);
 
@@ -180,6 +199,36 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
           </ul>
         )}
       </Card>
+
+      {pro ? (
+        <div className="grid gap-4 lg:grid-cols-2">
+          <Card title={`مقارنة بالـ ${days} يوم اللي قبلها`}>
+            <div className="grid grid-cols-2 gap-3 text-[13px]">
+              <Compare label="المبيعات" now={sales} before={prevSales} fmt={money} />
+              <Compare label="الطلبات" now={orders.length} before={prevOrders} fmt={(n) => String(n)} />
+            </div>
+          </Card>
+          <Card title="أفضل الزبائن">
+            {topCustomers.length === 0 ? (
+              <p className="py-6 text-center text-[13px] text-muted">لسا ما في زبائن</p>
+            ) : (
+              <ul className="divide-y divide-black/5 text-[13px]">
+                {topCustomers.map((c) => (
+                  <li key={c.id} className="flex items-center justify-between py-2">
+                    <Link href={`/dashboard/customers/${c.id}`} className="hover:underline">
+                      {c.name}
+                    </Link>
+                    <span className="text-muted">{c.orders_count} طلب</span>
+                    <span>{money(Number(c.total_spent))}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Card>
+        </div>
+      ) : (
+        <ProGate feature="تقارير أفضل الزبائن ومقارنة الفترات" compact />
+      )}
     </div>
   );
 }
@@ -190,6 +239,24 @@ function Tile({ label, value, sub }: { label: string; value: string; sub?: strin
       <div className="text-[13px] text-muted">{label}</div>
       <div className="mt-1 text-2xl font-semibold">{value}</div>
       {sub && <div className="mt-0.5 text-xs text-muted">{sub}</div>}
+    </div>
+  );
+}
+
+function Compare({ label, now, before, fmt }: { label: string; now: number; before: number; fmt: (n: number) => string }) {
+  const change = before ? ((now - before) / before) * 100 : null;
+  return (
+    <div className="rounded-lg bg-[#f7f7f7] p-3">
+      <div className="text-muted">{label}</div>
+      <div className="text-lg font-semibold">{fmt(now)}</div>
+      <div className="text-xs text-muted">
+        قبل: {fmt(before)}
+        {change !== null && (
+          <span className={change >= 0 ? "mr-1 text-green-700" : "mr-1 text-red-700"}>
+            {change >= 0 ? "▲" : "▼"} {Math.abs(change).toFixed(0)}%
+          </span>
+        )}
+      </div>
     </div>
   );
 }

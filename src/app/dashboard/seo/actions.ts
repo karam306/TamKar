@@ -2,7 +2,7 @@
 
 import { refresh, revalidatePath } from "next/cache";
 import type { FormState } from "@/components/form-ui";
-import { requireMerchant } from "@/lib/auth";
+import { requireOwner } from "@/lib/auth";
 
 const url = (v: FormDataEntryValue | null) => {
   const s = String(v ?? "").trim();
@@ -12,7 +12,7 @@ const url = (v: FormDataEntryValue | null) => {
 };
 
 export async function saveSeo(_: FormState, form: FormData): Promise<FormState> {
-  const { store, db } = await requireMerchant();
+  const { store, db } = await requireOwner();
   const image = String(form.get("image") ?? "");
   const social = {
     instagram: url(form.get("instagram")),

@@ -1,9 +1,18 @@
 import { PageHeader } from "@/components/admin-ui";
-import { requireMerchant } from "@/lib/auth";
+import { ProGate } from "@/components/pro-gate";
+import { isPro } from "@/lib/plans";
+import { requireOwner } from "@/lib/auth";
 import { ImportForm } from "./import-form";
 
 export default async function ImportPage() {
-  const { store, db } = await requireMerchant();
+  const { store, db } = await requireOwner();
+  if (!isPro(store))
+    return (
+      <div className="space-y-4">
+        <PageHeader title="استيراد وتصدير المنتجات" back="/dashboard/products" />
+        <ProGate feature="الاستيراد والتصدير من Excel" />
+      </div>
+    );
   const { count } = await db.from("products").select("id", { count: "exact", head: true }).eq("store_id", store.id);
   return (
     <div className="space-y-4">

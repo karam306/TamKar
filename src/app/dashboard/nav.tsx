@@ -41,6 +41,7 @@ export const SETTINGS: Item = {
   icon: ICONS.settings,
   sub: [
     { href: "/dashboard/settings/shipping", label: "الاستلام والتوصيل" },
+    { href: "/dashboard/settings/team", label: "الموظفين" },
     {
       href: "/dashboard/settings/advanced",
       label: "إعدادات متقدمة",
@@ -112,25 +113,31 @@ function NavList({ items, onNavigate }: { items: Item[]; onNavigate?: () => void
 }
 
 /** Grey side menu, like Shopify's admin. On phones it slides in from the side. */
-export function SideNav({ storeName, storeLink }: { storeName: string; storeLink: string }) {
+/** Staff see the day-to-day work only. */
+const STAFF_HREFS = ["/dashboard", "/dashboard/orders", "/dashboard/products", "/dashboard/customers"];
+const navFor = (staff?: boolean) => (staff ? NAV.filter((i) => STAFF_HREFS.includes(i.href)) : NAV);
+
+export function SideNav({ storeName, storeLink, staff }: { storeName: string; storeLink: string; staff?: boolean }) {
   return (
     <div className="flex h-full flex-col">
       <nav className="flex-1 overflow-y-auto p-3">
-        <NavList items={NAV} />
+        <NavList items={navFor(staff)} />
         <div className="mt-5 px-2.5 text-xs font-semibold text-[#616161]">المتجر الإلكتروني</div>
         <a href={storeLink} target="_blank" rel="noopener noreferrer" className="mt-1 flex items-center justify-between rounded-lg px-2.5 py-1.5 text-[13px] hover:bg-black/5">
           <span className="truncate">{storeName}</span>
           <span aria-hidden>↗</span>
         </a>
       </nav>
-      <div className="p-3">
-        <NavList items={[SETTINGS]} />
-      </div>
+      {!staff && (
+        <div className="p-3">
+          <NavList items={[SETTINGS]} />
+        </div>
+      )}
     </div>
   );
 }
 
-export function MobileMenu({ storeName, storeLink }: { storeName: string; storeLink: string }) {
+export function MobileMenu({ storeName, storeLink, staff }: { storeName: string; storeLink: string; staff?: boolean }) {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -148,7 +155,7 @@ export function MobileMenu({ storeName, storeLink }: { storeName: string; storeL
               </button>
             </div>
             <div className="flex-1 overflow-y-auto p-3" onClick={(e) => (e.target as HTMLElement).closest("a") && setOpen(false)}>
-              <NavList items={[...NAV, SETTINGS]} />
+              <NavList items={staff ? navFor(true) : [...NAV, SETTINGS]} />
               <a href={storeLink} target="_blank" rel="noopener noreferrer" className="mt-4 block rounded-lg px-2.5 py-1.5 text-[13px] hover:bg-black/5">
                 شوف متجرك ↗
               </a>

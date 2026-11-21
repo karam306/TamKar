@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { EmptyState, PageHeader } from "@/components/admin-ui";
-import { requireMerchant } from "@/lib/auth";
+import { requireOwner } from "@/lib/auth";
 import type { Discount } from "@/lib/types";
 import { describeDiscount, discountState } from "./describe";
 
 export default async function DiscountsPage({ searchParams }: { searchParams: Promise<{ saved?: string }> }) {
-  const { store, db } = await requireMerchant();
+  const { store, db } = await requireOwner();
   const { saved } = await searchParams;
   const { data } = await db.from("discounts").select("*").eq("store_id", store.id).order("created_at", { ascending: false });
   const list = (data ?? []) as Discount[];

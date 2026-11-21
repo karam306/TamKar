@@ -9,6 +9,7 @@ import { getStore } from "@/lib/data";
 import { whatsappLink } from "@/lib/format";
 import { isOpen } from "@/lib/subscription";
 import type { MenuLink, StoreSocial } from "@/lib/types";
+import { isPro } from "@/lib/plans";
 
 type Props = { children: React.ReactNode; params: Promise<{ site: string }> };
 
@@ -60,7 +61,7 @@ export default async function StoreLayout({ children, params }: Props) {
   return (
     <div data-theme={store.theme} style={style} className="flex min-h-screen flex-col bg-bg font-sans text-text">
       <StoreProvider info={{ slug: store.slug, base, currency: store.currency, whatsapp: store.whatsapp, name: store.name }}>
-        <StoreTracking slug={store.slug} pixelId={store.meta_pixel_id} />
+        <StoreTracking slug={store.slug} pixelId={isPro(store) ? store.meta_pixel_id : null} />
         <header className="sticky top-0 z-20 border-b border-black/5 bg-bg/95 backdrop-blur">
           <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4">
             <div className="flex items-center gap-2">
@@ -127,7 +128,7 @@ export default async function StoreLayout({ children, params }: Props) {
               </a>
             </div>
           </div>
-          <div className="pb-6 text-center text-xs text-muted">متجر مبني على منصة {platform}</div>
+          {!isPro(store) && <div className="pb-6 text-center text-xs text-muted">متجر مبني على منصة {platform}</div>}
         </footer>
       </StoreProvider>
     </div>

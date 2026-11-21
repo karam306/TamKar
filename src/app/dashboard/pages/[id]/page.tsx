@@ -1,13 +1,13 @@
 import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/admin-ui";
-import { requireMerchant } from "@/lib/auth";
+import { requireOwner } from "@/lib/auth";
 import type { StorePage } from "@/lib/types";
 import { storeUrl } from "@/lib/urls";
 import { deletePage } from "../actions";
 import { PageForm } from "../page-form";
 
 export default async function EditPage({ params }: { params: Promise<{ id: string }> }) {
-  const { store, db } = await requireMerchant();
+  const { store, db } = await requireOwner();
   const { id } = await params;
   if (!/^[0-9a-f-]{36}$/.test(id)) notFound();
   const { data } = await db.from("pages").select("*").eq("id", id).eq("store_id", store.id).maybeSingle();

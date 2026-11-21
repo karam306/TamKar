@@ -1,9 +1,9 @@
 import { PageHeader } from "@/components/admin-ui";
-import { requireMerchant } from "@/lib/auth";
+import { requireOwner } from "@/lib/auth";
 import { PageForm } from "../page-form";
 
 export default async function NewPage() {
-  await requireMerchant();
+  await requireOwner();
   return (
     <div>
       <PageHeader title="صفحة جديدة" back="/dashboard/pages" />

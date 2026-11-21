@@ -5,9 +5,11 @@ import { formatPrice } from "@/lib/format";
 import { hasVariants, priceRange, totalStock } from "@/lib/product-utils";
 import type { Product } from "@/lib/types";
 import { BulkBar } from "./bulk-bar";
+import { ProGate } from "@/components/pro-gate";
+import { isPro, LIMITS } from "@/lib/plans";
 
 const PER_PAGE = 50;
-type SP = { q?: string; status?: string; page?: string };
+type SP = { q?: string; status?: string; page?: string; limit?: string };
 
 export default async function ProductsPage({ searchParams }: { searchParams: Promise<SP> }) {
   const { store, db } = await requireMerchant();
@@ -51,6 +53,16 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         }
       />
 
+      {!isPro(store) && (sp.limit || (!sp.q && !sp.status && (count ?? 0) >= LIMITS.basic.products)) && (
+        <div className="mb-4">
+          <ProGate feature={`أكتر من ${LIMITS.basic.products} منتج`} compact />
+        </div>
+      )}
+      {!isPro(store) && !sp.q && !sp.status && (count ?? 0) < LIMITS.basic.products && (count ?? 0) >= LIMITS.basic.products - 10 && (
+        <p className="mb-4 text-[13px] text-muted">
+          عندك {count} منتج من أصل {LIMITS.basic.products} بالباقة الأساسية.
+        </p>
+      )}
       {!sp.q && !sp.status && products.length === 0 ? (
         <EmptyState
           title="ضيف منتجاتك"

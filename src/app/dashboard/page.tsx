@@ -6,9 +6,9 @@ import { storeUrl } from "@/lib/urls";
 import { CopyLink } from "./copy-link";
 import { StatusBadge } from "./orders/status";
 
-export default async function DashboardHome({ searchParams }: { searchParams: Promise<{ welcome?: string }> }) {
+export default async function DashboardHome({ searchParams }: { searchParams: Promise<{ welcome?: string; owner_only?: string }> }) {
   const { store, db } = await requireMerchant();
-  const { welcome } = await searchParams;
+  const { welcome, owner_only } = await searchParams;
 
   const monthStart = new Date();
   monthStart.setDate(1);
@@ -35,6 +35,7 @@ export default async function DashboardHome({ searchParams }: { searchParams: Pr
 
   return (
     <div className="space-y-6">
+      {owner_only && <div className="rounded-lg bg-[#fff4d6] p-3 text-[13px]">هالصفحة لصاحب المتجر بس.</div>}
       {welcome && (
         <div className="rounded-theme bg-primary p-5 text-white">
           <h1 className="text-2xl">🎉 مبروك، متجرك صار جاهز!</h1>

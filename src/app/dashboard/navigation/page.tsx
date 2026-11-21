@@ -1,10 +1,10 @@
 import { PageHeader } from "@/components/admin-ui";
-import { requireMerchant } from "@/lib/auth";
+import { requireOwner } from "@/lib/auth";
 import type { StoreMenus } from "@/lib/types";
 import { MenuEditor } from "./editor";
 
 export default async function NavigationPage() {
-  const { store, db } = await requireMerchant();
+  const { store, db } = await requireOwner();
   const [{ data: cols }, { data: pages }] = await Promise.all([
     db.from("collections").select("title, handle").eq("store_id", store.id).order("title"),
     db.from("pages").select("title, handle").eq("store_id", store.id).order("created_at"),
