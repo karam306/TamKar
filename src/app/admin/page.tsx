@@ -18,6 +18,8 @@ export default async function AdminHome() {
     .filter((x) => ["expiring", "grace", "expired"].includes(x.st) || (x.st === "trial" && (daysLeft(x.s.paid_until) ?? 99) <= 3))
     .sort((a, b) => (daysLeft(a.s.paid_until) ?? 0) - (daysLeft(b.s.paid_until) ?? 0));
 
+  const helpWanted = stores.filter((s) => s.note?.startsWith("🙋"));
+
   return (
     <div className="space-y-4">
       <PageHeader
@@ -39,6 +41,24 @@ export default async function AdminHome() {
         <Tile label="مبيعات بالدولار (30 يوم)" value={formatPrice(usd, "USD")} />
         <Tile label="مبيعات بالليرة (30 يوم)" value={formatPrice(syp, "SYP")} />
       </div>
+
+      {helpWanted.length > 0 && (
+        <Card title={`🙋 طلبوا مساعدة بالتجهيز والإعلانات (${helpWanted.length})`}>
+          <ul className="divide-y divide-black/5 text-[13px]">
+            {helpWanted.map((s) => (
+              <li key={s.id} className="flex items-center justify-between gap-3 py-2.5">
+                <Link href={`/admin/stores/${s.id}`} className="font-semibold hover:underline">
+                  {s.name}
+                </Link>
+                <span className="text-muted">{s.owner_name ?? ""}</span>
+                <a href={`https://wa.me/${s.whatsapp}`} target="_blank" rel="noopener noreferrer" className="btn !bg-[#25D366] !px-3 !py-1 text-xs">
+                  واتساب
+                </a>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
 
       <Card title="بحاجة متابعة (اشتراكات قربت تخلص أو خلصت)">
         {attention.length === 0 ? (
