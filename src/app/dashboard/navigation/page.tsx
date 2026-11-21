@@ -17,7 +17,7 @@ export default async function NavigationPage() {
   ];
   return (
     <div>
-      <PageHeader title="القوائم" back="/dashboard/design" />
+      <PageHeader title="قوائم المتجر" back="/dashboard/settings/advanced" />
       <MenuEditor initial={(store as { menus?: StoreMenus }).menus ?? {}} targets={targets} />
     </div>
   );

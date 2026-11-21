@@ -8,7 +8,7 @@ export default async function SeoPage() {
   const s = store as typeof store & { seo?: StoreSeo; social?: StoreSocial };
   return (
     <div>
-      <PageHeader title="SEO والسوشال ميديا" back="/dashboard/design" />
+      <PageHeader title="Google والسوشال ميديا" back="/dashboard/settings/advanced" />
       <SeoForm seo={s.seo ?? {}} social={s.social ?? {}} name={store.name} tagline={store.tagline ?? ""} slug={store.slug} />
     </div>
   );

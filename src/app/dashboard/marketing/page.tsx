@@ -9,7 +9,7 @@ export default async function MarketingPage() {
   const feed = `/api/feed/${store.slug}.csv`;
   return (
     <div className="space-y-4">
-      <PageHeader title="التسويق: Meta (فيسبوك وإنستغرام)" />
+      <PageHeader title="Meta Pixel وكتالوج المنتجات" back="/dashboard/settings/advanced" />
 
       <Card title="1. البيكسل و Conversions API">
         <p className="mb-3 text-[13px] text-muted">

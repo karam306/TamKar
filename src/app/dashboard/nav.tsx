@@ -4,7 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
-type Item = { href: string; label: string; icon: string; sub?: { href: string; label: string }[] };
+type Sub = { href: string; label: string; match?: string[] };
+type Item = { href: string; label: string; icon: string; sub?: Sub[] };
+
+const subOn = (path: string, s: Sub) => path.startsWith(s.href) || (s.match ?? []).some((m) => path.startsWith(m));
 
 const ICONS = {
   home: "M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z",
@@ -18,46 +21,43 @@ const ICONS = {
   settings: "M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19 12a7 7 0 0 0-.1-1.2l2-1.6-2-3.4-2.4 1a7 7 0 0 0-2-1.2L14 3h-4l-.5 2.6a7 7 0 0 0-2 1.2l-2.4-1-2 3.4 2 1.6a7 7 0 0 0 0 2.4l-2 1.6 2 3.4 2.4-1a7 7 0 0 0 2 1.2L10 21h4l.5-2.6a7 7 0 0 0 2-1.2l2.4 1 2-3.4-2-1.6c.1-.4.1-.8.1-1.2z",
 };
 
+// Kept short on purpose: everyday work only. Technical things (Meta, SEO, Excel,
+// menus) live under Settings > Advanced settings.
 export const NAV: Item[] = [
   { href: "/dashboard", label: "الرئيسية", icon: ICONS.home },
   { href: "/dashboard/orders", label: "الطلبات", icon: ICONS.orders, sub: [{ href: "/dashboard/orders/new", label: "طلب يدوي جديد" }] },
-  {
-    href: "/dashboard/products",
-    label: "المنتجات",
-    icon: ICONS.products,
-    sub: [
-      { href: "/dashboard/collections", label: "المجموعات" },
-      { href: "/dashboard/products/import", label: "استيراد وتصدير" },
-    ],
-  },
+  { href: "/dashboard/products", label: "المنتجات", icon: ICONS.products, sub: [{ href: "/dashboard/collections", label: "المجموعات" }] },
   { href: "/dashboard/customers", label: "الزبائن", icon: ICONS.customers },
-  { href: "/dashboard/analytics", label: "التقارير", icon: ICONS.analytics },
-  { href: "/dashboard/marketing", label: "التسويق", icon: ICONS.marketing },
   { href: "/dashboard/discounts", label: "الخصومات", icon: ICONS.discounts },
-  {
-    href: "/dashboard/design",
-    label: "تصميم المتجر",
-    icon: ICONS.store,
-    sub: [
-      { href: "/dashboard/pages", label: "الصفحات" },
-      { href: "/dashboard/navigation", label: "القوائم" },
-      { href: "/dashboard/seo", label: "SEO والسوشال ميديا" },
-    ],
-  },
+  { href: "/dashboard/analytics", label: "التقارير", icon: ICONS.analytics },
+  { href: "/dashboard/design", label: "شكل المتجر", icon: ICONS.store, sub: [{ href: "/dashboard/pages", label: "الصفحات" }] },
 ];
+
+const ADVANCED_PATHS = ["/dashboard/marketing", "/dashboard/seo", "/dashboard/navigation", "/dashboard/products/import"];
 
 export const SETTINGS: Item = {
   href: "/dashboard/settings",
   label: "الإعدادات",
   icon: ICONS.settings,
-  sub: [{ href: "/dashboard/settings/shipping", label: "الاستلام والتوصيل" }],
+  sub: [
+    { href: "/dashboard/settings/shipping", label: "الاستلام والتوصيل" },
+    {
+      href: "/dashboard/settings/advanced",
+      label: "إعدادات متقدمة",
+      match: ADVANCED_PATHS,
+    },
+  ],
 };
 
 function useActive() {
   const path = usePathname();
   return {
     path,
-    isActive: (href: string) => (href === "/dashboard" ? path === href : path === href || path.startsWith(href + "/")),
+    isActive: (href: string) => {
+      // Pages that moved to "Advanced settings" only light up that item.
+      if (href !== SETTINGS.href && ADVANCED_PATHS.some((m) => path.startsWith(m))) return false;
+      return href === "/dashboard" ? path === href : path === href || path.startsWith(href + "/");
+    },
   };
 }
 
@@ -74,7 +74,7 @@ function NavList({ items, onNavigate }: { items: Item[]; onNavigate?: () => void
   return (
     <ul className="flex flex-col gap-0.5">
       {items.map((i) => {
-        const subActive = i.sub?.some((s) => path.startsWith(s.href));
+        const subActive = i.sub?.some((s) => subOn(path, s));
         const active = isActive(i.href) && !subActive;
         const open = isActive(i.href) || subActive;
         return (
@@ -96,7 +96,7 @@ function NavList({ items, onNavigate }: { items: Item[]; onNavigate?: () => void
                     <Link
                       href={s.href}
                       onClick={onNavigate}
-                      className={`block rounded-lg px-2.5 py-1.5 text-[13px] ${path.startsWith(s.href) ? "bg-white font-semibold shadow-[0_0_0_1px_rgba(0,0,0,0.06)]" : "text-[#4a4a4a] hover:bg-black/5"}`}
+                      className={`block rounded-lg px-2.5 py-1.5 text-[13px] ${subOn(path, s) ? "bg-white font-semibold shadow-[0_0_0_1px_rgba(0,0,0,0.06)]" : "text-[#4a4a4a] hover:bg-black/5"}`}
                     >
                       {s.label}
                     </Link>
