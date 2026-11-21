@@ -16,7 +16,7 @@ export function NewMerchantForm() {
 
   if (state?.created) {
     const c = state.created;
-    const msg = `أهلاً بك بـ TamKar 🎉\nمتجرك "${c.name}" صار جاهز.\n\nرابط متجرك: ${origin}/s/${c.slug}\nلوحة التحكم: ${origin}/login\nالإيميل: ${c.email}\nكلمة السر: ${c.password}\n\nفيك تغيّر كلمة السر بعد أول دخول.`;
+    const msg = `أهلاً بك بـ نمى 🎉\nمتجرك "${c.name}" صار جاهز.\n\nرابط متجرك: ${origin}/s/${c.slug}\nلوحة التحكم: ${origin}/login\nالإيميل: ${c.email}\nكلمة السر: ${c.password}\n\nفيك تغيّر كلمة السر بعد أول دخول.`;
     return (
       <div className="card max-w-xl space-y-4 p-5">
         <h2 className="text-lg font-semibold">✓ انعمل المتجر</h2>

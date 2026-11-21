@@ -7,11 +7,12 @@ import { hasSupabase } from "@/lib/supabase";
 import { daysLeft, subState } from "@/lib/subscription";
 import { storeUrl } from "@/lib/urls";
 import { MobileMenu, SideNav } from "./nav";
+import { BRAND } from "@/lib/brand";
 
 export const metadata: Metadata = { title: "لوحة التحكم", robots: { index: false } };
 export const dynamic = "force-dynamic";
 
-const platform = process.env.NEXT_PUBLIC_PLATFORM_NAME || "TamKar";
+const platform = BRAND;
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   if (!hasSupabase) {

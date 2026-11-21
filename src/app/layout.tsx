@@ -1,8 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { BRAND } from "@/lib/brand";
 
 export const metadata: Metadata = {
-  title: process.env.NEXT_PUBLIC_PLATFORM_NAME || "TamKar",
+  title: BRAND,
   description: "افتح متجرك أونلاين خلال دقائق",
 };
 

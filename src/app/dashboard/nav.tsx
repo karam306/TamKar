@@ -25,7 +25,15 @@ const ICONS = {
 // menus) live under Settings > Advanced settings.
 export const NAV: Item[] = [
   { href: "/dashboard", label: "الرئيسية", icon: ICONS.home },
-  { href: "/dashboard/orders", label: "الطلبات", icon: ICONS.orders, sub: [{ href: "/dashboard/orders/new", label: "طلب يدوي جديد" }] },
+  {
+    href: "/dashboard/orders",
+    label: "الطلبات",
+    icon: ICONS.orders,
+    sub: [
+      { href: "/dashboard/orders/new", label: "طلب يدوي جديد" },
+      { href: "/dashboard/quotes", label: "عروض الأسعار" },
+    ],
+  },
   { href: "/dashboard/products", label: "المنتجات", icon: ICONS.products, sub: [{ href: "/dashboard/collections", label: "المجموعات" }] },
   { href: "/dashboard/customers", label: "الزبائن", icon: ICONS.customers },
   { href: "/dashboard/discounts", label: "الخصومات", icon: ICONS.discounts },

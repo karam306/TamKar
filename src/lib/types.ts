@@ -188,3 +188,22 @@ export type Order = {
   share_token?: string | null;
   created_at: string;
 };
+
+export type QuoteLine = { title: string; variantTitle?: string | null; price: number; qty: number; productId?: string | null };
+
+export type Quote = {
+  id: string;
+  number: number;
+  store_id: string;
+  customer_name: string;
+  phone: string | null;
+  items: QuoteLine[];
+  discount: number;
+  delivery_fee: number;
+  total: number;
+  notes: string | null;
+  valid_until: string | null;
+  status: "sent" | "accepted" | "declined";
+  share_token: string | null;
+  created_at: string;
+};

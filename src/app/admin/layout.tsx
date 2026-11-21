@@ -3,11 +3,12 @@ import Link from "next/link";
 import { logout } from "@/app/(auth)/actions";
 import { requirePlatformAdmin } from "@/lib/platform-admin";
 import { AdminNav } from "./nav";
+import { BRAND } from "@/lib/brand";
 
 export const metadata: Metadata = { title: "لوحة المنصة", robots: { index: false } };
 export const dynamic = "force-dynamic";
 
-const platform = process.env.NEXT_PUBLIC_PLATFORM_NAME || "TamKar";
+const platform = BRAND;
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const { email } = await requirePlatformAdmin();

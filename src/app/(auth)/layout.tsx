@@ -1,6 +1,7 @@
 import Link from "next/link";
+import { BRAND } from "@/lib/brand";
 
-const platform = process.env.NEXT_PUBLIC_PLATFORM_NAME || "TamKar";
+const platform = BRAND;
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
