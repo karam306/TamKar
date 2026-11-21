@@ -18,8 +18,8 @@ type Pack = {
   sub: "trial" | "paid" | "expiring";
   stock: Record<string, number>;
   discounts: { code: string | null; title: string; kind: "percent" | "fixed" | "free_shipping"; value: number; min?: number; automatic?: boolean; expired?: boolean; limit?: number }[];
-  shipping: { default_fee: number; free_over?: number; rates: { city: string; fee: number }[] };
-  orders: { c: number; items: [string, number, string?][]; code?: string; status: string; daysAgo: number; manual?: boolean }[];
+  shipping: { delivery: boolean; pickup_note: string; default_fee: number; free_over?: number; rates: { city: string; fee: number }[] };
+  orders: { c: number; items: [string, number, string?][]; code?: string; status: string; daysAgo: number; manual?: boolean; pickup?: boolean }[];
 };
 
 export const SEED_SLUGS = ["matbakh-test", "lamar-test", "yasmine-test"];
@@ -41,7 +41,7 @@ const PACKS: Pack[] = [
     name: "بيت المطبخ",
     sub: "paid",
     stock: { k1: 12, k2: 25, k3: 40, k4: 6, k5: 15, k6: 3, k7: 4, k8: 0 },
-    shipping: { default_fee: 3, free_over: 60, rates: [{ city: "حمص", fee: 0 }, { city: "حماة", fee: 2 }, { city: "دمشق", fee: 3 }] },
+    shipping: { delivery: true, pickup_note: "حمص، شارع الحضارة جانب صيدلية الشفاء، من 10 الصبح لـ 9 المسا", default_fee: 3, free_over: 60, rates: [{ city: "حمص", fee: 0 }, { city: "حماة", fee: 2 }, { city: "دمشق", fee: 3 }] },
     discounts: [
       { code: "WELCOME10", title: "خصم 10% لأول طلب", kind: "percent", value: 10 },
       { code: "FREESHIP", title: "توصيل مجاني فوق 30$", kind: "free_shipping", value: 0, min: 30 },
@@ -49,14 +49,14 @@ const PACKS: Pack[] = [
       { code: "OLD20", title: "كود منتهي (للتجربة)", kind: "percent", value: 20, expired: true },
     ],
     orders: [
-      { c: 0, items: [["k1", 1], ["k3", 2]], status: "delivered", daysAgo: 13 },
+      { c: 0, items: [["k1", 1], ["k3", 2]], status: "delivered", daysAgo: 13, pickup: true },
       { c: 1, items: [["k7", 1]], code: "WELCOME10", status: "delivered", daysAgo: 11 },
       { c: 2, items: [["k4", 1], ["k5", 1]], status: "delivered", daysAgo: 9 },
-      { c: 0, items: [["k6", 2]], status: "delivered", daysAgo: 7 },
+      { c: 0, items: [["k6", 2]], status: "delivered", daysAgo: 7, pickup: true },
       { c: 3, items: [["k2", 2], ["k3", 1]], code: "FREESHIP", status: "shipped", daysAgo: 4 },
       { c: 4, items: [["k1", 2], ["k7", 1]], status: "confirmed", daysAgo: 2, manual: true },
       { c: 5, items: [["k5", 1]], status: "cancelled", daysAgo: 3 },
-      { c: 6, items: [["k4", 1]], status: "new", daysAgo: 0 },
+      { c: 6, items: [["k4", 1]], status: "new", daysAgo: 0, pickup: true },
       { c: 1, items: [["k2", 2], ["k6", 1]], status: "new", daysAgo: 0 },
     ],
   },
@@ -66,7 +66,7 @@ const PACKS: Pack[] = [
     name: "لمار",
     sub: "trial",
     stock: { f2: 10, f3: 30, f4: 14, f5: 50, f6: 2 },
-    shipping: { default_fee: 2.5, free_over: 75, rates: [{ city: "دمشق", fee: 1 }, { city: "ريف دمشق", fee: 2 }] },
+    shipping: { delivery: true, pickup_note: "دمشق، الشعلان، من 11 الصبح لـ 10 المسا", default_fee: 2.5, free_over: 75, rates: [{ city: "دمشق", fee: 1 }, { city: "ريف دمشق", fee: 2 }] },
     discounts: [
       { code: "LAMAR15", title: "خصم 15% على كل شي", kind: "percent", value: 15, limit: 50 },
       { code: "SHAL3", title: "3$ خصم فوق 40$", kind: "fixed", value: 3, min: 40 },
@@ -74,7 +74,7 @@ const PACKS: Pack[] = [
     ],
     orders: [
       { c: 1, items: [["f1", 1, "M / أسود"], ["f5", 1]], status: "delivered", daysAgo: 12 },
-      { c: 5, items: [["f2", 1]], code: "LAMAR15", status: "delivered", daysAgo: 8 },
+      { c: 5, items: [["f2", 1]], code: "LAMAR15", status: "delivered", daysAgo: 8, pickup: true },
       { c: 3, items: [["f6", 1], ["f3", 2]], status: "shipped", daysAgo: 3 },
       { c: 1, items: [["f4", 1], ["f3", 2]], code: "SHAL3", status: "confirmed", daysAgo: 1 },
       { c: 4, items: [["f1", 1, "L / خمري"]], status: "cancelled", daysAgo: 5 },
@@ -87,7 +87,7 @@ const PACKS: Pack[] = [
     name: "حلويات الياسمين",
     sub: "expiring",
     stock: { h1: 20, h2: 15, h3: 25, h4: 5, h5: 8, h6: 10 },
-    shipping: { default_fee: 15000, free_over: 500000, rates: [{ city: "دمشق", fee: 10000 }, { city: "ريف دمشق", fee: 20000 }] },
+    shipping: { delivery: false, pickup_note: "دمشق، الميدان، جانب جامع الدقاق، من 9 الصبح لـ 11 بالليل", default_fee: 15000, free_over: 500000, rates: [{ city: "دمشق", fee: 10000 }, { city: "ريف دمشق", fee: 20000 }] },
     discounts: [
       { code: "EID", title: "عرض العيد 10%", kind: "percent", value: 10 },
       { code: "BOX50", title: "50 ألف خصم فوق 400 ألف", kind: "fixed", value: 50000, min: 400000 },
@@ -277,7 +277,7 @@ async function seedOne(pack: Pack, email: string, password: string, origin: stri
     });
     const { data, error } = await db.rpc("place_order", {
       p_store: sid,
-      p_customer: c,
+      p_customer: pack.shipping.delivery && !o.pickup ? { ...c, method: "delivery" } : { name: c.name, phone: c.phone, method: "pickup" },
       p_items: items,
       p_source: o.manual ? "manual" : "online",
       p_note: count === 2 ? "الرجاء الاتصال قبل التوصيل" : null,
@@ -292,7 +292,9 @@ async function seedOne(pack: Pack, email: string, password: string, origin: stri
     } else {
       const flow = ["confirmed", "shipped", "delivered"];
       const upto = flow.indexOf(o.status);
-      const labels: Record<string, string> = { confirmed: "تم تأكيد الطلب مع الزبون", shipped: "انشحن الطلب مع شركة التوصيل", delivered: "انسلم الطلب وانقبض المبلغ" };
+      const labels: Record<string, string> = o.pickup || !pack.shipping.delivery
+        ? { confirmed: "تم تأكيد الطلب مع الزبون", shipped: "الطلب جاهز للاستلام", delivered: "استلم الزبون طلبه ودفع" }
+        : { confirmed: "تم تأكيد الطلب مع الزبون", shipped: "انشحن الطلب مع شركة التوصيل", delivered: "انسلم الطلب وانقبض المبلغ" };
       flow.slice(0, upto + 1).forEach((s, k) => events.push({ message: labels[s], at: new Date(at.getTime() + (k + 1) * 5 * 3600000) }));
       await db
         .from("orders")
@@ -321,7 +323,7 @@ async function seedOne(pack: Pack, email: string, password: string, origin: stri
       day: ymd(day(i)),
       sessions,
       page_views: sessions * 3 + (i % 5) * 4,
-      product_views: Math.round(sessions * 1.8),
+      product_views: Math.round(sessions * 0.62),
       add_to_carts: Math.round(sessions * 0.22),
       checkouts: Math.round(sessions * 0.08),
     };

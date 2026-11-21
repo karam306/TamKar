@@ -90,7 +90,7 @@ export default async function DashboardHome({ searchParams }: { searchParams: Pr
                   </span>
                   <span className="flex items-center gap-3">
                     <span className="font-semibold">{formatPrice(Number(o.total), store.currency)}</span>
-                    <StatusBadge status={o.status} />
+                    <StatusBadge status={o.status} pickup={o.fulfillment === "pickup"} />
                   </span>
                 </Link>
               </li>

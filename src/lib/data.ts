@@ -4,7 +4,7 @@ import { demoCollections, demoProducts, demoStores } from "./demo-data";
 import { findVariant, hasVariants } from "./product-utils";
 import { hasSupabase, supabaseAdmin, supabasePublic } from "./supabase";
 import { templateMenus, templatePages } from "./business-templates";
-import type { CartItem, Collection, Order, OrderLine, Pricing, Product, Store, StorePage } from "./types";
+import type { CartItem, Collection, Order, OrderLine, Pricing, Product, Store, StorePage, Fulfillment } from "./types";
 
 export const isDemoStore = (storeId: string) => storeId.startsWith("s-");
 
@@ -117,7 +117,7 @@ export const getCategories = cache(async (storeId: string): Promise<string[]> =>
 const clean = (v: unknown, max: number) =>
   typeof v === "string" ? v.replace(/[\u0000-\u001f]/g, " ").trim().slice(0, max) : "";
 
-export type CustomerInput = { name: string; phone: string; city: string; address: string; notes?: string };
+export type CustomerInput = { name: string; phone: string; city: string; address: string; notes?: string; method?: Fulfillment };
 
 export type CreateOrderResult =
   | {
@@ -127,11 +127,13 @@ export type CreateOrderResult =
         discount: number;
         shipping: number;
         discount_code: string | null;
+        fulfillment: Fulfillment;
       };
     }
   | { ok: false; error: string };
 
 export function validateCustomer(input: CustomerInput): { ok: true; value: Required<CustomerInput> } | { ok: false; error: string } {
+  const method: Fulfillment = input.method === "delivery" ? "delivery" : "pickup";
   const name = clean(input.name, 80);
   const phone = clean(input.phone, 20).replace(/[^\d+]/g, "");
   const city = clean(input.city, 60);
@@ -139,8 +141,8 @@ export function validateCustomer(input: CustomerInput): { ok: true; value: Requi
   const notes = clean(input.notes, 500);
   if (name.length < 2) return { ok: false, error: "اكتب الاسم من فضلك" };
   if (phone.replace(/\D/g, "").length < 9) return { ok: false, error: "رقم الهاتف غير صحيح" };
-  if (!city || address.length < 4) return { ok: false, error: "اكتب المدينة والعنوان بالتفصيل" };
-  return { ok: true, value: { name, phone, city, address, notes } };
+  if (method === "delivery" && (!city || address.length < 4)) return { ok: false, error: "اكتب المدينة والعنوان بالتفصيل" };
+  return { ok: true, value: { name, phone, city, address, notes, method } };
 }
 
 /** Turns database error codes from place_order into a message for people. */
@@ -163,6 +165,10 @@ function orderError(message: string): string {
       return "كود الخصم منتهي";
     case "CODE_USED_UP":
       return "كود الخصم انستخدم لآخر مرة";
+    case "NO_DELIVERY":
+      return "هالمتجر ما عنده توصيل، الاستلام من المحل";
+    case "CODE_DELIVERY_ONLY":
+      return "هالكود للتوصيل المجاني، بيشتغل بس إذا اخترت التوصيل";
     case "CODE_MIN":
       return `كود الخصم بيشتغل على طلبات من ${detail} وفوق`;
     default:
@@ -171,23 +177,27 @@ function orderError(message: string): string {
 }
 
 /** Delivery fee and discount for demo stores (no database). */
-function demoPricing(store: Store, subtotal: number, city: string, code?: string): Pricing | { error: string } {
+function demoPricing(store: Store, subtotal: number, city: string, code?: string, pickup = true): Pricing | { error: string } {
   if (code?.trim()) return { error: orderError("BAD_CODE") };
   const ship = store.shipping ?? {};
+  if (pickup) return { subtotal, discount: 0, shipping: 0, total: subtotal, code: null };
+  if (!ship.delivery) return { error: orderError("NO_DELIVERY") };
   let fee = ship.rates?.find((r) => r.city.trim() === city.trim())?.fee ?? ship.default_fee ?? 0;
   if (ship.free_over != null && subtotal >= ship.free_over) fee = 0;
   return { subtotal, discount: 0, shipping: fee, total: subtotal + fee, code: null };
 }
 
 /** Discount and delivery fee for the cart preview, using the same rules as checkout. */
-export async function quote(store: Store, subtotal: number, city: string, code?: string): Promise<Pricing | { error: string }> {
-  if (!hasSupabase || isDemoStore(store.id)) return demoPricing(store, subtotal, city, code);
+export async function quote(store: Store, subtotal: number, city: string, code?: string, method: Fulfillment = "pickup"): Promise<Pricing | { error: string }> {
+  const pickup = method !== "delivery";
+  if (!hasSupabase || isDemoStore(store.id)) return demoPricing(store, subtotal, city, code, pickup);
   const { data, error } = await supabaseAdmin().rpc("order_pricing", {
     p_store: store.id,
     p_subtotal: subtotal,
     p_city: city,
     p_code: code?.trim() || null,
     p_use: false,
+    p_pickup: pickup,
   });
   if (error || !data) return { error: orderError(error?.message ?? "") };
   const d = data as { discount: number; shipping: number; code: string | null; free_shipping: boolean };
@@ -228,7 +238,7 @@ export async function createOrder(
     if (!lines.length) return { ok: false, error: "السلة فاضية" };
     const subtotal = lines.reduce((s, l) => s + l.price * l.qty, 0);
     const v = c.value;
-    const pr = demoPricing(store, subtotal, v.city, discountCode);
+    const pr = demoPricing(store, subtotal, v.city, discountCode, v.method === "pickup");
     if ("error" in pr) return { ok: false, error: pr.error };
     return {
       ok: true,
@@ -241,6 +251,7 @@ export async function createOrder(
         discount: 0,
         shipping: pr.shipping,
         discount_code: null,
+        fulfillment: v.method,
         customer_name: v.name,
         phone: v.phone,
         city: v.city,
@@ -253,7 +264,7 @@ export async function createOrder(
   const v = c.value;
   const { data, error } = await supabaseAdmin().rpc("place_order", {
     p_store: store.id,
-    p_customer: { name: v.name, phone: v.phone, city: v.city, address: v.address },
+    p_customer: { name: v.name, phone: v.phone, city: v.method === "delivery" ? v.city : "", address: v.method === "delivery" ? v.address : "", method: v.method },
     p_items: clean,
     p_source: source,
     p_note: v.notes || null,
@@ -275,6 +286,7 @@ export async function createOrder(
       discount: Number(r.discount),
       shipping: Number(r.shipping),
       discount_code: r.discount_code,
+      fulfillment: v.method,
       customer_name: v.name,
       phone: v.phone,
       city: v.city,

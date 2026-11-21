@@ -59,7 +59,7 @@ export default async function ProductPage({ params }: Props) {
           </a>
           <ul className="space-y-1 rounded-theme bg-surface p-4 text-sm text-muted">
             <li>💵 الدفع عند الاستلام</li>
-            {store.delivery_note && <li>🚚 {store.delivery_note}</li>}
+            {store.delivery_note && <li>{store.shipping?.delivery ? "🚚" : "🏪"} {store.delivery_note}</li>}
           </ul>
           {product.description && <div className="whitespace-pre-line leading-8 text-muted">{product.description}</div>}
           {(product.specs?.length ?? 0) > 0 && (

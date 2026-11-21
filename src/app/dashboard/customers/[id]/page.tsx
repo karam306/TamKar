@@ -66,7 +66,7 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
                   <Link href={`/dashboard/orders/${o.id}`} className="flex items-center justify-between gap-3 py-2.5 hover:bg-[#f7f7f7]">
                     <span className="font-semibold">#{o.number}</span>
                     <span className="text-muted">{date.format(new Date(o.created_at))}</span>
-                    <StatusBadge status={o.status} />
+                    <StatusBadge status={o.status} pickup={o.fulfillment === "pickup"} />
                     <span>{money(Number(o.total))}</span>
                   </Link>
                 </li>

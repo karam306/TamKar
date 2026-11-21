@@ -69,10 +69,11 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
 
   const cities = new Map<string, { orders: number; sales: number }>();
   for (const o of orders) {
-    const c = cities.get(o.city) ?? { orders: 0, sales: 0 };
+    const key = o.city || "استلام من المحل";
+    const c = cities.get(key) ?? { orders: 0, sales: 0 };
     c.orders += 1;
     c.sales += Number(o.total);
-    cities.set(o.city, c);
+    cities.set(key, c);
   }
   const topCities = [...cities.entries()].sort((a, b) => b[1].sales - a[1].sales).slice(0, 8);
 
@@ -143,7 +144,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
         <Card title="رحلة الزائر">
           <ul className="space-y-2.5 text-[13px]">
             {funnel.map((f, i) => {
-              const pct = funnel[0].value ? (f.value / funnel[0].value) * 100 : 0;
+              const pct = funnel[0].value ? Math.min((f.value / funnel[0].value) * 100, 100) : 0;
               return (
                 <li key={f.label}>
                   <div className="mb-1 flex justify-between">

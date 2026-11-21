@@ -8,6 +8,13 @@ export const ORDER_STATUSES: { id: OrderStatus; label: string; className: string
   { id: "cancelled", label: "ملغي", className: "bg-[#e3e3e3] text-[#616161]" },
 ];
 
+/** Pickup orders use shop words instead of delivery words. */
+const PICKUP_LABELS: Partial<Record<OrderStatus, string>> = { shipped: "جاهز للاستلام", delivered: "تم الاستلام" };
+
+export function statusLabel(status: OrderStatus, pickup = false): string {
+  return (pickup && PICKUP_LABELS[status]) || (ORDER_STATUSES.find((x) => x.id === status) ?? ORDER_STATUSES[0]).label;
+}
+
 /** What the merchant usually does next for each status. */
 export const NEXT_STEP: Partial<Record<OrderStatus, { to: OrderStatus; label: string }>> = {
   new: { to: "confirmed", label: "تأكيد الطلب" },
@@ -15,9 +22,15 @@ export const NEXT_STEP: Partial<Record<OrderStatus, { to: OrderStatus; label: st
   shipped: { to: "delivered", label: "تم التوصيل" },
 };
 
-export function StatusBadge({ status }: { status: Order["status"] }) {
+export function nextStep(status: OrderStatus, pickup = false) {
+  const n = NEXT_STEP[status];
+  if (!n || !pickup) return n;
+  return { to: n.to, label: status === "confirmed" ? "الطلب جاهز للاستلام" : status === "shipped" ? "استلم الزبون طلبه" : n.label };
+}
+
+export function StatusBadge({ status, pickup }: { status: Order["status"]; pickup?: boolean }) {
   const s = ORDER_STATUSES.find((x) => x.id === status) ?? ORDER_STATUSES[0];
-  return <span className={`badge ${s.className}`}>● {s.label}</span>;
+  return <span className={`badge ${s.className}`}>● {statusLabel(s.id, pickup)}</span>;
 }
 
 export function PaymentBadge({ status }: { status?: Order["payment_status"] }) {

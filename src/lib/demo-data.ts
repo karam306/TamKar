@@ -18,7 +18,7 @@ export const demoStores: Store[] = [
     primary_color: "#0f5c4d",
     delivery_note: "توصيل مجاني داخل حمص، والدفع عند الاستلام",
     status: "active",
-    shipping: { default_fee: 3, free_over: 60, rates: [{ city: "حمص", fee: 0 }, { city: "حماة", fee: 2 }, { city: "دمشق", fee: 3 }] },
+    shipping: { delivery: true, pickup_note: "حمص، شارع الحضارة جانب صيدلية الشفاء، من 10 الصبح لـ 9 المسا", default_fee: 3, free_over: 60, rates: [{ city: "حمص", fee: 0 }, { city: "حماة", fee: 2 }, { city: "دمشق", fee: 3 }] },
     sections: [
       { type: "announcement", text: "توصيل مجاني داخل حمص لكل الطلبات" },
       {
@@ -62,7 +62,7 @@ export const demoStores: Store[] = [
     primary_color: "#c2185b",
     delivery_note: "توصيل لكل المحافظات خلال 2 إلى 4 أيام",
     status: "active",
-    shipping: { default_fee: 4, free_over: 80, rates: [{ city: "دمشق", fee: 2 }, { city: "حلب", fee: 4 }, { city: "حمص", fee: 3 }] },
+    shipping: { delivery: true, pickup_note: "دمشق، الشعلان، من 11 الصبح لـ 10 المسا", default_fee: 4, free_over: 80, rates: [{ city: "دمشق", fee: 2 }, { city: "حلب", fee: 4 }, { city: "حمص", fee: 3 }] },
     sections: [
       { type: "announcement", text: "تشكيلة الشتاء وصلت" },
       {
@@ -88,7 +88,7 @@ export const demoStores: Store[] = [
     currency: "SYP",
     theme: "soft",
     primary_color: "#8d5a2b",
-    delivery_note: "توصيل داخل دمشق، اطلب قبل الساعة 2 الظهر",
+    delivery_note: "اطلب قبل الساعة 2 الظهر واستلم بنفس اليوم",
     status: "active",
     sections: [
       {

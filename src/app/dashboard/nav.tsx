@@ -50,7 +50,7 @@ export const SETTINGS: Item = {
   href: "/dashboard/settings",
   label: "الإعدادات",
   icon: ICONS.settings,
-  sub: [{ href: "/dashboard/settings/shipping", label: "التوصيل" }],
+  sub: [{ href: "/dashboard/settings/shipping", label: "الاستلام والتوصيل" }],
 };
 
 function useActive() {

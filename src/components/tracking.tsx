@@ -17,17 +17,27 @@ declare global {
 
 type Kind = "page" | "product" | "cart" | "checkout";
 
-function beacon(kind: Kind) {
+/** True the first time this visitor does `what` in this visit. */
+function firstTime(slug: string, what: string) {
+  try {
+    const key = `tk_${what}_${slug}`;
+    if (sessionStorage.getItem(key)) return false;
+    sessionStorage.setItem(key, "1");
+  } catch {}
+  return true;
+}
+
+// Funnel steps (product, cart, checkout) count once per visit, so each step is
+// "visits that got this far" and can never be bigger than the visits.
+function beacon(want: Kind) {
   const slug = window.__tk?.slug;
   if (!slug) return;
-  let fresh = false;
-  try {
-    const key = `tk_s_${slug}`;
-    if (!sessionStorage.getItem(key)) {
-      sessionStorage.setItem(key, "1");
-      fresh = true;
-    }
-  } catch {}
+  const fresh = firstTime(slug, "s");
+  let kind = want;
+  if (want !== "page" && !firstTime(slug, want)) {
+    if (want !== "product") return; // second add-to-cart in the same visit: nothing new
+    kind = "page"; // another product page: still a page view
+  }
   try {
     const body = JSON.stringify({ slug, kind, s: fresh });
     if (!navigator.sendBeacon?.("/api/track", new Blob([body], { type: "application/json" }))) {

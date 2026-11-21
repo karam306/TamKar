@@ -9,9 +9,8 @@ import { requireMerchant } from "@/lib/auth";
 import { createOrder } from "@/lib/data";
 import { supabaseAdmin } from "@/lib/supabase";
 import type { CartItem, Order, OrderStatus } from "@/lib/types";
-import { ORDER_STATUSES } from "./status";
+import { statusLabel } from "./status";
 
-const label = (s: string) => ORDER_STATUSES.find((x) => x.id === s)?.label ?? s;
 
 async function addEvent(orderId: string, storeId: string, message: string) {
   const { db } = await requireMerchant();
@@ -25,7 +24,7 @@ export async function setOrderStatus(form: FormData) {
   if (!["new", "confirmed", "shipped", "delivered"].includes(status)) return;
   const { data } = await db.from("orders").update({ status }).eq("id", id).eq("store_id", store.id).neq("status", "cancelled").select("*").maybeSingle();
   if (data) {
-    await addEvent(id, store.id, `تغيرت الحالة إلى: ${label(status)}`);
+    await addEvent(id, store.id, `تغيرت الحالة إلى: ${statusLabel(status, (data as Order).fulfillment === "pickup")}`);
     if (status === "delivered") {
       const o = data as Order;
       after(() => sendDeliveredEvent(store, { ...o, total: Number(o.total) }));
@@ -88,6 +87,7 @@ export async function createManualOrder(_: FormState, form: FormData): Promise<F
       city: String(form.get("city") ?? ""),
       address: String(form.get("address") ?? ""),
       notes: String(form.get("notes") ?? ""),
+      method: form.get("method") === "delivery" ? "delivery" : "pickup",
     },
     items,
     "manual",

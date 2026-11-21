@@ -28,10 +28,18 @@ export async function saveShipping(_: FormState, form: FormData): Promise<FormSt
   }
   const { error } = await db
     .from("stores")
-    .update({ shipping: { default_fee: defaultFee, free_over: freeOver, rates: clean } })
+    .update({
+      shipping: {
+        delivery: form.get("delivery") === "on",
+        pickup_note: String(form.get("pickup_note") ?? "").trim().slice(0, 200) || null,
+        default_fee: defaultFee,
+        free_over: freeOver,
+        rates: clean,
+      },
+    })
     .eq("id", store.id);
   if (error) return { error: "ما قدرنا نحفظ، جرب مرة تانية" };
   revalidatePath("/dashboard/settings/shipping");
   refresh();
-  return { ok: "✓ انحفظت أسعار التوصيل" };
+  return { ok: "✓ انحفظ" };
 }

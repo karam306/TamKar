@@ -49,7 +49,13 @@ export type StoreSocial = { instagram?: string; facebook?: string; tiktok?: stri
 
 export type StorePage = { id: string; store_id: string; title: string; handle: string; body: string; published: boolean; created_at?: string };
 
+export type Fulfillment = "pickup" | "delivery";
+
 export type ShippingSettings = {
+  /** Delivery is optional. When off, customers pick up from the shop. */
+  delivery?: boolean;
+  /** Where and when to pick up, shown at checkout and in the WhatsApp message. */
+  pickup_note?: string | null;
   default_fee?: number | null;
   free_over?: number | null;
   rates?: { city: string; fee: number }[];
@@ -136,6 +142,7 @@ export type OrderInput = {
   address: string;
   notes?: string;
   discountCode?: string;
+  method?: Fulfillment;
   items: CartItem[];
 };
 
@@ -157,8 +164,8 @@ export type Order = {
   store_id: string;
   customer_name: string;
   phone: string;
-  city: string;
-  address: string;
+  city: string | null;
+  address: string | null;
   notes?: string | null;
   items: OrderLine[];
   total: number;
@@ -171,5 +178,6 @@ export type Order = {
   discount_code?: string | null;
   discount_amount?: number;
   shipping_fee?: number;
+  fulfillment?: Fulfillment;
   created_at: string;
 };

@@ -120,7 +120,7 @@ export default async function StoreLayout({ children, params }: Props) {
             )}
             <div className="space-y-1 text-muted">
               {store.city && <p>📍 {store.city}</p>}
-              {store.delivery_note && <p>🚚 {store.delivery_note}</p>}
+              {store.delivery_note && <p>{store.shipping?.delivery ? "🚚" : "🏪"} {store.delivery_note}</p>}
               <p>💵 الدفع عند الاستلام</p>
               <a href={whatsappLink(store.whatsapp)} target="_blank" rel="noopener noreferrer" className="btn btn-outline mt-3 text-sm">
                 تواصل معنا على واتساب

@@ -7,7 +7,7 @@ export default async function ShippingPage() {
   const { store } = await requireMerchant();
   return (
     <div>
-      <PageHeader title="التوصيل" back="/dashboard/settings" />
+      <PageHeader title="الاستلام والتوصيل" back="/dashboard/settings" />
       <ShippingForm initial={(store as { shipping?: ShippingSettings }).shipping ?? {}} currency={store.currency} />
     </div>
   );

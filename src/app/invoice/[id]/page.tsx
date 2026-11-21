@@ -50,9 +50,7 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
           <div dir="ltr" className="text-right">
             {o.phone}
           </div>
-          <div>
-            {o.city}، {o.address}
-          </div>
+          <div>{o.fulfillment === "pickup" ? "استلام من المحل" : `${o.city}، ${o.address}`}</div>
         </div>
         <div>
           <div className="mb-1 font-semibold">الدفع</div>

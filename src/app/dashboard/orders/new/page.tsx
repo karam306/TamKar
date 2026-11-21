@@ -12,7 +12,7 @@ export default async function NewOrderPage({ searchParams }: { searchParams: Pro
   return (
     <div>
       <PageHeader title="طلب يدوي جديد" back="/dashboard/orders" />
-      <ManualOrderForm currency={store.currency} defaultCity={store.city ?? ""} customer={c ?? undefined} />
+      <ManualOrderForm currency={store.currency} defaultCity={store.city ?? ""} customer={c ?? undefined} delivery={Boolean(store.shipping?.delivery)} />
     </div>
   );
 }

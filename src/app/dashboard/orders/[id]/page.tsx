@@ -54,7 +54,7 @@ export default async function OrderPage({
   const qty = o.items.reduce((s, i) => s + i.qty, 0);
 
   return (
-    <LiveOrder status={o.status} payment={o.payment_status}>
+    <LiveOrder status={o.status} payment={o.payment_status} pickup={o.fulfillment === "pickup"}>
       <div>
         <PageHeader
           back="/dashboard/orders"
@@ -141,12 +141,18 @@ export default async function OrderPage({
                   </div>
                 )}
                 <div className="flex justify-between">
-                  <span>التوصيل</span>
-                  <span className="text-muted">{o.city}</span>
                   <span>
-                    {Number(o.shipping_fee ?? 0)
-                      ? money(Number(o.shipping_fee))
-                      : "مجاني"}
+                    {o.fulfillment === "pickup" ? "الاستلام" : "التوصيل"}
+                  </span>
+                  <span className="text-muted">
+                    {o.fulfillment === "pickup" ? "من المحل" : o.city}
+                  </span>
+                  <span>
+                    {o.fulfillment === "pickup"
+                      ? "-"
+                      : Number(o.shipping_fee ?? 0)
+                        ? money(Number(o.shipping_fee))
+                        : "مجاني"}
                   </span>
                 </div>
                 <div className="flex justify-between border-t border-black/5 pt-2 font-semibold">
@@ -230,9 +236,15 @@ export default async function OrderPage({
                     اتصال
                   </a>
                 </div>
-                <div className="pt-3 font-semibold">عنوان التوصيل</div>
-                <div>{o.city}</div>
-                <div className="text-muted">{o.address}</div>
+                {o.fulfillment === "pickup" ? (
+                  <div className="pt-3 font-semibold">🏪 استلام من المحل</div>
+                ) : (
+                  <>
+                    <div className="pt-3 font-semibold">🚚 عنوان التوصيل</div>
+                    <div>{o.city}</div>
+                    <div className="text-muted">{o.address}</div>
+                  </>
+                )}
               </div>
             </Card>
 

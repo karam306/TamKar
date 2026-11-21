@@ -3,27 +3,31 @@
 import { createContext, useContext, useOptimistic } from "react";
 import type { Order, OrderStatus } from "@/lib/types";
 import { setOrderStatus, setPaid } from "../actions";
-import { NEXT_STEP, ORDER_STATUSES, PaymentBadge, StatusBadge } from "../status";
+import { nextStep, ORDER_STATUSES, PaymentBadge, StatusBadge, statusLabel } from "../status";
 
 /**
  * Status and payment change on screen the moment the merchant clicks,
  * while the server saves in the background.
  */
 type Live = { status: OrderStatus; payment: Order["payment_status"] };
-const Ctx = createContext<{ live: Live; set: (l: Partial<Live>) => void } | null>(null);
+type LiveProps = Live & { pickup: boolean };
+const Ctx = createContext<{ live: Live; set: (l: Partial<Live>) => void; pickup: boolean } | null>(null);
 const useLive = () => useContext(Ctx)!;
 
-export function LiveOrder({ status, payment, children }: Live & { children: React.ReactNode }) {
+export function LiveOrder({ status, payment, pickup, children }: LiveProps & { children: React.ReactNode }) {
   const [live, set] = useOptimistic<Live, Partial<Live>>({ status, payment }, (cur, patch) => ({ ...cur, ...patch }));
-  return <Ctx.Provider value={{ live, set }}>{children}</Ctx.Provider>;
+  return <Ctx.Provider value={{ live, set, pickup }}>{children}</Ctx.Provider>;
 }
 
-export const LiveStatusBadge = () => <StatusBadge status={useLive().live.status} />;
+export function LiveStatusBadge() {
+  const { live, pickup } = useLive();
+  return <StatusBadge status={live.status} pickup={pickup} />;
+}
 export const LivePaymentBadge = () => <PaymentBadge status={useLive().live.payment} />;
 
 export function NextStepButton({ id }: { id: string }) {
-  const { live, set } = useLive();
-  const next = NEXT_STEP[live.status];
+  const { live, set, pickup } = useLive();
+  const next = nextStep(live.status, pickup);
   if (!next || live.status === "cancelled") return null;
   return (
     <div className="mt-3 flex justify-end border-t border-black/5 pt-3">
@@ -64,7 +68,7 @@ export function PaidButton({ id }: { id: string }) {
 export const LivePaidLabel = () => <>{useLive().live.payment === "paid" ? "مدفوع" : "باقي للتحصيل عند الاستلام"}</>;
 
 export function StatusSelect({ id }: { id: string }) {
-  const { live, set } = useLive();
+  const { live, set, pickup } = useLive();
   return (
     <form
       action={async (fd) => {
@@ -77,7 +81,7 @@ export function StatusSelect({ id }: { id: string }) {
       <select name="status" key={live.status} defaultValue={live.status} className="input">
         {ORDER_STATUSES.filter((s) => s.id !== "cancelled").map((s) => (
           <option key={s.id} value={s.id}>
-            {s.label}
+            {statusLabel(s.id, pickup)}
           </option>
         ))}
       </select>

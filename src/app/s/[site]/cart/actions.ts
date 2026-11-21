@@ -5,7 +5,7 @@ import { eventContext, sendPurchaseEvent } from "@/lib/meta";
 import { createOrder, getProductsByIds, getStore, quote } from "@/lib/data";
 import { whatsappOrderLink } from "@/lib/format";
 import { isOpen } from "@/lib/subscription";
-import type { CartItem, OrderInput, Pricing } from "@/lib/types";
+import type { CartItem, Fulfillment, OrderInput, Pricing } from "@/lib/types";
 
 export type PlaceOrderResult =
   | { ok: true; id: string; number: number; total: number; whatsappUrl: string; items: { productId: string; qty: number; price: number }[] }
@@ -17,7 +17,7 @@ export async function placeOrder(site: string, input: OrderInput): Promise<Place
   if (!isOpen(store)) return { ok: false, error: "المتجر متوقف مؤقتاً" };
   const result = await createOrder(
     store,
-    { name: input.customerName, phone: input.phone, city: input.city, address: input.address, notes: input.notes },
+    { name: input.customerName, phone: input.phone, city: input.city, address: input.address, notes: input.notes, method: input.method },
     input.items,
     "online",
     input.discountCode,
@@ -71,10 +71,10 @@ export async function getCartLines(site: string, items: CartItem[]): Promise<Car
 }
 
 /** Subtotal, discount, delivery fee and total for the cart page. */
-export async function quoteCart(site: string, items: CartItem[], city: string, code?: string): Promise<Pricing | { error: string }> {
+export async function quoteCart(site: string, items: CartItem[], city: string, code?: string, method: Fulfillment = "pickup"): Promise<Pricing | { error: string }> {
   const store = await getStore(site);
   if (!store) return { error: "المتجر غير موجود" };
   const lines = await getCartLines(site, items);
   const subtotal = lines.reduce((s, l) => s + l.price * (items.find((i) => i.productId === l.productId && (i.variantId ?? "") === (l.variantId ?? ""))?.qty ?? 0), 0);
-  return quote(store, Math.round(subtotal * 100) / 100, city, code);
+  return quote(store, Math.round(subtotal * 100) / 100, city, code, method);
 }
