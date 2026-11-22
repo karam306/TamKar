@@ -16,7 +16,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <div data-theme="admin" className="flex min-h-screen flex-col bg-[#0b2b26] font-sans text-text">
       <header className="flex h-14 items-center justify-between gap-3 px-4 text-white">
         <div className="flex items-center gap-3">
-          <Link href="/admin" className="text-lg font-bold">
+          <Link href="/admin" className="text-lg brand-display">
             {platform}
           </Link>
           <span className="rounded-md bg-white/15 px-2 py-0.5 text-xs">لوحة المنصة</span>

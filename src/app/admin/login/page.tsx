@@ -15,7 +15,7 @@ export default async function AdminLoginPage() {
   return (
     <div data-theme="admin" className="flex min-h-screen flex-col items-center justify-center bg-[#0b2b26] px-4 py-10 font-sans">
       <div className="mb-6 text-center text-white">
-        <div className="text-3xl font-bold">{BRAND}</div>
+        <div className="brand-display text-3xl">{BRAND}</div>
         <div className="mt-1 text-sm opacity-75">لوحة المنصة</div>
       </div>
       <div className="w-full max-w-sm rounded-xl bg-white p-6 shadow-lg sm:p-8">

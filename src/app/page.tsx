@@ -45,7 +45,7 @@ export default function PlatformHome() {
         <Link href="/" className="flex items-center gap-2" aria-label={`${BRAND_AR} ${BRAND}`}>
           <Sprout />
           <span className="brand-display text-[1.7rem] leading-none">{BRAND_AR}</span>
-          <span className="brand-display hl hl-lav text-lg leading-none" dir="ltr">
+          <span className="brand-display hl hl-apricot text-lg leading-none" dir="ltr">
             {BRAND}
           </span>
         </Link>
@@ -69,7 +69,7 @@ export default function PlatformHome() {
       <section className="nama-wrap grid items-center gap-10 pb-16 pt-8 lg:grid-cols-[1.15fr_1fr] lg:pt-16">
         <div>
           <h1 className="brand-display mb-6 text-[clamp(2.5rem,6.4vw,4.2rem)] leading-[1.45]">
-            <span className="hl hl-lav">متجرك على الإنترنت،</span>
+            <span className="hl hl-apricot">متجرك على الإنترنت،</span>
             <br />
             <span className="hl hl-pist">وطلباتك تصلك عبر واتساب.</span>
           </h1>
@@ -92,7 +92,7 @@ export default function PlatformHome() {
 
       <section id="how" className="nama-band py-16">
         <div className="nama-wrap">
-          <h2 className="nama-display mb-10 text-3xl sm:text-[2.6rem]"><span className="hl hl-sky">من المحل إلى الهاتف في ثلاث خطوات</span></h2>
+          <h2 className="nama-display mb-10 text-3xl sm:text-[2.6rem]"><span className="hl hl-mint">من المحل إلى الهاتف في ثلاث خطوات</span></h2>
           <ol className="grid gap-8 md:grid-cols-3">
             {steps.map((s, i) => (
               <li key={s.title} className="flex gap-4">
@@ -148,7 +148,7 @@ export default function PlatformHome() {
       </section>
 
       <section id="pricing" className="nama-wrap py-16">
-        <h2 className="nama-display mb-3 text-3xl sm:text-[2.6rem]"><span className="hl hl-lav">أسعار واضحة، دون عمولة</span></h2>
+        <h2 className="nama-display mb-3 text-3xl sm:text-[2.6rem]"><span className="hl hl-apricot">أسعار واضحة، دون عمولة</span></h2>
         <p className="mb-10 text-lg text-[var(--mute)]">جرّب جميع الميزات لمدة 14 يوماً، ثم اختر الباقة المناسبة.</p>
         <div className="grid gap-5 md:grid-cols-2">
           <Plan
@@ -172,7 +172,7 @@ export default function PlatformHome() {
 
       <section className="nama-band py-16">
         <div className="nama-wrap">
-          <h2 className="nama-display mb-3 text-3xl sm:text-[2.6rem]"><span className="hl hl-sky">جرّب بنفسك</span></h2>
+          <h2 className="nama-display mb-3 text-3xl sm:text-[2.6rem]"><span className="hl hl-mint">جرّب بنفسك</span></h2>
           <p className="mb-8 text-lg text-[var(--mute)]">متاجر تجريبية على المنصة. افتح أياً منها وجرّب تقديم طلب.</p>
           <div className="grid gap-4 sm:grid-cols-3">
             {demoStores.map((s) => (
@@ -205,7 +205,7 @@ export default function PlatformHome() {
       </section>
 
       <section className="nama-wrap pb-20 text-center">
-        <h2 className="brand-display mb-8 text-4xl leading-[1.5] sm:text-6xl"><span className="hl hl-lav">دع تجارتك تنمو.</span></h2>
+        <h2 className="brand-display mb-8 text-4xl leading-[1.5] sm:text-6xl"><span className="hl hl-apricot">دع تجارتك تنمو.</span></h2>
         <Link href="/signup" className="nama-btn text-lg">
           ابدأ مجاناً
         </Link>

@@ -20,7 +20,7 @@ export function PageHeader({
             →
           </Link>
         )}
-        <h1 className="text-xl font-bold">{title}</h1>
+        <h1 className="text-[1.35rem] font-bold">{typeof title === "string" ? <span className="hl hl-apricot">{title}</span> : title}</h1>
         {badges}
       </div>
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
@@ -33,7 +33,7 @@ export function Card({ title, action, children, className = "" }: { title?: Reac
     <section className={`card p-4 ${className}`}>
       {(title || action) && (
         <div className="mb-3 flex items-center justify-between gap-2">
-          {title && <h2 className="text-sm font-semibold">{title}</h2>}
+          {title && <h2 className="text-sm font-bold">{typeof title === "string" ? <span className="hl hl-mint">{title}</span> : title}</h2>}
           {action}
         </div>
       )}

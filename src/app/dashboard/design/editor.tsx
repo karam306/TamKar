@@ -39,10 +39,10 @@ export function DesignEditor({ initial, previewUrl, publicUrl, collections }: { 
       <input type="hidden" name="sections" value={JSON.stringify(sections)} />
 
       <div className="space-y-4">
-        <h1 className="text-2xl">تصميم المتجر</h1>
+        <h1 className="text-[1.35rem] font-bold"><span className="hl hl-apricot">تصميم المتجر</span></h1>
 
         <section className="space-y-3 card p-5">
-          <h2 className="font-semibold">القالب</h2>
+          <h2 className="font-bold"><span className="hl hl-mint">القالب</span></h2>
           <div className="grid gap-2">
             {THEMES.map((t) => (
               <button
@@ -62,7 +62,7 @@ export function DesignEditor({ initial, previewUrl, publicUrl, collections }: { 
         </section>
 
         <section className="space-y-3 card p-5">
-          <h2 className="font-semibold">اللون والشعار</h2>
+          <h2 className="font-bold"><span className="hl hl-mint">اللون والشعار</span></h2>
           <div className="flex items-center gap-3 text-sm">
             <input type="color" value={color || defaultColor} onChange={(e) => setColor(e.target.value)} className="h-10 w-14 cursor-pointer rounded border border-black/10" />
             <span>اللون الأساسي</span>
@@ -76,7 +76,7 @@ export function DesignEditor({ initial, previewUrl, publicUrl, collections }: { 
         </section>
 
         <section className="space-y-3 card p-5">
-          <h2 className="font-semibold">أقسام الصفحة الرئيسية</h2>
+          <h2 className="font-bold"><span className="hl hl-mint">أقسام الصفحة الرئيسية</span></h2>
           <p className="text-xs text-muted">رتّب الأقسام بالأسهم، واضغط على أي قسم لتعديل محتواه.</p>
           <ul className="space-y-2">
             {sections.map((s, i) => (

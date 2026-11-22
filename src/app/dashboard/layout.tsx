@@ -53,7 +53,7 @@ export default async function DashboardLayout({
             staff={staff}
             perms={perms}
           />
-          <Link href="/dashboard" className="text-lg font-bold tracking-tight">
+          <Link href="/dashboard" className="brand-display text-xl">
             {platform}
           </Link>
         </div>

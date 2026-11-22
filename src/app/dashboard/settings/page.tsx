@@ -12,7 +12,7 @@ export default async function SettingsPage() {
   const paid = store.paid_until ? new Date(store.paid_until).toLocaleDateString("en-GB") : null;
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl">الإعدادات</h1>
+      <h1 className="text-[1.35rem] font-bold"><span className="hl hl-apricot">الإعدادات</span></h1>
       <div className="grid gap-3 sm:grid-cols-2">
         <Link href="/dashboard/settings/shipping" className="card flex items-center gap-3 p-4 hover:shadow-md">
           <span className="text-2xl">{store.shipping?.delivery ? "🚚" : "🏪"}</span>
@@ -68,7 +68,7 @@ export default async function SettingsPage() {
         }}
       />
       <section className="space-y-2 card p-5 text-sm">
-        <h2 className="text-lg">الحساب والاشتراك</h2>
+        <h2 className="text-base font-bold"><span className="hl hl-mint">الحساب والاشتراك</span></h2>
         <p>
           البريد الإلكتروني: <span dir="ltr">{user.email}</span>
         </p>

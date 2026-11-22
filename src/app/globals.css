@@ -146,7 +146,7 @@ h1, h2, h3 {
   letter-spacing: 0;
 }
 .hl {
-  --hl: #ebcdf5;
+  --hl: #ffd3a8;
   background: linear-gradient(var(--hl), var(--hl)) no-repeat;
   background-size: 100% 0.42em;
   background-position: 0 86%;
@@ -154,7 +154,8 @@ h1, h2, h3 {
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
 }
-.hl-lav { --hl: #ebcdf5; }
-.hl-sky { --hl: #d6e4fb; }
+.hl-apricot { --hl: #ffd3a8; }
+.hl-mint { --hl: #ade4c3; }
+.hl-butter { --hl: #fbe28c; }
 .hl-pist { --hl: #dceaa4; }
 .hl-dark { --hl: #4a6b3a; }

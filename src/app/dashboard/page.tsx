@@ -121,13 +121,13 @@ export default async function DashboardHome({
       </div>
 
       <section id="share" className="card p-5">
-        <h2 className="mb-2 text-lg">رابط متجرك</h2>
+        <h2 className="mb-2 text-base font-bold"><span className="hl hl-mint">رابط متجرك</span></h2>
         <CopyLink url={url} />
       </section>
 
       {steps.some((s) => !s.done) && (
         <section className="card p-5">
-          <h2 className="mb-3 text-lg">خطوات البداية</h2>
+          <h2 className="mb-3 text-base font-bold"><span className="hl hl-mint">خطوات البداية</span></h2>
           <ul className="space-y-2">
             {steps.map((s) => (
               <li key={s.label}>
@@ -149,7 +149,7 @@ export default async function DashboardHome({
 
       <section className="card p-5">
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-lg">آخر الطلبات</h2>
+          <h2 className="text-base font-bold"><span className="hl hl-mint">آخر الطلبات</span></h2>
           <Link href="/dashboard/orders" className="text-sm text-primary">
             كل الطلبات ←
           </Link>
