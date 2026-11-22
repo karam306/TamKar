@@ -3,7 +3,7 @@ import { PageHeader } from "@/components/admin-ui";
 import { businessLabel } from "@/lib/business-types";
 import { formatPrice } from "@/lib/format";
 import { daysLeft, SUB_LABELS, subState, type SubState } from "@/lib/subscription";
-import { loadStores } from "../data";
+import { loadStores } from "@/app/admin/data";
 
 const FILTERS: { id: string; label: string; states: SubState[] }[] = [
   { id: "paid", label: "مدفوعة", states: ["active", "expiring"] },

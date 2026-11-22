@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { logout } from "@/app/(auth)/actions";
+import { adminLogout } from "@/app/admin/login/actions";
 import { requirePlatformAdmin } from "@/lib/platform-admin";
 import { AdminNav } from "./nav";
 import { BRAND } from "@/lib/brand";
@@ -25,7 +25,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <span className="hidden opacity-80 sm:inline" dir="ltr">
             {email}
           </span>
-          <form action={logout}>
+          <form action={adminLogout}>
             <button className="opacity-80 hover:opacity-100">خروج</button>
           </form>
         </div>

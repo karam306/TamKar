@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useActionState, useState, useSyncExternalStore } from "react";
 import { Field, FormMessage, SubmitButton } from "@/components/form-ui";
 import { BUSINESS_TYPES } from "@/lib/business-types";
-import { createMerchant } from "../../actions";
+import { createMerchant } from "@/app/admin/actions";
 
 const noop = () => () => {};
 

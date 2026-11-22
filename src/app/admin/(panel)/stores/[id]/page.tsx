@@ -7,8 +7,8 @@ import { daysLeft, SUB_LABELS, subState } from "@/lib/subscription";
 import { supabaseAdmin } from "@/lib/supabase";
 import { normalizeWhatsapp } from "@/lib/templates";
 import { storeUrl } from "@/lib/urls";
-import { saveMerchantInfo, setPaidUntil, setStoreStatus } from "../../actions";
-import { loadStores } from "../../data";
+import { saveMerchantInfo, setPaidUntil, setStoreStatus } from "@/app/admin/actions";
+import { loadStores } from "@/app/admin/data";
 import { PaymentForm, ResetPassword } from "./forms";
 
 const PLANS = PLAN_LABELS;

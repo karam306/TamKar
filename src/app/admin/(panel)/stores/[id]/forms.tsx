@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { FormMessage, SubmitButton } from "@/components/form-ui";
-import { recordPayment, resetPassword } from "../../actions";
+import { recordPayment, resetPassword } from "@/app/admin/actions";
 
 export function PaymentForm({ id, currency }: { id: string; currency: string }) {
   const [state, action] = useActionState(recordPayment, undefined);

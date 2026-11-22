@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Card, PageHeader } from "@/components/admin-ui";
 import { formatPrice } from "@/lib/format";
 import { daysLeft, SUB_LABELS, subState } from "@/lib/subscription";
-import { loadStores } from "./data";
+import { loadStores } from "@/app/admin/data";
 
 export default async function AdminHome() {
   const stores = await loadStores();
