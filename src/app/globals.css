@@ -7,6 +7,9 @@
 @import "@fontsource/cairo/arabic-900.css";
 @import "@fontsource/tajawal/400.css";
 @import "@fontsource/tajawal/700.css";
+/* Nama brand: Rakkas for Arabic display, Fraunces Black Italic for Latin (Nama, prices). */
+@import "@fontsource/rakkas/arabic-400.css";
+@import "@fontsource/fraunces/latin-900-italic.css";
 
 /* Store themes. Every template uses the same sections; these variables change the look. */
 :root,
@@ -133,3 +136,25 @@ h1, h2, h3 {
   outline: none;
 }
 .input:focus { border-color: var(--primary); }
+
+/* Nama brand highlighter: a pastel marker bar under display text. */
+.brand-display {
+  font-family: "Fraunces", "Rakkas", system-ui, sans-serif;
+  font-style: italic;
+  font-weight: 900;
+  font-synthesis: none;
+  letter-spacing: 0;
+}
+.hl {
+  --hl: #ebcdf5;
+  background: linear-gradient(var(--hl), var(--hl)) no-repeat;
+  background-size: 100% 0.42em;
+  background-position: 0 86%;
+  padding-inline: 0.14em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.hl-lav { --hl: #ebcdf5; }
+.hl-sky { --hl: #d6e4fb; }
+.hl-pist { --hl: #dceaa4; }
+.hl-dark { --hl: #4a6b3a; }

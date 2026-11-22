@@ -5,7 +5,8 @@ import { demoStores } from "@/lib/demo-data";
 /**
  * Nama's public homepage. Audience: shop owners in Syria, mostly on phones.
  * One job: get them to open a store (or ask us to build it for them).
- * Look: olive and pistachio, Cairo Black headlines, and one moving moment,
+ * Look: olive and pistachio, Rakkas / Fraunces Black Italic headlines with a pastel
+ * highlighter bar under them (the brand mark), and one moving moment,
  * the WhatsApp order arriving on the phone.
  */
 
@@ -43,8 +44,8 @@ export default function PlatformHome() {
       <header className="nama-wrap flex h-16 items-center justify-between">
         <Link href="/" className="flex items-center gap-2" aria-label={`${BRAND_AR} ${BRAND}`}>
           <Sprout />
-          <span className="nama-display text-2xl leading-none">{BRAND_AR}</span>
-          <span className="text-sm text-[var(--mute)]" dir="ltr">
+          <span className="brand-display text-[1.7rem] leading-none">{BRAND_AR}</span>
+          <span className="brand-display hl hl-lav text-lg leading-none" dir="ltr">
             {BRAND}
           </span>
         </Link>
@@ -67,10 +68,10 @@ export default function PlatformHome() {
       {/* Hero: the promise on one side, the moment it comes true on the other. */}
       <section className="nama-wrap grid items-center gap-10 pb-16 pt-8 lg:grid-cols-[1.15fr_1fr] lg:pt-16">
         <div>
-          <h1 className="nama-display mb-6 text-[clamp(2.4rem,6vw,3.9rem)] leading-[1.15]">
-            محلك صار أونلاين.
+          <h1 className="brand-display mb-6 text-[clamp(2.5rem,6.4vw,4.2rem)] leading-[1.45]">
+            <span className="hl hl-lav">محلك صار أونلاين.</span>
             <br />
-            والطلبات بتوصلك عالواتساب.
+            <span className="hl hl-pist">والطلبات بتوصلك عالواتساب.</span>
           </h1>
           <p className="mb-8 max-w-xl text-lg leading-9 text-[var(--mute)]">
             {BRAND_AR} بتعطي محلك متجر إلكتروني بالعربي خلال دقيقتين. الزبون بيتفرج على منتجاتك وبيطلب من موبايله، وإنت بيوصلك الطلب مرتب، وبيجي ياخده من محلك ويدفع.
@@ -91,7 +92,7 @@ export default function PlatformHome() {
 
       <section id="how" className="nama-band py-16">
         <div className="nama-wrap">
-          <h2 className="nama-display mb-10 text-3xl sm:text-4xl">من المحل للموبايل بتلات خطوات</h2>
+          <h2 className="nama-display mb-10 text-3xl sm:text-[2.6rem]"><span className="hl hl-sky">من المحل للموبايل بتلات خطوات</span></h2>
           <ol className="grid gap-8 md:grid-cols-3">
             {steps.map((s, i) => (
               <li key={s.title} className="flex gap-4">
@@ -109,7 +110,7 @@ export default function PlatformHome() {
       </section>
 
       <section className="nama-wrap py-16">
-        <h2 className="nama-display mb-3 text-3xl sm:text-4xl">معمول لطريقة البيع عنا</h2>
+        <h2 className="nama-display mb-3 text-3xl sm:text-[2.6rem]"><span className="hl hl-pist">معمول لطريقة البيع عنا</span></h2>
         <p className="mb-10 max-w-2xl text-lg leading-8 text-[var(--mute)]">ما نسخنا منصة أجنبية. بنيناها لمحل بحمص أو بالشام أو بحلب، بالشغلات اللي فعلاً بتفرق معه.</p>
         <dl className="grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
           {syria.map((f) => (
@@ -125,7 +126,7 @@ export default function PlatformHome() {
       <section className="nama-dark py-16">
         <div className="nama-wrap grid gap-10 lg:grid-cols-2">
           <div>
-            <h2 className="nama-display mb-4 text-3xl text-white sm:text-4xl">ما عندك وقت؟ نحن منبنيلك المتجر، ومنجيبلك الزبائن.</h2>
+            <h2 className="nama-display mb-4 text-3xl leading-[1.6] text-white sm:text-[2.6rem]"><span className="hl hl-dark">ما عندك وقت؟ نحن منبنيلك المتجر، ومنجيبلك الزبائن.</span></h2>
             <p className="mb-8 text-lg leading-9 text-white/75">فريقنا بيرفع منتجاتك، بيصمملك الصور والبوستات، وبيشغّلك إعلانات فيسبوك وانستغرام بتوصل الناس لمتجرك مباشرة. وإنت بتشتغل بمحلك.</p>
             <a href={helpLink} target={SUPPORT ? "_blank" : undefined} rel="noopener noreferrer" className="nama-btn-pist text-lg">
               احكينا عالواتساب
@@ -147,7 +148,7 @@ export default function PlatformHome() {
       </section>
 
       <section id="pricing" className="nama-wrap py-16">
-        <h2 className="nama-display mb-3 text-3xl sm:text-4xl">سعر واضح، بدون عمولة</h2>
+        <h2 className="nama-display mb-3 text-3xl sm:text-[2.6rem]"><span className="hl hl-lav">سعر واضح، بدون عمولة</span></h2>
         <p className="mb-10 text-lg text-[var(--mute)]">جرّب 14 يوم بكل الميزات، وبعدين اختار.</p>
         <div className="grid gap-5 md:grid-cols-2">
           <Plan
@@ -171,7 +172,7 @@ export default function PlatformHome() {
 
       <section className="nama-band py-16">
         <div className="nama-wrap">
-          <h2 className="nama-display mb-3 text-3xl sm:text-4xl">شوف بعينك</h2>
+          <h2 className="nama-display mb-3 text-3xl sm:text-[2.6rem]"><span className="hl hl-sky">شوف بعينك</span></h2>
           <p className="mb-8 text-lg text-[var(--mute)]">متاجر تجريبية على المنصة. افتح أي واحد وجرب تطلب.</p>
           <div className="grid gap-4 sm:grid-cols-3">
             {demoStores.map((s) => (
@@ -189,7 +190,7 @@ export default function PlatformHome() {
       </section>
 
       <section className="nama-wrap max-w-3xl py-16">
-        <h2 className="nama-display mb-8 text-3xl sm:text-4xl">أسئلة بتنسأل كتير</h2>
+        <h2 className="nama-display mb-8 text-3xl sm:text-[2.6rem]"><span className="hl hl-pist">أسئلة بتنسأل كتير</span></h2>
         <div className="divide-y divide-black/10 border-y border-black/10">
           {faqs.map((f) => (
             <details key={f.q} className="group py-4">
@@ -204,7 +205,7 @@ export default function PlatformHome() {
       </section>
 
       <section className="nama-wrap pb-20 text-center">
-        <h2 className="nama-display mb-6 text-3xl sm:text-5xl">خلّي محلك ينمو.</h2>
+        <h2 className="brand-display mb-8 text-4xl leading-[1.5] sm:text-6xl"><span className="hl hl-lav">خلّي محلك ينمو.</span></h2>
         <Link href="/signup" className="nama-btn text-lg">
           افتح متجرك مجاناً
         </Link>
@@ -237,7 +238,7 @@ function Plan({ name, price, note, items, featured }: { name: string; price: str
       <div className="mb-1 text-lg font-semibold">{name}</div>
       <div className={`mb-4 text-sm ${featured ? "text-white/70" : "text-[var(--mute)]"}`}>{note}</div>
       <div className="mb-6 flex items-baseline gap-2">
-        <span className="nama-display text-5xl" dir="ltr">
+        <span className={`brand-display hl text-5xl ${featured ? "hl-dark" : "hl-pist"}`} dir="ltr">
           {price}
         </span>
         <span className={featured ? "text-white/70" : "text-[var(--mute)]"}>بالشهر</span>
@@ -307,7 +308,7 @@ function Sprout() {
 const CSS = `
 .nama{--bg:#F5F8EF;--ink:#16241A;--leaf:#2D6A38;--pist:#C3D97F;--pist-soft:#E6EFC6;--mute:#56644F;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans Arabic",system-ui,sans-serif}
 .nama-wrap{max-width:72rem;margin-inline:auto;padding-inline:1.25rem}
-.nama-display{font-family:"Cairo",system-ui,sans-serif;font-weight:900;letter-spacing:-.01em}
+.nama-display{font-family:"Fraunces","Rakkas",system-ui,sans-serif;font-style:italic;font-weight:900;font-synthesis:none;line-height:1.55}
 .nama-band{background:#EAF0DE}
 .nama-dark{background:var(--ink)}
 .nama-btn,.nama-btn-ghost,.nama-btn-pist{display:inline-block;border-radius:999px;padding:.85rem 1.6rem;font-weight:600;transition:transform .15s ease}
@@ -316,7 +317,7 @@ const CSS = `
 .nama-btn-pist{background:var(--pist);color:var(--ink)}
 .nama-btn:hover,.nama-btn-ghost:hover,.nama-btn-pist:hover{transform:translateY(-1px)}
 .nama a:focus-visible,.nama summary:focus-visible{outline:3px solid var(--leaf);outline-offset:3px;border-radius:8px}
-.nama-step{flex:none;display:grid;place-items:center;width:3rem;height:3rem;border-radius:999px;background:var(--leaf);color:#fff;font-family:"Cairo",sans-serif;font-weight:900;font-size:1.4rem}
+.nama-step{flex:none;display:grid;place-items:center;width:3rem;height:3rem;border-radius:999px;background:var(--pist-soft);color:var(--ink);font-family:"Fraunces",serif;font-style:italic;font-weight:900;font-size:1.5rem}
 .nama-phone{border-radius:2.4rem;border:10px solid var(--ink);overflow:hidden;background:#fff;box-shadow:0 30px 60px -25px rgba(22,36,26,.45)}
 .nama-chat{background:#ECE5DD;font-size:12.5px;line-height:1.7}
 .nama-bubble{align-self:flex-start;max-width:92%;background:#DCF8C6;border-radius:12px 12px 12px 2px;padding:.6rem .75rem;color:#111;opacity:0;transform:translateY(14px);animation:nama-in .5s 1.6s cubic-bezier(.2,.8,.2,1) forwards}
