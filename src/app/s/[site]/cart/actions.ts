@@ -6,6 +6,8 @@ import { createOrder, getProductsByIds, getStore, quote } from "@/lib/data";
 import { whatsappOrderLink } from "@/lib/format";
 import { isOpen } from "@/lib/subscription";
 import { storeWallets } from "@/lib/wallets";
+import { notifyNewOrder } from "@/lib/telegram";
+import { platformOrigin } from "@/lib/site-origin";
 import type { CartItem, Fulfillment, OrderInput, Pricing, WalletId } from "@/lib/types";
 
 export type PlaceOrderResult =
@@ -36,6 +38,10 @@ export async function placeOrder(site: string, input: OrderInput): Promise<Place
   const o = result.order;
   const ctx = await eventContext();
   after(() => sendPurchaseEvent(store, o, ctx));
+  if (o.id !== "demo") {
+    const origin = await platformOrigin();
+    after(() => notifyNewOrder(store, o, origin));
+  }
   return {
     ok: true,
     id: o.id,

@@ -8,7 +8,8 @@ import { supabaseAdmin } from "@/lib/supabase";
 import { normalizeWhatsapp } from "@/lib/templates";
 import { storeUrl } from "@/lib/urls";
 import { saveMerchantInfo, setPaidUntil, setStoreStatus } from "@/app/admin/actions";
-import { loadStores } from "@/app/admin/data";
+import { loadSalesmen, loadStores } from "@/app/admin/data";
+import { setStoreSalesman } from "@/app/admin/platform-actions";
 import { PaymentForm, PlanSwitcher, ResetPassword } from "./forms";
 
 const PLANS = PLAN_LABELS;
@@ -16,7 +17,8 @@ const PLANS = PLAN_LABELS;
 export default async function AdminStorePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   if (!/^[0-9a-f-]{36}$/.test(id)) notFound();
-  const s = (await loadStores()).find((x) => x.id === id);
+  const [all, salesmen] = await Promise.all([loadStores(), loadSalesmen()]);
+  const s = all.find((x) => x.id === id);
   if (!s) notFound();
   const { data: payments } = await supabaseAdmin().from("subscription_payments").select("*").eq("store_id", id).order("created_at", { ascending: false });
   const st = subState(s);
@@ -141,6 +143,33 @@ export default async function AdminStorePage({ params }: { params: Promise<{ id:
               </a>
             )}
           </Card>
+          <Card title="المندوب والمصدر">
+            <div className="space-y-2 text-[13px]">
+              <form action={setStoreSalesman} className="flex gap-2">
+                <input type="hidden" name="store_id" value={s.id} />
+                <select name="salesman_id" defaultValue={s.salesman_id ?? ""} className="input">
+                  <option value="">بدون مندوب</option>
+                  {salesmen.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.name} ({m.code})
+                    </option>
+                  ))}
+                </select>
+                <button className="btn btn-outline">احفظ</button>
+              </form>
+              {s.heard_from && (
+                <div>
+                  <span className="text-muted">سمع عنا من: </span>
+                  {s.heard_from}
+                </div>
+              )}
+              <div>
+                <span className="text-muted">إشعارات تيليغرام: </span>
+                {s.telegram ? "✓ مربوط" : "مو مربوط"}
+              </div>
+            </div>
+          </Card>
+
           <Card title="معلومات المتجر">
             <div className="space-y-1 text-[13px]">
               <div>

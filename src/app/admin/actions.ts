@@ -72,6 +72,8 @@ export async function createMerchant(_: CreateResult, form: FormData): Promise<C
     owner_phone: str(form, "owner_phone", 30) || null,
     note: str(form, "note", 1000) || null,
   });
+  const salesman = str(form, "salesman_id", 40);
+  if (salesman) await admin.from("store_admin").update({ salesman_id: salesman, heard_from: "مندوب" }).eq("store_id", store.id);
   revalidatePath("/admin");
   refresh();
   return { created: { id: store.id as string, slug, email, password, name } };

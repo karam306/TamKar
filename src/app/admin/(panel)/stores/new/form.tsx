@@ -8,7 +8,7 @@ import { createMerchant } from "@/app/admin/actions";
 
 const noop = () => () => {};
 
-export function NewMerchantForm() {
+export function NewMerchantForm({ salesmen = [] }: { salesmen?: { id: string; name: string; code: string }[] }) {
   const [state, action] = useActionState(createMerchant, undefined);
   const [slug, setSlug] = useState("");
   const [plan, setPlan] = useState("trial");
@@ -110,6 +110,19 @@ export function NewMerchantForm() {
             </Field>
           )}
         </section>
+        {salesmen.length > 0 && (
+          <section className="card space-y-3 p-4">
+            <h2 className="text-sm font-semibold">المندوب</h2>
+            <select name="salesman_id" defaultValue="" className="input">
+              <option value="">بدون مندوب</option>
+              {salesmen.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.name} ({m.code})
+                </option>
+              ))}
+            </select>
+          </section>
+        )}
         <FormMessage state={state?.error ? { error: state.error } : undefined} />
         <SubmitButton className="w-full" pendingText="جاري الإنشاء...">
           أنشئ المتجر والحساب

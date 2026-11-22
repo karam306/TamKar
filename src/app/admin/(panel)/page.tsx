@@ -3,6 +3,8 @@ import { Card, PageHeader } from "@/components/admin-ui";
 import { formatPrice } from "@/lib/format";
 import { daysLeft, SUB_LABELS, subState } from "@/lib/subscription";
 import { loadStores } from "@/app/admin/data";
+import { botUsername, telegramReady } from "@/lib/telegram";
+import { TelegramCard } from "./telegram-card";
 
 export default async function AdminHome() {
   const stores = await loadStores();
@@ -41,6 +43,8 @@ export default async function AdminHome() {
         <Tile label="مبيعات بالدولار (30 يوم)" value={formatPrice(usd, "USD")} />
         <Tile label="مبيعات بالليرة (30 يوم)" value={formatPrice(syp, "SYP")} />
       </div>
+
+      <TelegramCard ready={telegramReady()} bot={telegramReady() ? await botUsername() : null} connected={stores.filter((s) => s.telegram).length} total={stores.length} />
 
       {helpWanted.length > 0 && (
         <Card title={`🙋 طلبوا مساعدة بالتجهيز والإعلانات (${helpWanted.length})`}>

@@ -18,6 +18,9 @@ export default function LoginPage() {
       </Field>
       <FormMessage state={state} />
       <SubmitButton pendingText="جاري الدخول...">دخول</SubmitButton>
+      <Link href="/forgot" className="text-center text-sm text-muted hover:text-primary">
+        نسيت كلمة السر؟
+      </Link>
       <p className="text-center text-sm text-muted">
         ما عندك متجر؟{" "}
         <Link href="/signup" className="text-primary">

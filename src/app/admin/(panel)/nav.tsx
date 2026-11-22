@@ -7,6 +7,7 @@ const ITEMS = [
   { href: "/admin", label: "نظرة عامة" },
   { href: "/admin/stores", label: "المتاجر" },
   { href: "/admin/stores/new", label: "+ متجر جديد" },
+  { href: "/admin/salesmen", label: "المندوبين" },
   { href: "/admin/test-data", label: "متاجر تجريبية" },
 ];
 

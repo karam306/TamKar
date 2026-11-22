@@ -19,6 +19,9 @@ export type AdminStore = {
   owner_name?: string | null;
   owner_phone?: string | null;
   note?: string | null;
+  salesman_id?: string | null;
+  heard_from?: string | null;
+  telegram?: boolean;
   orders30: number;
   sales30: number;
   products: number;
@@ -52,8 +55,20 @@ export async function loadStores(): Promise<AdminStore[]> {
     owner_name: notes.get(s.id as string)?.owner_name ?? null,
     owner_phone: notes.get(s.id as string)?.owner_phone ?? null,
     note: notes.get(s.id as string)?.note ?? null,
+    salesman_id: (notes.get(s.id as string)?.salesman_id as string | null) ?? null,
+    heard_from: (notes.get(s.id as string)?.heard_from as string | null) ?? null,
+    telegram: Boolean(notes.get(s.id as string)?.telegram_chat_id),
     orders30: agg.get(s.id as string)?.n ?? 0,
     sales30: agg.get(s.id as string)?.s ?? 0,
     products: counts[i].count ?? 0,
   }));
+}
+
+export type Salesman = { id: string; code: string; name: string; phone: string | null; active: boolean; created_at: string };
+
+/** Salesmen (empty until update 010 is run in Supabase). */
+export async function loadSalesmen(): Promise<Salesman[]> {
+  const { data, error } = await supabaseAdmin().from("salesmen").select("*").order("created_at");
+  if (error) return [];
+  return (data as Salesman[]) ?? [];
 }

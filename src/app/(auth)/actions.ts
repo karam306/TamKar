@@ -46,6 +46,8 @@ export async function signup(_: SignupState, form: FormData): Promise<SignupStat
   const instagramRaw = str(form, "instagram", 100).replace(/^@/, "");
   const color = str(form, "color", 7);
   const wantsHelp = form.get("wants_help") === "yes";
+  const heardFrom = str(form, "heard_from", 20);
+  const refCode = str(form, "ref", 12).toUpperCase().replace(/[^A-Z0-9]/g, "");
 
   if (storeName.length < 2) return { error: "اكتب اسم المتجر", field: "store_name" };
   if (!/^[a-z0-9-]{3,40}$/.test(slug) || slug.startsWith("-") || slug.endsWith("-")) {
@@ -110,11 +112,32 @@ export async function signup(_: SignupState, form: FormData): Promise<SignupStat
       owner_phone: whatsapp,
       note: wantsHelp ? "🙋 طلب مساعدة بتجهيز المتجر والإعلانات (من صفحة التسجيل)" : null,
     });
+    // Separate step so signup still works before update 010 is run.
+    let salesmanId: string | null = null;
+    if (refCode) {
+      const { data: m } = await admin.from("salesmen").select("id").eq("code", refCode).eq("active", true).maybeSingle();
+      salesmanId = (m?.id as string | undefined) ?? null;
+    }
+    const label = HEARD_LABELS[heardFrom] ?? (refCode ? "مندوب" : null);
+    const heard = label ? `${label}${refCode && !salesmanId ? `: كود ${refCode} (مو معروف)` : ""}` : null;
+    if (heard || salesmanId) {
+      const { error: srcError } = await admin.from("store_admin").update({ heard_from: heard, salesman_id: salesmanId }).eq("store_id", newStore.id);
+      if (srcError) console.error("signup: source not saved (run 010)", srcError.message);
+    }
   }
   const db = await supabaseUser();
   await db.auth.signInWithPassword({ email, password });
   redirect("/dashboard?welcome=1");
 }
+
+const HEARD_LABELS: Record<string, string> = {
+  salesman: "مندوب",
+  instagram: "إنستغرام",
+  facebook: "فيسبوك",
+  tiktok: "تيك توك",
+  friend: "صديق أو تاجر",
+  other: "غير هيك",
+};
 
 export async function login(_: FormState, form: FormData): Promise<FormState> {
   if (!hasSupabase) return { error: "قاعدة البيانات غير مربوطة بعد" };

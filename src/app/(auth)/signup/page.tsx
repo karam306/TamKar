@@ -42,6 +42,10 @@ type Data = {
   instagram: string;
   color: string;
   wants_help: "yes" | "no" | "";
+  heard_from: string;
+  ref: string;
+  /** "1" when the visitor came through a salesman's link (signup?ref=CODE): the question is skipped. */
+  ref_link: string;
   email: string;
   password: string;
 };
@@ -60,6 +64,9 @@ const EMPTY: Data = {
   instagram: "",
   color: "",
   wants_help: "",
+  heard_from: "",
+  ref: "",
+  ref_link: "",
   email: "",
   password: "",
 };
@@ -78,8 +85,19 @@ type StepId =
   | "instagram"
   | "color"
   | "wants_help"
+  | "heard_from"
+  | "ref_code"
   | "email"
   | "password";
+
+const HEARD = [
+  { id: "salesman", icon: "🤝", label: "مندوب زارني بالمحل" },
+  { id: "instagram", icon: "📸", label: "إنستغرام" },
+  { id: "facebook", icon: "👍", label: "فيسبوك" },
+  { id: "tiktok", icon: "🎵", label: "تيك توك" },
+  { id: "friend", icon: "🗣️", label: "صديق أو تاجر تاني" },
+  { id: "other", icon: "✨", label: "غير هيك" },
+];
 
 function stepsFor(d: Data): StepId[] {
   return [
@@ -95,6 +113,8 @@ function stepsFor(d: Data): StepId[] {
     "instagram",
     "color",
     "wants_help",
+    ...(d.ref_link === "1" ? [] : (["heard_from"] as StepId[])),
+    ...(d.ref_link !== "1" && d.heard_from === "salesman" ? (["ref_code"] as StepId[]) : []),
     "email",
     "password",
   ];
@@ -117,14 +137,24 @@ export default function SignupPage() {
 
   // Bring back answers from an earlier visit.
   useEffect(() => {
+    let restored: Data = EMPTY;
     try {
       const saved = JSON.parse(localStorage.getItem(SAVE_KEY) ?? "null");
       if (saved?.d) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setD({ ...EMPTY, ...saved.d, password: "" });
-        if (saved.step && saved.step !== "password") setStep(saved.step);
+        restored = { ...EMPTY, ...saved.d, password: "" };
       }
     } catch {}
+    // A salesman's personal link: signup?ref=CODE
+    const ref = new URLSearchParams(window.location.search).get("ref")?.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12);
+    if (ref) restored = { ...restored, ref, heard_from: "salesman", ref_link: "1" };
+    let savedStep: StepId | null = null;
+    try {
+      const st = JSON.parse(localStorage.getItem(SAVE_KEY) ?? "null")?.step;
+      if (st && st !== "password") savedStep = st;
+    } catch {}
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setD(restored);
+    if (savedStep) setStep(savedStep);
     loaded.current = true;
   }, []);
 
@@ -189,6 +219,8 @@ export default function SignupPage() {
         return d.delivery_fee && !(Number(d.delivery_fee.replace(/,/g, "")) >= 0) ? "اكتب رقم، أو اتركها فاضية إذا مجاني" : "";
       case "wants_help":
         return d.wants_help ? "" : "اختار وحدة";
+      case "heard_from":
+        return d.heard_from ? "" : "اختار وحدة";
       case "email":
         return /^\S+@\S+\.\S+$/.test(d.email.trim()) ? "" : "اكتب إيميل صحيح";
       case "password":
@@ -482,6 +514,27 @@ export default function SignupPage() {
                 </span>
               </Choice>
             </div>
+          </Screen>
+        )}
+
+        {step === "heard_from" && (
+          <Screen title="كيف سمعت عن نمى؟" sub="بيساعدنا نعرف وين نوصل لتجار متلك.">
+            <div className="grid grid-cols-2 gap-2">
+              {HEARD.map((h) => (
+                <Choice key={h.id} selected={d.heard_from === h.id} onClick={() => choose({ heard_from: h.id })}>
+                  <span className="text-2xl">{h.icon}</span>
+                  <span className="text-sm">{h.label}</span>
+                </Choice>
+              ))}
+            </div>
+          </Screen>
+        )}
+
+        {step === "ref_code" && (
+          <Screen title="كود المندوب" sub="المندوب بيعطيك كود قصير. إذا ما بتعرفه، فيك تتخطى.">
+            <TextInput value={d.ref} onChange={(v) => set({ ref: v.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12) })} onEnter={() => next()} placeholder="مثلاً SAMER123" dir="ltr" autoComplete="off" />
+            <Next onClick={() => next()} />
+            <Skip onClick={() => next(step, { ref: "" })} label="ما بعرفه" />
           </Screen>
         )}
 

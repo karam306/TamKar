@@ -5,9 +5,10 @@ import type { Order } from "@/lib/types";
 import { storeUrl } from "@/lib/urls";
 import { CopyLink } from "./copy-link";
 import { StatusBadge } from "./orders/status";
+import { storeChat, telegramReady } from "@/lib/telegram";
 
 export default async function DashboardHome({ searchParams }: { searchParams: Promise<{ welcome?: string; owner_only?: string }> }) {
-  const { store, db } = await requireMerchant();
+  const { store, db, role } = await requireMerchant();
   const { welcome, owner_only } = await searchParams;
 
   const monthStart = new Date();
@@ -27,8 +28,10 @@ export default async function DashboardHome({ searchParams }: { searchParams: Pr
   const orders = (latest.data ?? []) as Order[];
   const url = storeUrl(store.slug);
 
+  const telegramDone = role !== "owner" || !telegramReady() || Boolean(await storeChat(store.id));
   const steps = [
     { done: productCount > 0, label: "ضيف أول منتج", href: "/dashboard/products/new" },
+    { done: telegramDone, label: "اربط تيليغرام ليوصلك كل طلب فوراً", href: "/dashboard/settings/notifications" },
     { done: store.sections.length > 0 && store.tagline != null, label: "خصّص شكل متجرك", href: "/dashboard/design" },
     { done: month.length > 0, label: "شارك رابط متجرك واستقبل أول طلب", href: "#share" },
   ];
