@@ -55,7 +55,12 @@ export async function createQuote(_: FormState, form: FormData): Promise<FormSta
     })
     .select("id")
     .single();
-  if (error || !data) return { error: "ما قدرنا نحفظ العرض" };
+  if (error || !data) {
+    console.error("createQuote failed", error);
+    if (error?.code === "42P01" || error?.code === "PGRST205" || /quotes/.test(error?.message ?? "") && /exist|schema cache/.test(error?.message ?? ""))
+      return { error: "جدول عروض الأسعار لسا مو موجود بقاعدة البيانات (لازم ينشغّل ملف 008_quotes.sql بـ Supabase)" };
+    return { error: `ما قدرنا نحفظ العرض (${error?.code ?? ""}: ${(error?.message ?? "").slice(0, 80)})` };
+  }
   revalidatePath("/dashboard/quotes");
   redirect(`/dashboard/quotes/${data.id}?created=1`);
 }
