@@ -9,8 +9,8 @@ import { isPro } from "@/lib/plans";
 
 const RANGES = [
   { days: 7, label: "آخر 7 أيام" },
-  { days: 30, label: "آخر 30 يوم" },
-  { days: 90, label: "آخر 90 يوم" },
+  { days: 30, label: "آخر 30 يوماً" },
+  { days: 90, label: "آخر 90 يوماً" },
 ];
 
 type Stat = {
@@ -144,7 +144,7 @@ export default async function AnalyticsPage({
 
   const cities = new Map<string, { orders: number; sales: number }>();
   for (const o of orders) {
-    const key = o.city || "استلام من المحل";
+    const key = o.city || "الاستلام من المحل";
     const c = cities.get(key) ?? { orders: 0, sales: 0 };
     c.orders += 1;
     c.sales += net(o);
@@ -156,9 +156,9 @@ export default async function AnalyticsPage({
 
   const funnel = [
     { label: "زيارات", value: sessions },
-    { label: "شافوا منتج", value: sum("product_views") },
-    { label: "أضافوا للسلة", value: sum("add_to_carts") },
-    { label: "بلّشوا الطلب", value: sum("checkouts") },
+    { label: "شاهدوا منتجاً", value: sum("product_views") },
+    { label: "أضافوا إلى السلة", value: sum("add_to_carts") },
+    { label: "بدأوا الطلب", value: sum("checkouts") },
     { label: "طلبوا", value: online },
   ];
 
@@ -222,7 +222,7 @@ export default async function AnalyticsPage({
         <Card title="الأكثر مبيعاً">
           {top.length === 0 ? (
             <p className="py-6 text-center text-[13px] text-muted">
-              ما في مبيعات بهالفترة
+              لا توجد مبيعات في هذه الفترة
             </p>
           ) : (
             <table className="w-full text-[13px]">
@@ -280,8 +280,8 @@ export default async function AnalyticsPage({
           </ul>
           {sessions === 0 && (
             <p className="mt-3 text-xs text-muted">
-              الزيارات بتنحسب من وقت ما فعّلنا التقارير، فالأرقام بتبلش تظهر مع
-              أول زوار.
+              تُحتسب الزيارات منذ تفعيل التقارير، وتبدأ الأرقام بالظهور مع
+              الزوار الأوائل.
             </p>
           )}
         </Card>
@@ -290,7 +290,7 @@ export default async function AnalyticsPage({
       <Card title="المبيعات حسب المدينة">
         {topCities.length === 0 ? (
           <p className="py-6 text-center text-[13px] text-muted">
-            ما في مبيعات بهالفترة
+            لا توجد مبيعات في هذه الفترة
           </p>
         ) : (
           <ul className="divide-y divide-black/5 text-[13px]">
@@ -307,7 +307,7 @@ export default async function AnalyticsPage({
 
       {pro ? (
         <div className="grid gap-4 lg:grid-cols-2">
-          <Card title={`مقارنة بالـ ${days} يوم اللي قبلها`}>
+          <Card title={`مقارنة بالـ ${days} يوماً السابقة`}>
             <div className="grid grid-cols-2 gap-3 text-[13px]">
               <Compare
                 label="المبيعات"
@@ -326,7 +326,7 @@ export default async function AnalyticsPage({
           <Card title="أفضل الزبائن">
             {topCustomers.length === 0 ? (
               <p className="py-6 text-center text-[13px] text-muted">
-                لسا ما في زبائن
+                لا يوجد زبائن بعد
               </p>
             ) : (
               <ul className="divide-y divide-black/5 text-[13px]">
@@ -391,7 +391,7 @@ function Compare({
       <div className="text-muted">{label}</div>
       <div className="text-lg font-semibold">{fmt(now)}</div>
       <div className="text-xs text-muted">
-        قبل: {fmt(before)}
+        السابق: {fmt(before)}
         {change !== null && (
           <span
             className={

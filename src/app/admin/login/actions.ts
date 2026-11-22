@@ -6,14 +6,14 @@ import { isAdminEmail } from "@/lib/platform-admin";
 import { hasSupabase } from "@/lib/supabase";
 import { supabaseUser } from "@/lib/auth";
 
-const WRONG = "الإيميل أو كلمة السر غلط";
+const WRONG = "البريد الإلكتروني أو كلمة المرور غير صحيحة";
 
 /** Platform owner login. Merchant emails are refused here without even trying them. */
 export async function adminLogin(_: FormState, form: FormData): Promise<FormState> {
-  if (!hasSupabase) return { error: "قاعدة البيانات غير مربوطة بعد" };
+  if (!hasSupabase) return { error: "قاعدة البيانات غير مرتبطة بعد" };
   const email = String(form.get("email") ?? "").trim().toLowerCase().slice(0, 120);
   const password = String(form.get("password") ?? "");
-  if (!email || !password) return { error: "اكتب الإيميل وكلمة السر" };
+  if (!email || !password) return { error: "أدخل البريد الإلكتروني وكلمة المرور" };
   if (!isAdminEmail(email)) return { error: WRONG };
 
   const db = await supabaseUser();
@@ -22,8 +22,8 @@ export async function adminLogin(_: FormState, form: FormData): Promise<FormStat
   if (error) {
     console.error("admin login failed", error.status, error.code, error.message);
     if (error.code === "invalid_credentials") return { error: WRONG };
-    if (error.code === "email_not_confirmed") return { error: "الإيميل لسا ما تأكد بـ Supabase" };
-    return { error: `ما قدرنا نسجل دخول (${error.code ?? error.status ?? ""})` };
+    if (error.code === "email_not_confirmed") return { error: "لم يُؤكَّد البريد الإلكتروني في Supabase بعد" };
+    return { error: `تعذّر تسجيل الدخول (${error.code ?? error.status ?? ""})` };
   }
   redirect("/admin");
 }

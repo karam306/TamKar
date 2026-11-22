@@ -50,12 +50,12 @@ export default async function ProductPage({ params }: Props) {
           <h1 className="text-3xl leading-snug">{product.title}</h1>
           {hasVariants(product) ? <VariantPicker product={product} /> : <SimpleBuy product={product} />}
           <a
-            href={whatsappLink(store.whatsapp, `مرحبا، عندي سؤال عن: ${product.title}`)}
+            href={whatsappLink(store.whatsapp, `مرحباً، لدي سؤال عن: ${product.title}`)}
             target="_blank"
             rel="noopener noreferrer"
             className="btn btn-outline max-w-sm"
           >
-            اسأل عن المنتج على واتساب
+            اسأل عن المنتج عبر واتساب
           </a>
           <ul className="space-y-1 rounded-theme bg-surface p-4 text-sm text-muted">
             <li>💵 الدفع عند الاستلام</li>

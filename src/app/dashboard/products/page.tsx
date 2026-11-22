@@ -60,7 +60,7 @@ export default async function ProductsPage({
               استيراد وتصدير
             </Link>
             <Link href="/dashboard/products/new" className="btn">
-              أضف منتج
+              إضافة منتج
             </Link>
           </>
         }
@@ -71,7 +71,7 @@ export default async function ProductsPage({
           (!sp.q && !sp.status && (count ?? 0) >= LIMITS.basic.products)) && (
           <div className="mb-4">
             <ProGate
-              feature={`أكتر من ${LIMITS.basic.products} منتج`}
+              feature={`أكثر من ${LIMITS.basic.products} منتج`}
               compact
             />
           </div>
@@ -82,17 +82,17 @@ export default async function ProductsPage({
         (count ?? 0) < LIMITS.basic.products &&
         (count ?? 0) >= LIMITS.basic.products - 10 && (
           <p className="mb-4 text-[13px] text-muted">
-            عندك {count} منتج من أصل {LIMITS.basic.products} بالباقة الأساسية.
+            لديك {count} منتج من أصل {LIMITS.basic.products} في الباقة الأساسية.
           </p>
         )}
       {!sp.q && !sp.status && products.length === 0 ? (
         <EmptyState
-          title="ضيف منتجاتك"
-          text="ابدأ بإضافة أول منتج، أو استورد كل منتجاتك دفعة وحدة من ملف Excel."
+          title="أضف منتجاتك"
+          text="ابدأ بإضافة أول منتج، أو استورد جميع منتجاتك دفعة واحدة من ملف Excel."
           action={
             <div className="flex gap-2">
               <Link href="/dashboard/products/new" className="btn">
-                أضف منتج
+                إضافة منتج
               </Link>
               <Link
                 href="/dashboard/products/import"
@@ -194,9 +194,9 @@ export default async function ProductsPage({
                           <span className="text-muted">غير محدود</span>
                         ) : (
                           <span className={stock === 0 ? "text-red-700" : ""}>
-                            {stock} بالمخزون
+                            {stock} في المخزون
                             {hasVariants(p)
-                              ? ` لـ ${p.variants!.length} خيار`
+                              ? ` لـ ${p.variants!.length} خيارات`
                               : ""}
                           </span>
                         )}
@@ -216,7 +216,7 @@ export default async function ProductsPage({
             </table>
           </BulkBar>
           {products.length === 0 && (
-            <p className="p-10 text-center text-muted">ما في منتجات مطابقة</p>
+            <p className="p-10 text-center text-muted">لا توجد منتجات مطابقة</p>
           )}
           <Pager
             page={page}

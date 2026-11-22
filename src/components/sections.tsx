@@ -37,7 +37,7 @@ function SectionView({ section, store, products, categories, collections, byColl
             {section.subtitle && <p className="max-w-lg text-lg text-muted">{section.subtitle}</p>}
             <div>
               <StoreLink href="/products" className="btn mt-2">
-                {section.buttonText || "شوف المنتجات"}
+                {section.buttonText || "تصفّح المنتجات"}
               </StoreLink>
             </div>
           </div>
@@ -139,7 +139,7 @@ function SectionView({ section, store, products, categories, collections, byColl
               {section.text && <p className="mt-1 opacity-90">{section.text}</p>}
             </div>
             <a href={whatsappLink(store.whatsapp)} target="_blank" rel="noopener noreferrer" className="rounded-theme bg-white px-6 py-3 font-semibold text-primary">
-              راسلنا على واتساب
+              راسلنا عبر واتساب
             </a>
           </div>
         </section>

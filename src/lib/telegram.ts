@@ -105,7 +105,7 @@ export async function notifyNewOrder(
     const cur = store.currency as Currency;
     const pickup = o.fulfillment === "pickup";
     const lines = [
-      `🛍 طلب جديد #${o.number} بـ${store.name}`,
+      `🛍 طلب جديد #${o.number} في ${store.name}`,
       "",
       ...o.items.map(
         (i) =>
@@ -114,9 +114,9 @@ export async function notifyNewOrder(
       "",
       `المجموع: ${formatPrice(o.total, cur)}`,
       pickup
-        ? `🏪 استلام من المحل${o.branch ? `: ${o.branch.name}` : ""}`
-        : `🚚 توصيل: ${o.city ?? ""}، ${o.address ?? ""}`,
-      `الدفع: ${paymentLabel(o.payment_method, pickup)}${o.payment_method && o.payment_method !== "cod" ? " (تأكد إنو التحويل وصل)" : ""}`,
+        ? `🏪 الاستلام من المحل${o.branch ? `: ${o.branch.name}` : ""}`
+        : `🚚 التوصيل: ${o.city ?? ""}، ${o.address ?? ""}`,
+      `الدفع: ${paymentLabel(o.payment_method, pickup)}${o.payment_method && o.payment_method !== "cod" ? " (تحقّق من وصول التحويل)" : ""}`,
       "",
       `👤 ${o.customer_name}`,
       `📞 ${o.phone}`,

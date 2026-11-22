@@ -40,25 +40,25 @@ export async function saveDiscount(
   const ends = date(form.get("ends_at"));
 
   if (!["percent", "fixed", "free_shipping"].includes(kind))
-    return { error: "اختار نوع الخصم" };
+    return { error: "اختر نوع الخصم" };
   if (!automatic && !/^[A-Z0-9_-]{3,30}$/.test(code))
-    return { error: "الكود لازم يكون من 3 لـ 30 حرف إنكليزي أو رقم" };
+    return { error: "يجب أن يتكوّن الرمز من 3 إلى 30 حرفاً إنجليزياً أو رقماً" };
   if (automatic && !title)
-    return { error: "اكتب اسم للخصم (بيظهر للزبون بالسلة)" };
+    return { error: "أدخل اسماً للخصم (يظهر للزبون في السلة)" };
   if (
     kind !== "free_shipping" &&
     (value === null || Number.isNaN(value) || value <= 0)
   )
-    return { error: "اكتب قيمة الخصم" };
+    return { error: "أدخل قيمة الخصم" };
   if (kind === "percent" && value! > 100)
-    return { error: "النسبة لازم تكون 100 أو أقل" };
+    return { error: "يجب ألا تتجاوز النسبة 100" };
   if (
     Number.isNaN(min) ||
     Number.isNaN(limit) ||
     starts === undefined ||
     ends === undefined
   )
-    return { error: "في قيمة غير صحيحة" };
+    return { error: "توجد قيمة غير صحيحة" };
 
   const row = {
     store_id: store.id,
@@ -84,8 +84,8 @@ export async function saveDiscount(
     return {
       error:
         res.error.code === "23505"
-          ? "في كود خصم بنفس الاسم"
-          : "ما قدرنا نحفظ، جرب مرة تانية",
+          ? "يوجد رمز خصم بالاسم نفسه"
+          : "تعذّر الحفظ، حاول مرة أخرى",
     };
   revalidatePath("/dashboard/discounts");
   refresh();

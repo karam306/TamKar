@@ -21,8 +21,8 @@ export function DiscountForm({ discount, currency }: { discount?: Discount; curr
           <h2 className="text-sm font-semibold">طريقة الخصم</h2>
           <div className="grid grid-cols-2 gap-2">
             {[
-              { id: "code", label: "كود خصم", hint: "الزبون بيكتبه بالسلة" },
-              { id: "automatic", label: "خصم تلقائي", hint: "بيتطبق لحاله" },
+              { id: "code", label: "رمز خصم", hint: "يكتبه الزبون في السلة" },
+              { id: "automatic", label: "خصم تلقائي", hint: "يُطبَّق تلقائياً" },
             ].map((m) => (
               <label key={m.id} className={`cursor-pointer rounded-lg border-2 p-3 ${method === m.id ? "border-black" : "border-black/10"}`}>
                 <input type="radio" name="method" value={m.id} checked={method === m.id} onChange={() => setMethod(m.id)} className="sr-only" />
@@ -32,11 +32,11 @@ export function DiscountForm({ discount, currency }: { discount?: Discount; curr
             ))}
           </div>
           {method === "code" ? (
-            <Field label="الكود" hint="أحرف إنكليزية وأرقام، مثلاً EID20">
+            <Field label="الرمز" hint="أحرف إنجليزية وأرقام، مثلاً: EID20">
               <input name="code" required defaultValue={discount?.code ?? ""} className="input uppercase" dir="ltr" />
             </Field>
           ) : (
-            <Field label="اسم الخصم" hint="بيظهر للزبون بالسلة، مثلاً: عرض الافتتاح">
+            <Field label="اسم الخصم" hint="يظهر للزبون في السلة، مثلاً: عرض الافتتاح">
               <input name="title" required defaultValue={discount?.title ?? ""} className="input" />
             </Field>
           )}
@@ -54,7 +54,7 @@ export function DiscountForm({ discount, currency }: { discount?: Discount; curr
               <input name="value" required inputMode="decimal" defaultValue={discount?.value ?? ""} className="input" dir="ltr" />
             </Field>
           )}
-          <Field label={`أقل مبلغ للطلب (${unit})`} hint="اختياري. الخصم ما بيشتغل تحت هالمبلغ">
+          <Field label={`أقل مبلغ للطلب (${unit})`} hint="اختياري. لا يُطبَّق الخصم على الطلبات الأقل من هذا المبلغ">
             <input name="min_subtotal" inputMode="decimal" defaultValue={discount?.min_subtotal ?? ""} className="input" dir="ltr" />
           </Field>
         </section>
@@ -65,11 +65,11 @@ export function DiscountForm({ discount, currency }: { discount?: Discount; curr
             <Field label="يبدأ من">
               <input type="date" name="starts_at" defaultValue={day(discount?.starts_at)} className="input" />
             </Field>
-            <Field label="ينتهي بـ" hint="اختياري">
+            <Field label="ينتهي في" hint="اختياري">
               <input type="date" name="ends_at" defaultValue={day(discount?.ends_at)} className="input" />
             </Field>
           </div>
-          <Field label="عدد مرات الاستخدام الكلي" hint="اختياري. مثلاً 100 يعني أول 100 طلب بس">
+          <Field label="عدد مرات الاستخدام الكلي" hint="اختياري. مثلاً: 100 تعني أول 100 طلب فقط">
             <input name="usage_limit" inputMode="numeric" defaultValue={discount?.usage_limit ?? ""} className="input" dir="ltr" />
           </Field>
         </section>
@@ -82,10 +82,10 @@ export function DiscountForm({ discount, currency }: { discount?: Discount; curr
             <option value="on">فعّال</option>
             <option value="off">متوقف</option>
           </select>
-          {discount && <p className="text-xs text-muted">انستخدم {discount.used_count} مرة</p>}
+          {discount && <p className="text-xs text-muted">استُخدم {discount.used_count} مرة</p>}
         </section>
         <FormMessage state={state} />
-        <SubmitButton className="w-full">احفظ الخصم</SubmitButton>
+        <SubmitButton className="w-full">حفظ الخصم</SubmitButton>
       </div>
     </form>
   );

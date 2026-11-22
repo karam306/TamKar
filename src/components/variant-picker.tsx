@@ -47,7 +47,7 @@ export function VariantPicker({ product }: { product: Product }) {
       ))}
       <Quantity qty={qty} setQty={setQty} />
       <div className="max-w-sm">
-        <AddToCart productId={product.id} variantId={variant?.id} price={variant?.price} qty={qty} disabled={soldOut} full label={soldOut ? "هالخيار مش متوفر" : undefined} />
+        <AddToCart productId={product.id} variantId={variant?.id} price={variant?.price} qty={qty} disabled={soldOut} full label={soldOut ? "هذا الخيار غير متوفر" : undefined} />
       </div>
     </div>
   );
@@ -60,7 +60,7 @@ export function SimpleBuy({ product }: { product: Product }) {
   return (
     <div className="flex flex-col gap-5">
       <Price amount={product.price} compare={product.compare_at_price} className="text-2xl" />
-      {product.stock != null && product.stock > 0 && product.stock <= 5 && <p className="text-sm text-amber-700">باقي {product.stock} قطع بس</p>}
+      {product.stock != null && product.stock > 0 && product.stock <= 5 && <p className="text-sm text-amber-700">بقيت {product.stock} قطع فقط</p>}
       <Quantity qty={qty} setQty={setQty} />
       <div className="max-w-sm">
         <AddToCart productId={product.id} price={product.price} qty={qty} disabled={soldOut} full />

@@ -15,18 +15,18 @@ const str = (f: FormData, k: string, max = 200) => String(f.get(k) ?? "").trim()
 /** Is this store address free? Used while the merchant types the store name. */
 export async function checkSlug(slug: string): Promise<{ ok: boolean; reason?: string }> {
   const s = String(slug ?? "").toLowerCase();
-  if (!/^[a-z0-9-]{3,40}$/.test(s) || s.startsWith("-") || s.endsWith("-")) return { ok: false, reason: "أحرف إنكليزية صغيرة وأرقام وشرطة، 3 أحرف أو أكتر" };
-  if (RESERVED_SLUGS.includes(s)) return { ok: false, reason: "هالرابط محجوز" };
+  if (!/^[a-z0-9-]{3,40}$/.test(s) || s.startsWith("-") || s.endsWith("-")) return { ok: false, reason: "أحرف إنجليزية صغيرة وأرقام وشرطة، 3 أحرف على الأقل" };
+  if (RESERVED_SLUGS.includes(s)) return { ok: false, reason: "هذا الرابط محجوز" };
   if (!hasSupabase) return { ok: true };
   const { data } = await supabaseAdmin().from("stores").select("id").eq("slug", s).maybeSingle();
-  return data ? { ok: false, reason: "هالرابط مستخدم" } : { ok: true };
+  return data ? { ok: false, reason: "هذا الرابط مستخدم" } : { ok: true };
 }
 
 /** Which onboarding question an error belongs to, so the screen can go back to it. */
 export type SignupState = { error?: string; field?: string } | undefined;
 
 export async function signup(_: SignupState, form: FormData): Promise<SignupState> {
-  if (!hasSupabase) return { error: "قاعدة البيانات غير مربوطة بعد" };
+  if (!hasSupabase) return { error: "قاعدة البيانات غير مرتبطة بعد" };
 
   const storeName = str(form, "store_name", 80);
   const slug = str(form, "slug", 40).toLowerCase();
@@ -49,13 +49,13 @@ export async function signup(_: SignupState, form: FormData): Promise<SignupStat
   const heardFrom = str(form, "heard_from", 20);
   const refCode = str(form, "ref", 12).toUpperCase().replace(/[^A-Z0-9]/g, "");
 
-  if (storeName.length < 2) return { error: "اكتب اسم المتجر", field: "store_name" };
+  if (storeName.length < 2) return { error: "أدخل اسم المتجر", field: "store_name" };
   if (!/^[a-z0-9-]{3,40}$/.test(slug) || slug.startsWith("-") || slug.endsWith("-")) {
-    return { error: "رابط المتجر لازم يكون أحرف إنكليزية صغيرة وأرقام وشرطة (-) فقط، من 3 أحرف أو أكثر", field: "store_name" };
+    return { error: "يجب أن يتكوّن رابط المتجر من أحرف إنجليزية صغيرة وأرقام وشرطة (-) فقط، و3 أحرف على الأقل", field: "store_name" };
   }
-  if (RESERVED_SLUGS.includes(slug)) return { error: "هالرابط محجوز، اختار رابط تاني", field: "store_name" };
-  if (!/^\S+@\S+\.\S+$/.test(email)) return { error: "الإيميل غير صحيح", field: "email" };
-  if (password.length < 8) return { error: "كلمة السر لازم تكون 8 أحرف على الأقل", field: "password" };
+  if (RESERVED_SLUGS.includes(slug)) return { error: "هذا الرابط محجوز، اختر رابطاً آخر", field: "store_name" };
+  if (!/^\S+@\S+\.\S+$/.test(email)) return { error: "البريد الإلكتروني غير صحيح", field: "email" };
+  if (password.length < 8) return { error: "يجب ألا تقل كلمة المرور عن 8 أحرف", field: "password" };
   if (!/^\d{9,15}$/.test(whatsapp)) return { error: "رقم واتساب غير صحيح", field: "whatsapp" };
   if (!Number.isFinite(fee) || fee < 0) return { error: "سعر التوصيل غير صحيح", field: "delivery_fee" };
 
@@ -63,9 +63,9 @@ export async function signup(_: SignupState, form: FormData): Promise<SignupStat
   const { data: taken, error: checkError } = await admin.from("stores").select("id").eq("slug", slug).maybeSingle();
   if (checkError) {
     console.error("signup: stores check failed", checkError.code, checkError.message);
-    return { error: `قاعدة البيانات مش جاهزة (رمز: DB ${checkError.code ?? ""} ${(checkError.message ?? "").slice(0, 80)})، تواصل مع الدعم` };
+    return { error: `قاعدة البيانات غير جاهزة (رمز: DB ${checkError.code ?? ""} ${(checkError.message ?? "").slice(0, 80)})، يُرجى التواصل مع الدعم` };
   }
-  if (taken) return { error: "هالرابط مستخدم، اختار رابط تاني", field: "store_name" };
+  if (taken) return { error: "هذا الرابط مستخدم، اختر رابطاً آخر", field: "store_name" };
 
   const { data: created, error: userError } = await admin.auth.admin.createUser({
     email,
@@ -76,8 +76,8 @@ export async function signup(_: SignupState, form: FormData): Promise<SignupStat
     const msg = userError?.message ?? "";
     console.error("signup: createUser failed", userError?.status, userError?.code, msg);
     return /already|registered|exists/i.test(msg)
-      ? { error: "في حساب بهالإيميل. سجّل دخول، أو استعمل إيميل تاني", field: "email" }
-      : { error: "ما قدرنا ننشئ الحساب، جرب مرة تانية" };
+      ? { error: "يوجد حساب مسجّل بهذا البريد الإلكتروني. سجّل الدخول، أو استخدم بريداً آخر", field: "email" }
+      : { error: "تعذّر إنشاء الحساب، حاول مرة أخرى" };
   }
 
   const { data: newStore, error: storeError } = await admin
@@ -101,7 +101,7 @@ export async function signup(_: SignupState, form: FormData): Promise<SignupStat
   if (storeError) {
     console.error("signup: store insert failed", storeError.code, storeError.message);
     await admin.auth.admin.deleteUser(created.user.id);
-    return storeError.code === "23505" ? { error: "هالرابط مستخدم، اختار رابط تاني", field: "store_name" } : { error: "ما قدرنا ننشئ المتجر، جرب مرة تانية" };
+    return storeError.code === "23505" ? { error: "هذا الرابط مستخدم، اختر رابطاً آخر", field: "store_name" } : { error: "تعذّر إنشاء المتجر، حاول مرة أخرى" };
   }
 
   if (newStore) {
@@ -110,7 +110,7 @@ export async function signup(_: SignupState, form: FormData): Promise<SignupStat
       store_id: newStore.id,
       owner_name: ownerName || null,
       owner_phone: whatsapp,
-      note: wantsHelp ? "🙋 طلب مساعدة بتجهيز المتجر والإعلانات (من صفحة التسجيل)" : null,
+      note: wantsHelp ? "🙋 طلب المساعدة في تجهيز المتجر والإعلانات (من صفحة التسجيل)" : null,
     });
     // Separate step so signup still works before update 010 is run.
     let salesmanId: string | null = null;
@@ -119,7 +119,7 @@ export async function signup(_: SignupState, form: FormData): Promise<SignupStat
       salesmanId = (m?.id as string | undefined) ?? null;
     }
     const label = HEARD_LABELS[heardFrom] ?? (refCode ? "مندوب" : null);
-    const heard = label ? `${label}${refCode && !salesmanId ? `: كود ${refCode} (مو معروف)` : ""}` : null;
+    const heard = label ? `${label}${refCode && !salesmanId ? `: رمز ${refCode} (غير معروف)` : ""}` : null;
     if (heard || salesmanId) {
       const { error: srcError } = await admin.from("store_admin").update({ heard_from: heard, salesman_id: salesmanId }).eq("store_id", newStore.id);
       if (srcError) console.error("signup: source not saved (run 010)", srcError.message);
@@ -136,11 +136,11 @@ const HEARD_LABELS: Record<string, string> = {
   facebook: "فيسبوك",
   tiktok: "تيك توك",
   friend: "صديق أو تاجر",
-  other: "غير هيك",
+  other: "مصدر آخر",
 };
 
 export async function login(_: FormState, form: FormData): Promise<FormState> {
-  if (!hasSupabase) return { error: "قاعدة البيانات غير مربوطة بعد" };
+  if (!hasSupabase) return { error: "قاعدة البيانات غير مرتبطة بعد" };
   const db = await supabaseUser();
   const { data, error } = await db.auth.signInWithPassword({
     email: str(form, "email", 120).toLowerCase(),
@@ -148,9 +148,9 @@ export async function login(_: FormState, form: FormData): Promise<FormState> {
   });
   if (error) {
     console.error("login failed", error.status, error.code, error.message);
-    if (error.code === "email_not_confirmed") return { error: "الإيميل لسا ما تأكد. تواصل مع الدعم" };
-    if (error.code === "invalid_credentials") return { error: "الإيميل أو كلمة السر غلط" };
-    return { error: `ما قدرنا نسجل دخول (${error.code ?? error.status ?? ""}: ${error.message.slice(0, 80)})` };
+    if (error.code === "email_not_confirmed") return { error: "لم يُؤكَّد البريد الإلكتروني بعد. تواصل مع الدعم" };
+    if (error.code === "invalid_credentials") return { error: "البريد الإلكتروني أو كلمة المرور غير صحيحة" };
+    return { error: `تعذّر تسجيل الدخول (${error.code ?? error.status ?? ""}: ${error.message.slice(0, 80)})` };
   }
   redirect(isAdminEmail(data.user?.email) ? "/admin" : "/dashboard");
 }

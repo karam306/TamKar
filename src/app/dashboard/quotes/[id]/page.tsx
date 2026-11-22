@@ -33,7 +33,7 @@ export default async function QuotePage({
         <PageHeader title={`عرض سعر #${q.number}`} back="/dashboard/quotes" />
         {created && (
           <div className="mb-3 rounded-lg bg-[#affebf] p-3 text-[13px]">
-            ✓ انحفظ العرض. ابعته للزبون من الزر تحت.
+            ✓ تم حفظ العرض. أرسله إلى الزبون من الزر أدناه.
           </div>
         )}
         <div className="flex flex-wrap items-center gap-2">
@@ -59,15 +59,15 @@ export default async function QuotePage({
                   {s === "accepted"
                     ? "✓ وافق الزبون"
                     : s === "declined"
-                      ? "ما وافق"
-                      : "رجّعه مبعوث"}
+                      ? "لم يوافق"
+                      : "إعادته إلى مُرسَل"}
                 </button>
               </form>
             ))}
           <form action={deleteQuote} className="mr-auto">
             <input type="hidden" name="id" value={q.id} />
             <button className="text-xs text-red-700 hover:underline">
-              احذف العرض
+              حذف العرض
             </button>
           </form>
         </div>

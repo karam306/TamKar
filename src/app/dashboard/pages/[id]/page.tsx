@@ -45,7 +45,7 @@ export default async function EditPage({
         </summary>
         <form action={deletePage} className="mt-3">
           <input type="hidden" name="id" value={page.id} />
-          <button className="btn !bg-[#c70a24]">احذف</button>
+          <button className="btn !bg-[#c70a24]">حذف</button>
         </form>
       </details>
     </div>

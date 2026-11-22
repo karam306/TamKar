@@ -19,7 +19,7 @@ export async function createQuote(
   form: FormData,
 ): Promise<FormState> {
   const { store, db } = await requireAccess("quotes");
-  if (!isPro(store)) return { error: "عروض الأسعار متاحة بالباقة الاحترافية" };
+  if (!isPro(store)) return { error: "عروض الأسعار متاحة في الباقة الاحترافية" };
   let raw: Partial<QuoteLine>[] = [];
   try {
     raw = JSON.parse(String(form.get("items") ?? "[]"));
@@ -38,11 +38,11 @@ export async function createQuote(
       productId: l.productId ? String(l.productId) : null,
     }))
     .filter((l) => l.title);
-  if (!items.length) return { error: "ضيف منتج واحد على الأقل" };
+  if (!items.length) return { error: "أضف منتجاً واحداً على الأقل" };
   const name = String(form.get("customer_name") ?? "")
     .trim()
     .slice(0, 120);
-  if (!name) return { error: "اكتب اسم الزبون" };
+  if (!name) return { error: "أدخل اسم الزبون" };
   const subtotal = items.reduce((s, l) => s + l.price * l.qty, 0);
   const discount = Math.min(num(form.get("discount")), subtotal);
   const delivery = num(form.get("delivery_fee"));
@@ -85,10 +85,10 @@ export async function createQuote(
     )
       return {
         error:
-          "جدول عروض الأسعار لسا مو موجود بقاعدة البيانات (لازم ينشغّل ملف 008_quotes.sql بـ Supabase)",
+          "جدول عروض الأسعار غير موجود في قاعدة البيانات بعد (يجب تشغيل الملف 008_quotes.sql في Supabase)",
       };
     return {
-      error: `ما قدرنا نحفظ العرض (${error?.code ?? ""}: ${(error?.message ?? "").slice(0, 80)})`,
+      error: `تعذّر حفظ العرض (${error?.code ?? ""}: ${(error?.message ?? "").slice(0, 80)})`,
     };
   }
   revalidatePath("/dashboard/quotes");

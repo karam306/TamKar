@@ -7,7 +7,7 @@ import type { Product } from "@/lib/types";
 export async function GET(req: Request) {
   const m = await getMerchant();
   if (!m || m.role !== "owner") return new Response("Unauthorized", { status: 401 });
-  if (!isPro(m.store)) return new Response("التصدير لـ Excel متاح بالباقة الاحترافية", { status: 403, headers: { "content-type": "text/plain; charset=utf-8" } });
+  if (!isPro(m.store)) return new Response("التصدير إلى Excel متاح في الباقة الاحترافية", { status: 403, headers: { "content-type": "text/plain; charset=utf-8" } });
   const template = new URL(req.url).searchParams.get("template") === "1";
   const headers = PRODUCT_COLUMNS.map((c) => c.header);
 

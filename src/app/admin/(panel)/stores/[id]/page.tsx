@@ -34,12 +34,12 @@ export default async function AdminStorePage({ params }: { params: Promise<{ id:
         actions={
           <>
             <a href={link} target="_blank" rel="noopener noreferrer" className="btn btn-outline">
-              شوف المتجر ↗
+              عرض المتجر ↗
             </a>
             <form action={setStoreStatus}>
               <input type="hidden" name="id" value={s.id} />
               <input type="hidden" name="status" value={s.status === "suspended" ? "active" : "suspended"} />
-              <button className={s.status === "suspended" ? "btn" : "btn !bg-[#c70a24]"}>{s.status === "suspended" ? "فعّل المتجر" : "أوقف المتجر"}</button>
+              <button className={s.status === "suspended" ? "btn" : "btn !bg-[#c70a24]"}>{s.status === "suspended" ? "تفعيل المتجر" : "إيقاف المتجر"}</button>
             </form>
           </>
         }
@@ -60,10 +60,10 @@ export default async function AdminStorePage({ params }: { params: Promise<{ id:
             </div>
             <div className="mb-4 grid gap-1 text-[13px] sm:grid-cols-2">
               <div>
-                <span className="text-muted">لغاية: </span>
-                {s.paid_until ?? "بدون تاريخ"}
+                <span className="text-muted">حتى: </span>
+                {s.paid_until ?? "دون تاريخ"}
               </div>
-              <div className="text-muted">{left == null ? "" : left >= 0 ? `باقي ${left} يوم` : `خلص من ${-left} يوم`}</div>
+              <div className="text-muted">{left == null ? "" : left >= 0 ? `متبقٍّ ${left} يوم` : `انتهى منذ ${-left} يوم`}</div>
             </div>
             <PaymentForm id={s.id} currency={s.currency} />
             <details className="mt-4 text-[13px]">
@@ -85,7 +85,7 @@ export default async function AdminStorePage({ params }: { params: Promise<{ id:
 
           <Card title="الدفعات">
             {(payments ?? []).length === 0 ? (
-              <p className="text-[13px] text-muted">ما في دفعات مسجلة</p>
+              <p className="text-[13px] text-muted">لا توجد دفعات مسجلة</p>
             ) : (
               <table className="w-full text-[13px]">
                 <thead className="text-right text-xs text-muted">
@@ -94,7 +94,7 @@ export default async function AdminStorePage({ params }: { params: Promise<{ id:
                     <th className="pb-2 font-medium">المبلغ</th>
                     <th className="pb-2 font-medium">الأشهر</th>
                     <th className="pb-2 font-medium">الطريقة</th>
-                    <th className="pb-2 font-medium">لغاية</th>
+                    <th className="pb-2 font-medium">حتى</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-black/5">
@@ -129,7 +129,7 @@ export default async function AdminStorePage({ params }: { params: Promise<{ id:
                   </option>
                 ))}
               </select>
-              <textarea name="note" rows={3} defaultValue={s.note ?? ""} placeholder="ملاحظات خاصة فيك" className="input" />
+              <textarea name="note" rows={3} defaultValue={s.note ?? ""} placeholder="ملاحظات خاصة بك" className="input" />
               <button className="btn btn-outline">احفظ</button>
             </form>
             {(s.owner_phone || s.whatsapp) && (
@@ -139,7 +139,7 @@ export default async function AdminStorePage({ params }: { params: Promise<{ id:
                 rel="noopener noreferrer"
                 className="btn mt-3 w-full !bg-[#25D366]"
               >
-                راسل التاجر على واتساب
+                راسل التاجر عبر واتساب
               </a>
             )}
           </Card>
@@ -148,7 +148,7 @@ export default async function AdminStorePage({ params }: { params: Promise<{ id:
               <form action={setStoreSalesman} className="flex gap-2">
                 <input type="hidden" name="store_id" value={s.id} />
                 <select name="salesman_id" defaultValue={s.salesman_id ?? ""} className="input">
-                  <option value="">بدون مندوب</option>
+                  <option value="">دون مندوب</option>
                   {salesmen.map((m) => (
                     <option key={m.id} value={m.id}>
                       {m.name} ({m.code})
@@ -159,13 +159,13 @@ export default async function AdminStorePage({ params }: { params: Promise<{ id:
               </form>
               {s.heard_from && (
                 <div>
-                  <span className="text-muted">سمع عنا من: </span>
+                  <span className="text-muted">مصدر المعرفة بنا: </span>
                   {s.heard_from}
                 </div>
               )}
               <div>
                 <span className="text-muted">إشعارات تيليغرام: </span>
-                {s.telegram ? "✓ مربوط" : "مو مربوط"}
+                {s.telegram ? "✓ مرتبط" : "غير مرتبط"}
               </div>
             </div>
           </Card>
@@ -193,12 +193,12 @@ export default async function AdminStorePage({ params }: { params: Promise<{ id:
                 </div>
               )}
               <div>
-                <span className="text-muted">أنشئ بتاريخ: </span>
+                <span className="text-muted">أُنشئ بتاريخ: </span>
                 {new Date(s.created_at).toLocaleDateString("en-GB")}
               </div>
             </div>
           </Card>
-          <Card title="كلمة السر">
+          <Card title="كلمة المرور">
             <ResetPassword id={s.id} />
           </Card>
         </div>

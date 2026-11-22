@@ -5,7 +5,7 @@ import { useActionState, useOptimistic, useTransition } from "react";
 import { recordPayment, resetPassword, setPlan } from "@/app/admin/actions";
 
 const PLAN_CHOICES = [
-  { id: "basic", label: "أساسي", hint: "$15 · لغاية 100 منتج" },
+  { id: "basic", label: "أساسي", hint: "$15 · حتى 100 منتج" },
   { id: "pro", label: "احترافي", hint: "$29 · كل الميزات" },
   { id: "trial", label: "تجريبي", hint: "كل الميزات مؤقتاً" },
 ];
@@ -51,7 +51,7 @@ export function PaymentForm({ id, currency }: { id: string; currency: string }) 
   const [state, action] = useActionState(recordPayment, undefined);
   return (
     <form action={action} className="space-y-2 rounded-lg bg-[#f7f7f7] p-3 text-[13px]">
-      <div className="font-semibold">سجّل دفعة اشتراك</div>
+      <div className="font-semibold">تسجيل دفعة اشتراك</div>
       <input type="hidden" name="id" value={id} />
       <div className="grid gap-2 sm:grid-cols-4">
         <input name="amount" required inputMode="decimal" placeholder="المبلغ" className="input" dir="ltr" />
@@ -66,16 +66,16 @@ export function PaymentForm({ id, currency }: { id: string; currency: string }) 
             </option>
           ))}
         </select>
-        <input name="method" placeholder="الطريقة (كاش، شام كاش...)" className="input" />
+        <input name="method" placeholder="الطريقة (نقداً، شام كاش...)" className="input" />
       </div>
       <select name="plan" defaultValue="" className="input">
-        <option value="">نفس الباقة</option>
+        <option value="">الباقة نفسها</option>
         <option value="basic">أساسي</option>
         <option value="pro">احترافي</option>
       </select>
       <input name="note" placeholder="ملاحظة (اختياري)" className="input" />
       <FormMessage state={state} />
-      <SubmitButton pendingText="جاري التسجيل...">سجّل الدفعة ومدّد الاشتراك</SubmitButton>
+      <SubmitButton pendingText="جارٍ التسجيل...">تسجيل الدفعة وتمديد الاشتراك</SubmitButton>
     </form>
   );
 }
@@ -85,18 +85,18 @@ export function ResetPassword({ id }: { id: string }) {
   return (
     <form action={action} className="space-y-2 text-[13px]">
       <input type="hidden" name="id" value={id} />
-      <p className="text-muted">إذا التاجر نسي كلمة السر: اكتب وحدة جديدة، أو اتركها فاضية ومنعملك وحدة عشوائية.</p>
-      <input name="password" dir="ltr" minLength={8} placeholder="كلمة سر جديدة (اختياري)" className="input" autoComplete="new-password" />
+      <p className="text-muted">إذا نسي التاجر كلمة المرور: اكتب كلمة جديدة، أو اترك الحقل فارغاً لإنشاء كلمة عشوائية.</p>
+      <input name="password" dir="ltr" minLength={8} placeholder="كلمة مرور جديدة (اختياري)" className="input" autoComplete="new-password" />
       {state?.password && (
         <div className="rounded-lg bg-[#f7f7f7] p-2">
-          كلمة السر الجديدة:{" "}
+          كلمة المرور الجديدة:{" "}
           <b dir="ltr" className="select-all">
             {state.password}
           </b>
         </div>
       )}
       {state?.error && <p className="text-red-700">{state.error}</p>}
-      <SubmitButton pendingText="...">غيّر كلمة السر</SubmitButton>
+      <SubmitButton pendingText="...">تغيير كلمة المرور</SubmitButton>
     </form>
   );
 }

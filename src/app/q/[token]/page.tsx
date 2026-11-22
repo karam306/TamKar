@@ -21,7 +21,7 @@ export default async function SharedQuote({ params }: { params: Promise<{ token:
   return (
     <div data-theme="classic" className="mx-auto max-w-2xl bg-white p-6 font-sans text-[14px] print:p-0">
       <div className="mb-6 flex justify-end print:hidden">
-        <PrintButton label="احفظ العرض PDF" />
+        <PrintButton label="حفظ العرض PDF" />
       </div>
       <QuoteView store={store as Store} quote={data as Quote} />
     </div>

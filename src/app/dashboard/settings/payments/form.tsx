@@ -16,14 +16,14 @@ export function PaymentsForm({ cod, wallets }: { cod: boolean; wallets: Wallet[]
         <label className="flex items-center gap-3">
           <input type="checkbox" name="cod" defaultChecked={cod} className="h-5 w-5" />
           <span>
-            <b className="block text-sm">💵 كاش عند الاستلام</b>
-            <span className="text-[13px] text-muted">الزبون بيدفع بالمحل أو للمندوب لما يستلم.</span>
+            <b className="block text-sm">💵 نقداً عند الاستلام</b>
+            <span className="text-[13px] text-muted">يدفع الزبون في المحل أو للمندوب عند الاستلام.</span>
           </span>
         </label>
       </section>
 
       <p className="px-1 text-[13px] text-muted">
-        فعّل المحفظة اللي عندك. بعد ما يطلب الزبون، بتطلعله صفحة فيها المبلغ ورقم حسابك مع زر نسخ، بيحوّل من تطبيقه وبيبعتلك الإيصال على واتساب. أنت بتتأكد إنو المبلغ وصل وبتكبس &quot;تم الدفع&quot; بالطلب.
+        فعّل المحفظة التي لديك. بعد أن يطلب الزبون، تظهر له صفحة فيها المبلغ ورقم حسابك مع زر نسخ، فيحوّل من تطبيقه ويرسل إليك الإيصال عبر واتساب. وبعد التحقق من وصول المبلغ، اضغط &quot;تم الدفع&quot; في الطلب.
       </p>
 
       {WALLET_IDS.map((id: WalletId) => {
@@ -48,18 +48,18 @@ export function PaymentsForm({ cod, wallets }: { cod: boolean; wallets: Wallet[]
                 <Field label={info.accountLabel} hint={info.accountHint}>
                   <input name={`${id}_account`} required defaultValue={w?.account ?? ""} className="input font-mono" dir="ltr" autoComplete="off" />
                 </Field>
-                <Field label="اسم صاحب الحساب (اختياري)" hint="الزبون بيشوفه ليتأكد إنو عم يحوّل للشخص الصح">
+                <Field label="اسم صاحب الحساب (اختياري)" hint="يراه الزبون ليتأكد من أنه يحوّل إلى الشخص الصحيح">
                   <input name={`${id}_holder`} defaultValue={w?.holder ?? ""} maxLength={80} className="input" />
                 </Field>
                 {info.qr && (
-                  <Field label="صورة الـ QR (اختياري)" hint="من تطبيق شام كاش: استقبال، خود سكرين شوت للرمز وارفعه هون.">
+                  <Field label="صورة الـ QR (اختياري)" hint="من تطبيق شام كاش: اختر «استقبال»، والتقط صورة للشاشة تُظهر الرمز، ثم ارفعها هنا.">
                     <div className="space-y-2">
                       {w?.qr && (
                         <div className="flex items-center gap-3">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img src={w.qr} alt="QR" className="h-24 w-24 rounded-lg border object-contain" />
                           <label className="flex items-center gap-1 text-[13px] text-muted">
-                            <input type="checkbox" name={`${id}_qr_remove`} /> احذف الصورة
+                            <input type="checkbox" name={`${id}_qr_remove`} /> حذف الصورة
                           </label>
                         </div>
                       )}
@@ -74,7 +74,7 @@ export function PaymentsForm({ cod, wallets }: { cod: boolean; wallets: Wallet[]
       })}
 
       <FormMessage state={state} />
-      <SubmitButton>احفظ</SubmitButton>
+      <SubmitButton>حفظ</SubmitButton>
     </form>
   );
 }

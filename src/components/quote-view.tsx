@@ -24,7 +24,7 @@ export function QuoteView({ store, quote: q }: { store: Pick<Store, "name" | "ci
           <div className="text-xl font-bold">عرض سعر</div>
           <div>رقم {q.number}</div>
           <div className="text-muted">{day(q.created_at)}</div>
-          {q.valid_until && <div className="text-muted">صالح لغاية {day(q.valid_until + "T12:00:00Z")}</div>}
+          {q.valid_until && <div className="text-muted">صالح حتى {day(q.valid_until + "T12:00:00Z")}</div>}
         </div>
       </header>
 
@@ -84,7 +84,7 @@ export function QuoteView({ store, quote: q }: { store: Pick<Store, "name" | "ci
         </div>
       </div>
       {q.notes && <p className="mt-6 whitespace-pre-line text-muted">ملاحظات: {q.notes}</p>}
-      <footer className="mt-12 text-center text-muted">للموافقة على العرض تواصل معنا على واتساب +{store.whatsapp}</footer>
+      <footer className="mt-12 text-center text-muted">للموافقة على العرض تواصل معنا عبر واتساب على الرقم +{store.whatsapp}</footer>
     </>
   );
 }

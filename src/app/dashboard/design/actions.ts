@@ -154,7 +154,7 @@ export async function saveDesign(
   try {
     sections = JSON.parse(String(form.get("sections") ?? "[]"));
   } catch {
-    return { error: "صار خطأ بالأقسام" };
+    return { error: "حدث خطأ في الأقسام" };
   }
 
   const { error } = await db
@@ -166,11 +166,11 @@ export async function saveDesign(
       sections: cleanSections(sections, store.id),
     })
     .eq("id", store.id);
-  if (error) return { error: "ما قدرنا نحفظ، جرب مرة تانية" };
+  if (error) return { error: "تعذّر الحفظ، حاول مرة أخرى" };
   revalidatePath("/dashboard/design");
   refresh();
   return {
-    ok: `✓ انحفظ التصميم (${new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })})`,
+    ok: `✓ تم حفظ التصميم (${new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })})`,
   };
 }
 

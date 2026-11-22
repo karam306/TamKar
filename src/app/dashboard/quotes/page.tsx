@@ -39,8 +39,8 @@ export default async function QuotesPage() {
       />
       {quotes.length === 0 ? (
         <EmptyState
-          title="ابعت لزبونك عرض سعر"
-          text="لما حدا يسألك عن سعر لكمية كبيرة أو لمجموعة منتجات، اعمله عرض سعر بأسعار خاصة وابعتله ياه PDF عالواتساب."
+          title="أرسل عرض سعر إلى زبونك"
+          text="عندما يسألك زبون عن سعر كمية كبيرة أو مجموعة منتجات، أنشئ له عرض سعر بأسعار خاصة وأرسله إليه بصيغة PDF عبر واتساب."
           action={
             <Link href="/dashboard/quotes/new" className="btn">
               عرض سعر جديد

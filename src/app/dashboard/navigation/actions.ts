@@ -33,8 +33,8 @@ export async function saveMenus(
     .from("stores")
     .update({ menus: { header: clean(raw.header), footer: clean(raw.footer) } })
     .eq("id", store.id);
-  if (error) return { error: "ما قدرنا نحفظ، جرب مرة تانية" };
+  if (error) return { error: "تعذّر الحفظ، حاول مرة أخرى" };
   revalidatePath("/dashboard/navigation");
   refresh();
-  return { ok: "✓ انحفظت القوائم" };
+  return { ok: "✓ تم حفظ القوائم" };
 }

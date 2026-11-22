@@ -39,7 +39,7 @@ export function ProductForm({
             <input name="title" required defaultValue={product?.title} maxLength={200} className="input" placeholder="مثلاً: طقم صحون سيراميك 18 قطعة" />
           </Field>
           <Field label="الوصف">
-            <textarea name="description" rows={6} defaultValue={product?.description ?? ""} className="input" placeholder="المقاسات، الخامة، طريقة الاستعمال..." />
+            <textarea name="description" rows={6} defaultValue={product?.description ?? ""} className="input" placeholder="المقاسات، والخامة، وطريقة الاستخدام..." />
           </Field>
           <ImageUploader name="images" initial={product?.images ?? []} upload={uploadImage} max={10} label="الصور" />
         </section>
@@ -52,7 +52,7 @@ export function ProductForm({
                 <Field label={`السعر (${unit})`}>
                   <input name="price" required inputMode="decimal" value={price} onChange={(e) => setPrice(e.target.value)} className="input" dir="ltr" />
                 </Field>
-                <Field label={`السعر قبل الخصم (${unit})`} hint="بيبين مشطوب جنب السعر">
+                <Field label={`السعر قبل الخصم (${unit})`} hint="يظهر مشطوباً بجانب السعر">
                   <input name="compare_at_price" inputMode="decimal" defaultValue={product?.compare_at_price ?? ""} className="input" dir="ltr" />
                 </Field>
               </div>
@@ -60,7 +60,7 @@ export function ProductForm({
             <section className="card space-y-3 p-4">
               <h2 className="text-sm font-semibold">المخزون</h2>
               <div className="grid gap-3 sm:grid-cols-2">
-                <Field label="الكمية المتوفرة" hint="اتركها فاضية إذا الكمية مفتوحة. بتنقص تلقائياً مع كل طلب">
+                <Field label="الكمية المتوفرة" hint="اتركه فارغاً إذا كانت الكمية غير محدودة. تنقص تلقائياً مع كل طلب">
                   <input name="stock" inputMode="numeric" defaultValue={product?.stock ?? ""} className="input" dir="ltr" />
                 </Field>
                 <Field label="SKU (رمز المنتج)">
@@ -76,7 +76,7 @@ export function ProductForm({
         <section className="card space-y-3 p-4">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-semibold">الخيارات</h2>
-            {withVariants && <span className="text-xs text-muted">كل خيار إله سعر وكمية خاصين فيه</span>}
+            {withVariants && <span className="text-xs text-muted">لكل خيار سعر وكمية خاصان به</span>}
           </div>
           {withVariants ? (
             <>
@@ -85,7 +85,7 @@ export function ProductForm({
             </>
           ) : (
             <button type="button" className="text-[13px] font-semibold text-[#005bd3] hover:underline" onClick={() => setWithVariants(true)}>
-              + هالمنتج إله خيارات، مثل {optionPresets.slice(0, 2).join(" أو ")}
+              + لهذا المنتج خيارات، مثل {optionPresets.slice(0, 2).join(" أو ")}
             </button>
           )}
         </section>
@@ -95,14 +95,14 @@ export function ProductForm({
         <section className="card space-y-2 p-4">
           <h2 className="text-sm font-semibold">الحالة</h2>
           <select name="status" defaultValue={product && !product.active ? "draft" : "active"} className="input">
-            <option value="active">نشط (ظاهر بالمتجر)</option>
+            <option value="active">نشط (ظاهر في المتجر)</option>
             <option value="draft">مسودة (مخفي)</option>
           </select>
         </section>
 
         <section className="card space-y-3 p-4">
           <h2 className="text-sm font-semibold">التنظيم</h2>
-          <Field label="نوع المنتج" hint="بيظهر كفلتر بصفحة المنتجات">
+          <Field label="نوع المنتج" hint="يظهر كعامل تصفية في صفحة المنتجات">
             <input name="category" list="cats" defaultValue={product?.category ?? ""} className="input" placeholder="مثلاً: صحون" />
             <datalist id="cats">
               {categories.map((c) => (
@@ -114,7 +114,7 @@ export function ProductForm({
             <div className="text-sm font-semibold">المجموعات</div>
             {collections.length === 0 ? (
               <p className="text-xs text-muted">
-                ما عندك مجموعات.{" "}
+                لا توجد مجموعات.{" "}
                 <Link href="/dashboard/collections/new" className="text-[#005bd3]">
                   أنشئ مجموعة
                 </Link>
@@ -132,7 +132,7 @@ export function ProductForm({
 
         <div className="sticky bottom-3 space-y-2">
           <FormMessage state={state} />
-          <SubmitButton className="w-full">احفظ</SubmitButton>
+          <SubmitButton className="w-full">حفظ</SubmitButton>
         </div>
       </div>
     </form>

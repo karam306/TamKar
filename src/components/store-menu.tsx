@@ -34,7 +34,7 @@ export function StoreMobileMenu({ links }: { links: MenuLink[] }) {
             <button
               type="button"
               className="absolute inset-0 bg-black/40"
-              aria-label="سكّر"
+              aria-label="إغلاق"
               onClick={() => setOpen(false)}
             />
             <nav className="absolute inset-y-0 right-0 flex w-72 flex-col gap-1 bg-bg p-4 shadow-xl">
@@ -42,7 +42,7 @@ export function StoreMobileMenu({ links }: { links: MenuLink[] }) {
                 type="button"
                 onClick={() => setOpen(false)}
                 className="mb-2 self-start p-1 text-muted"
-                aria-label="سكّر"
+                aria-label="إغلاق"
               >
                 ✕
               </button>

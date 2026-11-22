@@ -24,18 +24,18 @@ export default async function DiscountsPage({
         title="الخصومات"
         actions={
           <Link href="/dashboard/discounts/new" className="btn">
-            أنشئ خصم
+            إنشاء خصم
           </Link>
         }
       />
-      {saved && <p className="card mb-4 p-3 text-[13px]">✓ انحفظ الخصم</p>}
+      {saved && <p className="card mb-4 p-3 text-[13px]">✓ تم حفظ الخصم</p>}
       {list.length === 0 ? (
         <EmptyState
-          title="اعمل خصومات لزبائنك"
-          text="كود خصم بيكتبه الزبون بالسلة (مثل RAMADAN10)، أو خصم تلقائي بيتطبّق لحاله، أو توصيل مجاني."
+          title="أنشئ خصومات لزبائنك"
+          text="رمز خصم يكتبه الزبون في السلة (مثل RAMADAN10)، أو خصم يُطبَّق تلقائياً، أو توصيل مجاني."
           action={
             <Link href="/dashboard/discounts/new" className="btn">
-              أنشئ خصم
+              إنشاء خصم
             </Link>
           }
         />
@@ -73,7 +73,7 @@ export default async function DiscountsPage({
                       </span>
                     </td>
                     <td className="hidden p-2 text-muted sm:table-cell">
-                      {d.automatic ? "تلقائي" : "كود"}
+                      {d.automatic ? "تلقائي" : "رمز"}
                     </td>
                     <td className="p-2">
                       {d.used_count}

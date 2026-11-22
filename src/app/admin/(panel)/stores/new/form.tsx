@@ -16,18 +16,18 @@ export function NewMerchantForm({ salesmen = [] }: { salesmen?: { id: string; na
 
   if (state?.created) {
     const c = state.created;
-    const msg = `أهلاً بك بـ نمى 🎉\nمتجرك "${c.name}" صار جاهز.\n\nرابط متجرك: ${origin}/s/${c.slug}\nلوحة التحكم: ${origin}/login\nالإيميل: ${c.email}\nكلمة السر: ${c.password}\n\nفيك تغيّر كلمة السر بعد أول دخول.`;
+    const msg = `أهلاً بك في نمى.\nمتجرك "${c.name}" جاهز.\n\nرابط متجرك: ${origin}/s/${c.slug}\nلوحة التحكم: ${origin}/login\nالبريد الإلكتروني: ${c.email}\nكلمة المرور: ${c.password}\n\nيمكنك تغيير كلمة المرور بعد أول تسجيل دخول.`;
     return (
       <div className="card max-w-xl space-y-4 p-5">
-        <h2 className="text-lg font-semibold">✓ انعمل المتجر</h2>
-        <p className="text-[13px] text-muted">ابعت هالمعلومات للتاجر. كلمة السر ما رح تظهر مرة تانية (بتقدر تعمل وحدة جديدة من صفحة المتجر).</p>
+        <h2 className="text-lg font-semibold">✓ أُنشئ المتجر</h2>
+        <p className="text-[13px] text-muted">أرسل هذه المعلومات إلى التاجر. لن تظهر كلمة المرور مرة أخرى (يمكنك إنشاء كلمة جديدة من صفحة المتجر).</p>
         <pre className="whitespace-pre-wrap rounded-lg bg-[#f7f7f7] p-3 text-[13px] leading-6">{msg}</pre>
         <div className="flex flex-wrap gap-2">
           <button type="button" className="btn" onClick={() => navigator.clipboard.writeText(msg).catch(() => {})}>
-            انسخ الرسالة
+            نسخ الرسالة
           </button>
           <a href={`https://wa.me/?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer" className="btn !bg-[#25D366]">
-            ابعتها على واتساب
+            إرسالها عبر واتساب
           </a>
           <Link href={`/admin/stores/${c.id}`} className="btn btn-outline">
             صفحة المتجر
@@ -52,7 +52,7 @@ export function NewMerchantForm({ salesmen = [] }: { salesmen?: { id: string; na
             <Field label="نوع النشاط">
               <select name="business_type" required defaultValue="" className="input">
                 <option value="" disabled>
-                  اختار
+                  اختر
                 </option>
                 {BUSINESS_TYPES.map((b) => (
                   <option key={b.id} value={b.id}>
@@ -67,7 +67,7 @@ export function NewMerchantForm({ salesmen = [] }: { salesmen?: { id: string; na
                 <option value="SYP">ليرة سورية</option>
               </select>
             </Field>
-            <Field label="واتساب الطلبات" hint="مثال 0912345678">
+            <Field label="واتساب الطلبات" hint="مثال: 0912345678">
               <input name="whatsapp" required dir="ltr" inputMode="tel" className="input" />
             </Field>
             <Field label="المدينة">
@@ -84,14 +84,14 @@ export function NewMerchantForm({ salesmen = [] }: { salesmen?: { id: string; na
             <Field label="رقم الهاتف">
               <input name="owner_phone" dir="ltr" className="input" />
             </Field>
-            <Field label="إيميل الدخول">
+            <Field label="البريد الإلكتروني لتسجيل الدخول">
               <input name="email" type="email" required dir="ltr" className="input" />
             </Field>
-            <Field label="كلمة السر" hint="اتركها فاضية لننشئ وحدة تلقائياً">
+            <Field label="كلمة المرور" hint="اتركه فارغاً لإنشاء كلمة مرور تلقائياً">
               <input name="password" dir="ltr" className="input" autoComplete="new-password" />
             </Field>
           </div>
-          <Field label="ملاحظات خاصة فيك" hint="ما بيشوفها التاجر">
+          <Field label="ملاحظات خاصة بك" hint="لا يراها التاجر">
             <textarea name="note" rows={2} className="input" />
           </Field>
         </section>
@@ -100,12 +100,12 @@ export function NewMerchantForm({ salesmen = [] }: { salesmen?: { id: string; na
         <section className="card space-y-3 p-4">
           <h2 className="text-sm font-semibold">الاشتراك</h2>
           <select name="plan" value={plan} onChange={(e) => setPlan(e.target.value)} className="input">
-            <option value="trial">تجريبي (14 يوم)</option>
+            <option value="trial">تجريبي (14 يوماً)</option>
             <option value="basic">أساسي</option>
             <option value="pro">احترافي</option>
           </select>
           {plan !== "trial" && (
-            <Field label="مدفوع لكم شهر" hint="0 يعني بدون تاريخ انتهاء">
+            <Field label="عدد الأشهر المدفوعة" hint="القيمة 0 تعني دون تاريخ انتهاء">
               <input name="months" type="number" min={0} max={36} defaultValue={1} className="input" />
             </Field>
           )}
@@ -114,7 +114,7 @@ export function NewMerchantForm({ salesmen = [] }: { salesmen?: { id: string; na
           <section className="card space-y-3 p-4">
             <h2 className="text-sm font-semibold">المندوب</h2>
             <select name="salesman_id" defaultValue="" className="input">
-              <option value="">بدون مندوب</option>
+              <option value="">دون مندوب</option>
               {salesmen.map((m) => (
                 <option key={m.id} value={m.id}>
                   {m.name} ({m.code})
@@ -124,8 +124,8 @@ export function NewMerchantForm({ salesmen = [] }: { salesmen?: { id: string; na
           </section>
         )}
         <FormMessage state={state?.error ? { error: state.error } : undefined} />
-        <SubmitButton className="w-full" pendingText="جاري الإنشاء...">
-          أنشئ المتجر والحساب
+        <SubmitButton className="w-full" pendingText="جارٍ الإنشاء...">
+          إنشاء المتجر والحساب
         </SubmitButton>
       </div>
     </form>

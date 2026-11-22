@@ -43,7 +43,7 @@ export default async function StoreLayout({ children, params }: Props) {
     return (
       <div data-theme={store.theme} className="flex min-h-screen flex-col items-center justify-center gap-3 bg-bg p-8 text-center font-sans text-text">
         <h1 className="text-2xl">{store.name}</h1>
-        <p className="text-muted">المتجر متوقف مؤقتاً. تواصل معنا على واتساب للطلب.</p>
+        <p className="text-muted">المتجر متوقف مؤقتاً. تواصل معنا عبر واتساب لتقديم طلبك.</p>
         <a href={whatsappLink(store.whatsapp)} className="btn" target="_blank" rel="noopener noreferrer">
           واتساب
         </a>
@@ -125,7 +125,7 @@ export default async function StoreLayout({ children, params }: Props) {
               {store.delivery_note && <p>{store.shipping?.delivery ? "🚚" : "🏪"} {store.delivery_note}</p>}
               <p>💵 الدفع عند الاستلام</p>
               <a href={whatsappLink(store.whatsapp)} target="_blank" rel="noopener noreferrer" className="btn btn-outline mt-3 text-sm">
-                تواصل معنا على واتساب
+                تواصل معنا عبر واتساب
               </a>
             </div>
           </div>

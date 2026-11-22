@@ -11,29 +11,29 @@ import { demoStores } from "@/lib/demo-data";
  */
 
 const SUPPORT = process.env.PLATFORM_SUPPORT_WHATSAPP;
-const helpLink = SUPPORT ? `https://wa.me/${SUPPORT}?text=${encodeURIComponent("مرحبا، بدي تساعدوني افتح متجر على نمى")}` : "/signup";
+const helpLink = SUPPORT ? `https://wa.me/${SUPPORT}?text=${encodeURIComponent("مرحباً، أرغب في مساعدتكم لإنشاء متجر على نمى")}` : "/signup";
 
 const steps = [
-  { title: "افتح متجرك", text: "جاوب على كم سؤال: اسم المحل، شو بتبيع، رقم الواتساب. متجرك بيطلع جاهز بقالب مناسب لنشاطك." },
-  { title: "شارك الرابط", text: "حطه بالبايو تبع انستغرام، ابعته بالستوري، أو بكروبات الواتساب. الزبون بيتفرج على كل منتجاتك بأسعارها." },
-  { title: "استلم الطلب", text: "الطلب بيوصلك مرتب عالواتساب. الزبون بيجي ياخده من محلك ويدفع، أو بتوصله إذا عندك توصيل." },
+  { title: "أنشئ متجرك", text: "أجب عن بضعة أسئلة: اسم المحل، ونوع نشاطك، ورقم واتساب. يُجهَّز متجرك بقالب يناسب نشاطك." },
+  { title: "شارك الرابط", text: "ضعه في التعريف على إنستغرام، أو انشره في القصص ومجموعات واتساب. يطّلع الزبون على منتجاتك وأسعارها." },
+  { title: "استلم الطلب", text: "يصلك الطلب منظّماً عبر واتساب. يستلمه الزبون من محلك ويدفع، أو توصله إليه إن كانت لديك خدمة توصيل." },
 ];
 
 const syria = [
-  { title: "الاستلام من المحل هو الأساس", text: "ما عندك توصيل؟ عادي. الزبون بيطلب أونلاين وبيجي ياخد طلبه جاهز." },
-  { title: "الدفع عند الاستلام", text: "ما في بطاقات ولا دفع أونلاين. الزبون بيدفع لما يستلم، متل ما متعودين." },
-  { title: "بالليرة أو بالدولار", text: "سعّر بالعملة اللي بتشتغل فيها." },
-  { title: "خفيف على النت الضعيف", text: "المتجر مصمم ليفتح بسرعة على الموبايل، حتى على باقة ضعيفة." },
-  { title: "بدون عمولة على مبيعاتك", text: "اشتراك شهري ثابت، وكل ليرة بتبيعها إلك." },
-  { title: "لوحة تحكم بالعربي وبسيطة", text: "إذا بتعرف تبعت صورة عالواتساب، بتعرف تدير متجرك." },
+  { title: "الاستلام من المحل هو الأساس", text: "لا تملك خدمة توصيل؟ لا بأس. يطلب الزبون عبر الإنترنت ويستلم طلبه جاهزاً من المحل." },
+  { title: "الدفع عند الاستلام", text: "لا حاجة إلى بطاقات أو دفع إلكتروني. يدفع الزبون عند الاستلام، أو بالتحويل عبر شام كاش." },
+  { title: "بالليرة أو بالدولار", text: "سعّر منتجاتك بالعملة التي تتعامل بها." },
+  { title: "سريع على الاتصال الضعيف", text: "صُمّم المتجر ليفتح بسرعة على الهاتف المحمول، حتى مع اتصال ضعيف." },
+  { title: "دون عمولة على مبيعاتك", text: "اشتراك شهري ثابت، وجميع أرباح مبيعاتك لك." },
+  { title: "لوحة تحكم عربية وبسيطة", text: "واجهة واضحة تتيح لك إدارة متجرك دون خبرة تقنية." },
 ];
 
 const faqs = [
-  { q: "لازم يكون عندي توصيل؟", a: "لا. أغلب المحلات بتشتغل بالاستلام من المحل. وإذا بيوم بلشت توصيل، بتفعّله من الإعدادات وبتحط سعر لكل مدينة." },
-  { q: "كيف بيدفع الزبون؟", a: "عند الاستلام، كاش. المنصة ما بتاخد ولا بتمسك مصاري الزبائن." },
-  { q: "شو بصير بعد 14 يوم التجربة؟", a: "إذا عجبك بتدفع الاشتراك وبيكمل متجرك متل ما هو. إذا لا، بيتوقف لحاله وما بتدفع شي." },
-  { q: "ما عندي وقت أرفع المنتجات.", a: "نحن منرفعلك ياهن ومنجهز المتجر كله، وإنت بس بتستلم الطلبات. تواصل معنا عالواتساب." },
-  { q: "بتساعدوني جيب زبائن؟", a: "إيه، هي شغلتنا الأساسية: منعملك محتوى وإعلانات فيسبوك وانستغرام بتوصل الناس لمتجرك مباشرة." },
+  { q: "هل يجب أن تكون لدي خدمة توصيل؟", a: "لا. تعمل معظم المحلات بالاستلام من المحل. وإذا بدأت التوصيل لاحقاً، فعّله من الإعدادات وحدّد سعراً لكل مدينة." },
+  { q: "كيف يدفع الزبون؟", a: "نقداً عند الاستلام، أو بالتحويل عبر شام كاش أو سيرياتل كاش أو MTN كاش إلى حسابك مباشرة. لا تستلم المنصة أموال الزبائن ولا تحتفظ بها." },
+  { q: "ماذا يحدث بعد انتهاء التجربة المجانية؟", a: "إذا قررت الاستمرار، تدفع الاشتراك ويستمر متجرك كما هو. وإن لم ترغب، يتوقف المتجر تلقائياً دون أي رسوم." },
+  { q: "ليس لدي وقت لإضافة المنتجات.", a: "يمكننا إضافة منتجاتك وتجهيز المتجر بالكامل، لتتفرغ لاستلام الطلبات. تواصل معنا عبر واتساب." },
+  { q: "هل تساعدونني في الوصول إلى الزبائن؟", a: "نعم. نقدّم خدمة إعداد المحتوى وإدارة إعلانات فيسبوك وإنستغرام التي توجّه الزبائن إلى متجرك مباشرة." },
 ];
 
 export default function PlatformHome() {
@@ -51,7 +51,7 @@ export default function PlatformHome() {
         </Link>
         <nav className="flex items-center gap-1 text-sm">
           <a href="#how" className="hidden px-3 py-2 hover:underline sm:inline">
-            كيف بيشتغل
+            طريقة العمل
           </a>
           <a href="#pricing" className="hidden px-3 py-2 hover:underline sm:inline">
             الأسعار
@@ -60,7 +60,7 @@ export default function PlatformHome() {
             دخول
           </Link>
           <Link href="/signup" className="nama-btn !px-4 !py-2 text-sm">
-            افتح متجرك
+            أنشئ متجرك
           </Link>
         </nav>
       </header>
@@ -69,22 +69,22 @@ export default function PlatformHome() {
       <section className="nama-wrap grid items-center gap-10 pb-16 pt-8 lg:grid-cols-[1.15fr_1fr] lg:pt-16">
         <div>
           <h1 className="brand-display mb-6 text-[clamp(2.5rem,6.4vw,4.2rem)] leading-[1.45]">
-            <span className="hl hl-lav">محلك صار أونلاين.</span>
+            <span className="hl hl-lav">متجرك على الإنترنت،</span>
             <br />
-            <span className="hl hl-pist">والطلبات بتوصلك عالواتساب.</span>
+            <span className="hl hl-pist">وطلباتك تصلك عبر واتساب.</span>
           </h1>
           <p className="mb-8 max-w-xl text-lg leading-9 text-[var(--mute)]">
-            {BRAND_AR} بتعطي محلك متجر إلكتروني بالعربي خلال دقيقتين. الزبون بيتفرج على منتجاتك وبيطلب من موبايله، وإنت بيوصلك الطلب مرتب، وبيجي ياخده من محلك ويدفع.
+            تتيح لك {BRAND_AR} إنشاء متجر إلكتروني عربي لمحلك خلال دقائق. يتصفح الزبون منتجاتك ويطلب من هاتفه، ويصلك الطلب منظّماً، ثم يستلمه من محلك ويدفع.
           </p>
           <div className="flex flex-wrap gap-3">
             <Link href="/signup" className="nama-btn text-lg">
-              افتح متجرك، 14 يوم مجاناً
+              ابدأ تجربة مجانية لمدة 14 يوماً
             </Link>
             <a href={helpLink} target={SUPPORT ? "_blank" : undefined} rel="noopener noreferrer" className="nama-btn-ghost text-lg">
-              بدي تجهزولي ياه
+              اطلب تجهيز متجرك
             </a>
           </div>
-          <p className="mt-4 text-sm text-[var(--mute)]">بدون بطاقة. بدون عمولة على مبيعاتك.</p>
+          <p className="mt-4 text-sm text-[var(--mute)]">دون بطاقة ائتمان، ودون عمولة على مبيعاتك.</p>
         </div>
 
         <Phone />
@@ -92,7 +92,7 @@ export default function PlatformHome() {
 
       <section id="how" className="nama-band py-16">
         <div className="nama-wrap">
-          <h2 className="nama-display mb-10 text-3xl sm:text-[2.6rem]"><span className="hl hl-sky">من المحل للموبايل بتلات خطوات</span></h2>
+          <h2 className="nama-display mb-10 text-3xl sm:text-[2.6rem]"><span className="hl hl-sky">من المحل إلى الهاتف في ثلاث خطوات</span></h2>
           <ol className="grid gap-8 md:grid-cols-3">
             {steps.map((s, i) => (
               <li key={s.title} className="flex gap-4">
@@ -110,8 +110,8 @@ export default function PlatformHome() {
       </section>
 
       <section className="nama-wrap py-16">
-        <h2 className="nama-display mb-3 text-3xl sm:text-[2.6rem]"><span className="hl hl-pist">معمول لطريقة البيع عنا</span></h2>
-        <p className="mb-10 max-w-2xl text-lg leading-8 text-[var(--mute)]">ما نسخنا منصة أجنبية. بنيناها لمحل بحمص أو بالشام أو بحلب، بالشغلات اللي فعلاً بتفرق معه.</p>
+        <h2 className="nama-display mb-3 text-3xl sm:text-[2.6rem]"><span className="hl hl-pist">مصمَّم لطريقة البيع المحلية</span></h2>
+        <p className="mb-10 max-w-2xl text-lg leading-8 text-[var(--mute)]">صُمّمت المنصة لتناسب المحلات في سوريا، مع التركيز على ما يحتاجه التاجر فعلاً.</p>
         <dl className="grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
           {syria.map((f) => (
             <div key={f.title} className="border-t-2 border-[var(--leaf)] pt-4">
@@ -126,17 +126,17 @@ export default function PlatformHome() {
       <section className="nama-dark py-16">
         <div className="nama-wrap grid gap-10 lg:grid-cols-2">
           <div>
-            <h2 className="nama-display mb-4 text-3xl leading-[1.6] text-white sm:text-[2.6rem]"><span className="hl hl-dark">ما عندك وقت؟ نحن منبنيلك المتجر، ومنجيبلك الزبائن.</span></h2>
-            <p className="mb-8 text-lg leading-9 text-white/75">فريقنا بيرفع منتجاتك، بيصمملك الصور والبوستات، وبيشغّلك إعلانات فيسبوك وانستغرام بتوصل الناس لمتجرك مباشرة. وإنت بتشتغل بمحلك.</p>
+            <h2 className="nama-display mb-4 text-3xl leading-[1.6] text-white sm:text-[2.6rem]"><span className="hl hl-dark">نجهّز متجرك، ونساعدك في الوصول إلى الزبائن.</span></h2>
+            <p className="mb-8 text-lg leading-9 text-white/75">يضيف فريقنا منتجاتك، ويصمم الصور والمنشورات، ويدير إعلانات فيسبوك وإنستغرام التي توجّه الزبائن إلى متجرك، بينما تتفرغ أنت لعملك.</p>
             <a href={helpLink} target={SUPPORT ? "_blank" : undefined} rel="noopener noreferrer" className="nama-btn-pist text-lg">
-              احكينا عالواتساب
+              تواصل معنا عبر واتساب
             </a>
           </div>
           <ul className="space-y-4 self-center">
             {[
-              ["تجهيز المتجر", "منرفع منتجاتك بصورها وأسعارها، ومنرتب المتجر بهوية محلك."],
-              ["محتوى وصور", "بوستات وريلز، وصور منتجات احترافية بالذكاء الاصطناعي."],
-              ["إعلانات بتجيب طلبات", "حملات فيسبوك وانستغرام مربوطة بمتجرك، مع تقرير كل شهر بعدد الطلبات."],
+              ["تجهيز المتجر", "نضيف منتجاتك بصورها وأسعارها، وننسّق المتجر بما يتوافق مع هوية محلك."],
+              ["المحتوى والصور", "منشورات ومقاطع قصيرة، وصور منتجات احترافية بالذكاء الاصطناعي."],
+              ["إدارة الإعلانات", "حملات على فيسبوك وإنستغرام مرتبطة بمتجرك، مع تقرير شهري بعدد الطلبات."],
             ].map(([t, d]) => (
               <li key={t} className="rounded-2xl bg-white/[0.06] p-5">
                 <div className="mb-1 font-semibold text-[var(--pist)]">{t}</div>
@@ -148,32 +148,32 @@ export default function PlatformHome() {
       </section>
 
       <section id="pricing" className="nama-wrap py-16">
-        <h2 className="nama-display mb-3 text-3xl sm:text-[2.6rem]"><span className="hl hl-lav">سعر واضح، بدون عمولة</span></h2>
-        <p className="mb-10 text-lg text-[var(--mute)]">جرّب 14 يوم بكل الميزات، وبعدين اختار.</p>
+        <h2 className="nama-display mb-3 text-3xl sm:text-[2.6rem]"><span className="hl hl-lav">أسعار واضحة، دون عمولة</span></h2>
+        <p className="mb-10 text-lg text-[var(--mute)]">جرّب جميع الميزات لمدة 14 يوماً، ثم اختر الباقة المناسبة.</p>
         <div className="grid gap-5 md:grid-cols-2">
           <Plan
             name="أساسي"
             price="15$"
-            note="كل شي بيحتاجه محل ليبيع أونلاين"
-            items={["متجر جاهز بقالب حسب نشاطك", "لغاية 100 منتج", "استلام من المحل وتوصيل", "الطلبات عالواتساب", "أكواد خصم وتقارير"]}
+            note="كل ما يحتاجه المحل للبيع عبر الإنترنت"
+            items={["متجر جاهز بقالب يناسب نشاطك", "حتى 100 منتج", "الاستلام من المحل والتوصيل", "استلام الطلبات عبر واتساب", "رموز خصم وتقارير"]}
           />
           <Plan
             name="احترافي"
             price="29$"
-            note="للمحل اللي كبر"
+            note="للمحلات المتنامية"
             featured
-            items={["كل شي بالأساسي، ومنتجات بلا حدود", "حسابات لموظفينك", "لغاية 5 فروع، كل فرع بواتسابه", "فواتير وعروض أسعار PDF للزبون", "ربط إعلانات فيسبوك وانستغرام"]}
+            items={["جميع ميزات الباقة الأساسية، ومنتجات غير محدودة", "حسابات للموظفين بصلاحيات محددة", "حتى 5 فروع، لكل فرع رقم واتساب خاص", "فواتير وعروض أسعار PDF للزبائن", "ربط إعلانات فيسبوك وإنستغرام"]}
           />
         </div>
         <p className="mt-6 rounded-2xl bg-[var(--pist-soft)] p-4 leading-8">
-          <b>سعر المؤسسين:</b> أول 50 محل بكل مدينة بياخدوا الأساسي بـ 10$ بالشهر، مدى الحياة. والدفع لـ 6 أشهر بيعطيك شهر مجاني.
+          <b>سعر المؤسسين:</b> تحصل أول 50 محلاً في كل مدينة على الباقة الأساسية بسعر 10$ شهرياً بشكل دائم. وعند الدفع المسبق لستة أشهر، تحصل على شهر مجاني.
         </p>
       </section>
 
       <section className="nama-band py-16">
         <div className="nama-wrap">
-          <h2 className="nama-display mb-3 text-3xl sm:text-[2.6rem]"><span className="hl hl-sky">شوف بعينك</span></h2>
-          <p className="mb-8 text-lg text-[var(--mute)]">متاجر تجريبية على المنصة. افتح أي واحد وجرب تطلب.</p>
+          <h2 className="nama-display mb-3 text-3xl sm:text-[2.6rem]"><span className="hl hl-sky">جرّب بنفسك</span></h2>
+          <p className="mb-8 text-lg text-[var(--mute)]">متاجر تجريبية على المنصة. افتح أياً منها وجرّب تقديم طلب.</p>
           <div className="grid gap-4 sm:grid-cols-3">
             {demoStores.map((s) => (
               <Link key={s.slug} href={`/s/${s.slug}`} className="group block overflow-hidden rounded-2xl bg-white ring-1 ring-black/5">
@@ -190,7 +190,7 @@ export default function PlatformHome() {
       </section>
 
       <section className="nama-wrap max-w-3xl py-16">
-        <h2 className="nama-display mb-8 text-3xl sm:text-[2.6rem]"><span className="hl hl-pist">أسئلة بتنسأل كتير</span></h2>
+        <h2 className="nama-display mb-8 text-3xl sm:text-[2.6rem]"><span className="hl hl-pist">الأسئلة الشائعة</span></h2>
         <div className="divide-y divide-black/10 border-y border-black/10">
           {faqs.map((f) => (
             <details key={f.q} className="group py-4">
@@ -205,9 +205,9 @@ export default function PlatformHome() {
       </section>
 
       <section className="nama-wrap pb-20 text-center">
-        <h2 className="brand-display mb-8 text-4xl leading-[1.5] sm:text-6xl"><span className="hl hl-lav">خلّي محلك ينمو.</span></h2>
+        <h2 className="brand-display mb-8 text-4xl leading-[1.5] sm:text-6xl"><span className="hl hl-lav">دع تجارتك تنمو.</span></h2>
         <Link href="/signup" className="nama-btn text-lg">
-          افتح متجرك مجاناً
+          ابدأ مجاناً
         </Link>
       </section>
 
@@ -241,7 +241,7 @@ function Plan({ name, price, note, items, featured }: { name: string; price: str
         <span className={`brand-display hl text-5xl ${featured ? "hl-dark" : "hl-pist"}`} dir="ltr">
           {price}
         </span>
-        <span className={featured ? "text-white/70" : "text-[var(--mute)]"}>بالشهر</span>
+        <span className={featured ? "text-white/70" : "text-[var(--mute)]"}>شهرياً</span>
       </div>
       <ul className="mb-8 space-y-2.5">
         {items.map((i) => (
@@ -254,7 +254,7 @@ function Plan({ name, price, note, items, featured }: { name: string; price: str
         ))}
       </ul>
       <Link href="/signup" className={featured ? "nama-btn-pist w-full text-center" : "nama-btn w-full text-center"}>
-        جرّب 14 يوم مجاناً
+        جرّب مجاناً لمدة 14 يوماً
       </Link>
     </div>
   );

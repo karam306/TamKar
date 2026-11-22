@@ -12,9 +12,9 @@ export async function saveSettings(_: FormState, form: FormData): Promise<FormSt
   const name = str(form, "name", 80);
   const whatsapp = normalizeWhatsapp(str(form, "whatsapp", 20));
   const currency = str(form, "currency", 3);
-  if (name.length < 2) return { error: "اكتب اسم المتجر" };
+  if (name.length < 2) return { error: "أدخل اسم المتجر" };
   if (!/^\d{9,15}$/.test(whatsapp)) return { error: "رقم واتساب غير صحيح" };
-  if (!["USD", "SYP"].includes(currency)) return { error: "اختار العملة" };
+  if (!["USD", "SYP"].includes(currency)) return { error: "اختر العملة" };
 
   const { error } = await db
     .from("stores")
@@ -27,8 +27,8 @@ export async function saveSettings(_: FormState, form: FormData): Promise<FormSt
       delivery_note: str(form, "delivery_note", 200) || null,
     })
     .eq("id", store.id);
-  if (error) return { error: "ما قدرنا نحفظ، جرب مرة تانية" };
+  if (error) return { error: "تعذّر الحفظ، حاول مرة أخرى" };
   revalidatePath("/dashboard", "layout");
   refresh();
-  return { ok: "✓ انحفظت الإعدادات" };
+  return { ok: "✓ تم حفظ الإعدادات" };
 }

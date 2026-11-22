@@ -16,7 +16,7 @@ export async function saveCollection(
   const title = String(form.get("title") ?? "")
     .trim()
     .slice(0, 100);
-  if (!title) return { error: "اكتب اسم المجموعة" };
+  if (!title) return { error: "أدخل اسم المجموعة" };
   const rawHandle = String(form.get("handle") ?? "")
     .trim()
     .toLowerCase();
@@ -47,13 +47,13 @@ export async function saveCollection(
     return {
       error:
         res.error.code === "23505"
-          ? "في مجموعة تانية بنفس الرابط، غيّر الرابط"
-          : "ما قدرنا نحفظ، جرب مرة تانية",
+          ? "توجد مجموعة أخرى بالرابط نفسه، يُرجى تغيير الرابط"
+          : "تعذّر الحفظ، حاول مرة أخرى",
     };
   revalidatePath("/dashboard/collections");
   refresh();
   if (!id) redirect(`/dashboard/collections/${res.data.id}?created=1`);
-  return { ok: "✓ انحفظت المجموعة" };
+  return { ok: "✓ تم حفظ المجموعة" };
 }
 
 export async function deleteCollection(form: FormData) {

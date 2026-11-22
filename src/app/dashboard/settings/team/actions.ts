@@ -29,7 +29,7 @@ export async function addStaff(
 ): Promise<TeamState> {
   const { store, user } = await requireOwner();
   if (!isPro(store))
-    return { error: "حسابات الموظفين متاحة بالباقة الاحترافية" };
+    return { error: "حسابات الموظفين متاحة في الباقة الاحترافية" };
   const email = String(form.get("email") ?? "")
     .trim()
     .toLowerCase()
@@ -37,8 +37,8 @@ export async function addStaff(
   const name = String(form.get("name") ?? "")
     .trim()
     .slice(0, 60);
-  if (!/^\S+@\S+\.\S+$/.test(email)) return { error: "الإيميل غير صحيح" };
-  if (email === user.email?.toLowerCase()) return { error: "هاد إيميلك إنت" };
+  if (!/^\S+@\S+\.\S+$/.test(email)) return { error: "البريد الإلكتروني غير صحيح" };
+  if (email === user.email?.toLowerCase()) return { error: "هذا بريدك الإلكتروني" };
   const admin = supabaseAdmin();
   const { count } = await admin
     .from("store_staff")
@@ -56,8 +56,8 @@ export async function addStaff(
   if (error || !data.user) {
     return {
       error: /already|registered|exists/i.test(error?.message ?? "")
-        ? "هالإيميل إله حساب من قبل. استعمل إيميل تاني للموظف"
-        : "ما قدرنا ننشئ الحساب",
+        ? "يوجد حساب مسجّل بهذا البريد الإلكتروني. استخدم بريداً آخر للموظف"
+        : "تعذّر إنشاء الحساب",
     };
   }
   const perms = PERMS.filter((p) => form.get(`perm_${p}`) === "on");
@@ -82,7 +82,7 @@ export async function addStaff(
       }));
   if (e2) {
     await admin.auth.admin.deleteUser(data.user.id);
-    return { error: "ما قدرنا نضيف الموظف" };
+    return { error: "تعذّرت إضافة الموظف" };
   }
   revalidatePath("/dashboard/settings/team");
   refresh();
@@ -105,12 +105,12 @@ export async function saveStaffPerms(
   if (error)
     return {
       error: /permissions/.test(error.message)
-        ? "لازم يتشغّل تحديث 011 بقاعدة البيانات أول"
-        : "ما قدرنا نحفظ",
+        ? "يجب تشغيل التحديث 011 في قاعدة البيانات أولاً"
+        : "تعذّر الحفظ",
     };
   revalidatePath("/dashboard/settings/team");
   refresh();
-  return { ok: "✓ انحفظت الصلاحيات" };
+  return { ok: "✓ تم حفظ الصلاحيات" };
 }
 
 /** Removes the staff member and their login. */
@@ -144,9 +144,9 @@ export async function resetStaffPassword(
     .eq("store_id", store.id)
     .eq("user_id", userId)
     .maybeSingle();
-  if (!data) return { error: "الموظف مش موجود" };
+  if (!data) return { error: "الموظف غير موجود" };
   const password = makePassword();
   const { error } = await admin.auth.admin.updateUserById(userId, { password });
-  if (error) return { error: "ما قدرنا نغير كلمة السر" };
+  if (error) return { error: "تعذّر تغيير كلمة المرور" };
   return { created: { email: data.email as string, password } };
 }

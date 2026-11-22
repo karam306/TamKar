@@ -19,19 +19,19 @@ const toNum = (s?: string) => {
  */
 export async function importProducts(_: ImportResult, form: FormData): Promise<ImportResult> {
   const { store, db } = await requireOwner();
-  if (!isPro(store)) return { error: "الاستيراد من Excel متاح بالباقة الاحترافية" };
+  if (!isPro(store)) return { error: "الاستيراد من Excel متاح في الباقة الاحترافية" };
   const file = form.get("file") as File | null;
-  if (!file || file.size === 0) return { error: "اختار ملف" };
-  if (file.size > 4 * 1024 * 1024) return { error: "الملف كبير كتير (الحد 4 ميغا). قسّمه لكذا ملف." };
+  if (!file || file.size === 0) return { error: "اختر ملفاً" };
+  if (file.size > 4 * 1024 * 1024) return { error: "حجم الملف كبير جداً (الحد الأقصى 4 ميغابايت). قسّمه إلى عدة ملفات." };
 
   let rows;
   try {
     rows = await readProductSheet(file);
   } catch {
-    return { error: "ما قدرنا نقرأ الملف. تأكد إنه Excel (.xlsx) أو CSV" };
+    return { error: "تعذّرت قراءة الملف. تأكد من أنه بصيغة Excel (.xlsx) أو CSV" };
   }
-  if (rows.length === 0) return { error: "الملف فاضي أو ما فيه عمود \"الاسم\"" };
-  if (rows.length > 20000) return { error: "الحد 20,000 منتج بالملف الواحد" };
+  if (rows.length === 0) return { error: "الملف فارغ أو لا يحتوي على عمود \"الاسم\"" };
+  if (rows.length > 20000) return { error: "الحد الأقصى 20,000 منتج في الملف الواحد" };
 
   // Existing SKUs in this store, to update instead of duplicating.
   const skuToId = new Map<string, string>();
@@ -51,9 +51,9 @@ export async function importProducts(_: ImportResult, form: FormData): Promise<I
     const price = toNum(r.price);
     const compare = toNum(r.compare_at_price);
     const stock = toNum(r.stock);
-    if (!title) return void problems.push(`سطر ${line}: ما في اسم`);
-    if (price === null || Number.isNaN(price)) return void problems.push(`سطر ${line}: السعر غير صحيح`);
-    if (Number.isNaN(compare) || Number.isNaN(stock)) return void problems.push(`سطر ${line}: رقم غير صحيح`);
+    if (!title) return void problems.push(`السطر ${line}: الاسم مفقود`);
+    if (price === null || Number.isNaN(price)) return void problems.push(`السطر ${line}: السعر غير صحيح`);
+    if (Number.isNaN(compare) || Number.isNaN(stock)) return void problems.push(`السطر ${line}: رقم غير صحيح`);
     const status = (r.status ?? "").trim().toLowerCase();
     const row = {
       title,
@@ -74,7 +74,7 @@ export async function importProducts(_: ImportResult, form: FormData): Promise<I
   for (let i = 0; i < inserts.length; i += 500) {
     const { error } = await db.from("products").insert(inserts.slice(i, i + 500));
     if (error) {
-      problems.push(`صار خطأ بحفظ دفعة من المنتجات (من ${i + 1} لـ ${Math.min(i + 500, inserts.length)})`);
+      problems.push(`حدث خطأ أثناء حفظ دفعة من المنتجات (من ${i + 1} إلى ${Math.min(i + 500, inserts.length)})`);
       continue;
     }
     added += Math.min(500, inserts.length - i);
@@ -89,7 +89,7 @@ export async function importProducts(_: ImportResult, form: FormData): Promise<I
 
   refresh();
   return {
-    ok: `✓ انضاف ${added} منتج${updated ? ` وتحدّث ${updated}` : ""}`,
+    ok: `✓ أُأضف ${added} منتج${updated ? ` وحُدِّث ${updated}` : ""}`,
     problems: problems.slice(0, 50),
   };
 }

@@ -30,20 +30,20 @@ export async function createMerchant(_: CreateResult, form: FormData): Promise<C
   const plan = str(form, "plan", 20);
   const months = Math.max(0, Math.min(36, Number(form.get("months")) || 0));
 
-  if (name.length < 2) return { error: "اكتب اسم المتجر" };
-  if (!/^[a-z0-9-]{3,40}$/.test(slug) || slug.startsWith("-") || slug.endsWith("-")) return { error: "الرابط: أحرف إنكليزية صغيرة وأرقام وشرطة، 3 أحرف أو أكثر" };
-  if (RESERVED_SLUGS.includes(slug)) return { error: "هالرابط محجوز" };
-  if (!/^\S+@\S+\.\S+$/.test(email)) return { error: "الإيميل غير صحيح" };
-  if (password.length < 8) return { error: "كلمة السر 8 أحرف على الأقل" };
+  if (name.length < 2) return { error: "أدخل اسم المتجر" };
+  if (!/^[a-z0-9-]{3,40}$/.test(slug) || slug.startsWith("-") || slug.endsWith("-")) return { error: "الرابط: أحرف إنجليزية صغيرة وأرقام وشرطة، 3 أحرف على الأقل" };
+  if (RESERVED_SLUGS.includes(slug)) return { error: "هذا الرابط محجوز" };
+  if (!/^\S+@\S+\.\S+$/.test(email)) return { error: "البريد الإلكتروني غير صحيح" };
+  if (password.length < 8) return { error: "يجب ألا تقل كلمة المرور عن 8 أحرف" };
   if (!/^\d{9,15}$/.test(whatsapp)) return { error: "رقم واتساب غير صحيح" };
-  if (!BUSINESS_TYPES.some((b) => b.id === type)) return { error: "اختار نوع النشاط" };
+  if (!BUSINESS_TYPES.some((b) => b.id === type)) return { error: "اختر نوع النشاط" };
 
   const admin = supabaseAdmin();
   const { data: taken } = await admin.from("stores").select("id").eq("slug", slug).maybeSingle();
-  if (taken) return { error: "هالرابط مستخدم" };
+  if (taken) return { error: "هذا الرابط مستخدم" };
 
   const { data: u, error: ue } = await admin.auth.admin.createUser({ email, password, email_confirm: true });
-  if (ue || !u.user) return { error: /already|registered|exists/i.test(ue?.message ?? "") ? "في حساب بهالإيميل من قبل" : "ما قدرنا ننشئ الحساب" };
+  if (ue || !u.user) return { error: /already|registered|exists/i.test(ue?.message ?? "") ? "يوجد حساب مسجّل بهذا البريد الإلكتروني" : "تعذّر إنشاء الحساب" };
 
   const paid = plan === "trial" ? trialEnd() : months ? extendDate(null, months) : null;
   const { data: store, error: se } = await admin
@@ -63,7 +63,7 @@ export async function createMerchant(_: CreateResult, form: FormData): Promise<C
     .single();
   if (se || !store) {
     await admin.auth.admin.deleteUser(u.user.id);
-    return { error: se?.code === "23505" ? "هالرابط مستخدم" : "ما قدرنا ننشئ المتجر" };
+    return { error: se?.code === "23505" ? "هذا الرابط مستخدم" : "تعذّر إنشاء المتجر" };
   }
   await createTemplatePages(store.id as string, type, name);
   await admin.from("store_admin").insert({
@@ -95,7 +95,7 @@ export async function recordPayment(_: { error?: string; ok?: string } | undefin
   const id = str(form, "id", 40);
   const months = Math.floor(Number(form.get("months")));
   const amount = Number(String(form.get("amount") ?? "").replace(/,/g, ""));
-  if (!(months >= 1 && months <= 36)) return { error: "عدد الأشهر من 1 لـ 36" };
+  if (!(months >= 1 && months <= 36)) return { error: "عدد الأشهر من 1 إلى 36" };
   if (!Number.isFinite(amount) || amount < 0) return { error: "المبلغ غير صحيح" };
   const { data: s } = await admin.from("stores").select("paid_until, plan").eq("id", id).maybeSingle();
   if (!s) return { error: "المتجر غير موجود" };
@@ -110,11 +110,11 @@ export async function recordPayment(_: { error?: string; ok?: string } | undefin
     note: str(form, "note", 300) || null,
     paid_until: until,
   });
-  if (error) return { error: "ما قدرنا نسجل الدفعة" };
+  if (error) return { error: "تعذّر تسجيل الدفعة" };
   await admin.from("stores").update({ paid_until: until, plan, status: "active" }).eq("id", id);
   revalidatePath(`/admin/stores/${id}`);
   refresh();
-  return { ok: `✓ انسجلت الدفعة. الاشتراك فعّال لغاية ${until}` };
+  return { ok: `✓ سُجّلت الدفعة. الاشتراك فعّال حتى ${until}` };
 }
 
 /** One-click plan change from the store page. Keeps the paid-until date as it is. */
@@ -127,9 +127,9 @@ export async function setPlan(_: { error?: string; ok?: string } | undefined, fo
   const { data, error } = await admin.from("stores").update({ plan }).eq("id", id).select("plan").maybeSingle();
   if (error || !data) {
     console.error("setPlan failed", error);
-    return { error: `ما قدرنا نغيّر الباقة${error?.message ? ` (${error.message.slice(0, 80)})` : ""}` };
+    return { error: `تعذّر تغيير الباقة${error?.message ? ` (${error.message.slice(0, 80)})` : ""}` };
   }
-  if (data.plan !== plan) return { error: "قاعدة البيانات رفضت التغيير. تأكد إن SUPABASE_SECRET_KEY بـ Vercel هو المفتاح السري (secret)" };
+  if (data.plan !== plan) return { error: "رفضت قاعدة البيانات التغيير. تأكد من أن SUPABASE_SECRET_KEY في Vercel هو المفتاح السري (secret)" };
   revalidatePath(`/admin/stores/${id}`);
   revalidatePath("/admin/stores");
   refresh();
@@ -172,9 +172,9 @@ export async function resetPassword(_: { password?: string; error?: string } | u
   const { data: s } = await admin.from("stores").select("owner_id").eq("id", str(form, "id", 40)).maybeSingle();
   if (!s) return { error: "المتجر غير موجود" };
   const typed = String(form.get("password") ?? "").trim();
-  if (typed && typed.length < 8) return { error: "كلمة السر لازم تكون 8 أحرف على الأقل" };
+  if (typed && typed.length < 8) return { error: "يجب ألا تقل كلمة المرور عن 8 أحرف" };
   const password = typed || makePassword();
   const { error } = await admin.auth.admin.updateUserById(s.owner_id as string, { password });
-  if (error) return { error: "ما قدرنا نغير كلمة السر" };
+  if (error) return { error: "تعذّر تغيير كلمة المرور" };
   return { password };
 }

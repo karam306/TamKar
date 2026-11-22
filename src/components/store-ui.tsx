@@ -85,16 +85,16 @@ export function AddToCart({
           >
             <style>{`@keyframes tkup{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}`}</style>
             <span className="flex-1">
-              ✓ انضاف للسلة.{" "}
+              ✓ أُأضف إلى السلة.{" "}
               <span className="opacity-75">
-                بالسلة هلق {count} {count === 1 ? "قطعة" : "قطع"}
+                في السلة الآن: {count} {count === 1 ? "قطعة" : "قطع"}
               </span>
             </span>
             <Link
               href={`${base}/cart`}
               className="shrink-0 rounded-theme bg-white px-3 py-1.5 font-semibold text-text"
             >
-              روح للسلة
+              الذهاب إلى السلة
             </Link>
           </div>,
           document.body,
@@ -107,22 +107,22 @@ export function AddToCart({
       <>
         <div
           className="flex w-full items-center justify-between rounded-theme border-2 border-primary text-sm"
-          aria-label="الكمية بالسلة"
+          aria-label="الكمية في السلة"
         >
           <button
             type="button"
             onClick={() => setQty(productId, inCart - 1, variantId)}
             className="px-3 py-1.5 text-lg leading-none text-primary"
-            aria-label="نقّص"
+            aria-label="إنقاص"
           >
             −
           </button>
-          <span className="font-semibold text-primary">✓ {inCart} بالسلة</span>
+          <span className="font-semibold text-primary">✓ {inCart} في السلة</span>
           <button
             type="button"
             onClick={doAdd}
             className="px-3 py-1.5 text-lg leading-none text-primary"
-            aria-label="زيد"
+            aria-label="زيادة"
           >
             +
           </button>
@@ -137,10 +137,10 @@ export function AddToCart({
       {full && inCart > 0 && (
         <div className="flex items-center justify-between gap-2 rounded-theme bg-green-50 px-3 py-2 text-sm text-green-800">
           <span>
-            ✓ عندك <b>{inCart}</b> من هالمنتج بالسلة
+            ✓ لديك <b>{inCart}</b> من هذا المنتج في السلة
           </span>
           <Link href={`${base}/cart`} className="font-semibold underline">
-            شوف السلة
+            عرض السلة
           </Link>
         </div>
       )}
@@ -155,13 +155,13 @@ export function AddToCart({
             ? "نفدت الكمية"
             : inCart > 0
               ? qty > 1
-                ? `ضيف كمان ${qty}`
-                : "ضيف كمان وحدة"
-              : "أضف للسلة")}
+                ? `أضف ${qty} أخرى`
+                : "أضف قطعة أخرى"
+              : "أضف إلى السلة")}
       </button>
       {full && inCart > 0 && (
         <Link href={`${base}/cart`} className="btn w-full">
-          كمّل الطلب
+          إتمام الطلب
         </Link>
       )}
       {toastBar}
@@ -240,7 +240,7 @@ export function ProductCard({ product }: { product: Product }) {
             href={href}
             className={`btn w-full text-sm !py-2 ${soldOut ? "pointer-events-none opacity-50" : ""}`}
           >
-            {soldOut ? "نفدت الكمية" : "اختار"}
+            {soldOut ? "نفدت الكمية" : "اختر"}
           </Link>
         ) : (
           <AddToCart

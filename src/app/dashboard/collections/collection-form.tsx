@@ -39,7 +39,7 @@ export function CollectionForm({ collection, children }: { collection?: Collecti
           </Field>
         </section>
         <FormMessage state={state} />
-        <SubmitButton className="w-full">احفظ</SubmitButton>
+        <SubmitButton className="w-full">حفظ</SubmitButton>
       </div>
     </form>
   );

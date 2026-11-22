@@ -25,13 +25,13 @@ export default async function TeamPage() {
     <div className="space-y-4">
       <PageHeader title="الموظفين" back="/dashboard/settings" />
       <p className="text-[13px] text-muted">
-        الموظف بيدخل بإيميله وكلمة سره، وبيشوف بس الأقسام اللي بتختارها إله.
-        الإعدادات (الدفع، التوصيل، الموظفين، الاشتراك) بتضل إلك لحالك.
+        يدخل الموظف ببريده الإلكتروني وكلمة مروره، ويرى فقط الأقسام التي تختارها له.
+        تبقى الإعدادات (الدفع، والتوصيل، والموظفون، والاشتراك) لك وحدك.
       </p>
       <section className="card divide-y divide-black/5">
         {staff.length === 0 ? (
           <p className="p-4 text-center text-[13px] text-muted">
-            لسا ما ضفت موظفين
+            لم تُضف أي موظف بعد
           </p>
         ) : (
           staff.map((s) => (
@@ -49,7 +49,7 @@ export default async function TeamPage() {
         <AddStaffForm />
       ) : (
         <p className="text-[13px] text-muted">
-          وصلت للحد ({LIMITS.pro.staff} موظفين).
+          بلغت الحد الأقصى ({LIMITS.pro.staff} موظفين).
         </p>
       )}
     </div>

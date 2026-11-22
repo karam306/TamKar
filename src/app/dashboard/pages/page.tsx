@@ -17,17 +17,17 @@ export default async function PagesList() {
         title="الصفحات"
         actions={
           <Link href="/dashboard/pages/new" className="btn">
-            أضف صفحة
+            إضافة صفحة
           </Link>
         }
       />
       {pages.length === 0 ? (
         <EmptyState
           title="صفحات متجرك"
-          text="مثل: من نحن، التوصيل والدفع، سياسة الإرجاع. بتظهر بأسفل المتجر."
+          text="مثل: من نحن، والتوصيل والدفع، وسياسة الإرجاع. تظهر أسفل المتجر."
           action={
             <Link href="/dashboard/pages/new" className="btn">
-              أضف صفحة
+              إضافة صفحة
             </Link>
           }
         />

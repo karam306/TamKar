@@ -150,7 +150,7 @@ export function ManualOrderForm({
             )}
             {results.length === 0 && (
               <li className="p-3 text-center text-[13px] text-muted">
-                ما في نتائج
+                لا توجد نتائج
               </li>
             )}
           </ul>
@@ -196,7 +196,7 @@ export function ManualOrderForm({
                       setLines((cur) => cur.filter((_, j) => j !== i))
                     }
                     className="text-muted hover:text-red-700"
-                    aria-label="احذف"
+                    aria-label="حذف"
                   >
                     ✕
                   </button>
@@ -218,8 +218,8 @@ export function ManualOrderForm({
             label="الهاتف"
             hint={
               found
-                ? "✓ زبون موجود، عبّينا معلوماته"
-                : "إذا الزبون طلب قبل، بنعبّي معلوماته تلقائياً"
+                ? "✓ زبون مسجّل، وتمت تعبئة بياناته"
+                : "إذا سبق للزبون الطلب، تُعبَّأ بياناته تلقائياً"
             }
           >
             <input
@@ -295,7 +295,7 @@ export function ManualOrderForm({
           <Field label="ملاحظات">
             <textarea name="notes" rows={2} className="input" />
           </Field>
-          <Field label="كود خصم (اختياري)">
+          <Field label="رمز خصم (اختياري)">
             <input name="discount_code" className="input" dir="ltr" />
           </Field>
           <label className="flex items-center gap-2 text-[13px]">
@@ -304,12 +304,12 @@ export function ManualOrderForm({
               name="paid"
               className="h-4 w-4 accent-black"
             />
-            الزبون دفع سلف
+            دفع الزبون مسبقاً
           </label>
         </section>
         <FormMessage state={state} />
-        <SubmitButton className="w-full" pendingText="جاري الإنشاء...">
-          أنشئ الطلب
+        <SubmitButton className="w-full" pendingText="جارٍ الإنشاء...">
+          إنشاء الطلب
         </SubmitButton>
       </div>
     </form>

@@ -24,15 +24,15 @@ export function CopyLink({ url }: { url: string }) {
           } catch {}
         }}
       >
-        {copied ? "✓ انتسخ" : "انسخ الرابط"}
+        {copied ? "✓ تم النسخ" : "نسخ الرابط"}
       </button>
       <a
         className="btn btn-outline !py-2 text-sm"
-        href={`https://wa.me/?text=${encodeURIComponent(`تفضلوا شوفوا متجرنا واطلبوا أونلاين: ${full}`)}`}
+        href={`https://wa.me/?text=${encodeURIComponent(`تفضّلوا بزيارة متجرنا والطلب عبر الإنترنت: ${full}`)}`}
         target="_blank"
         rel="noopener noreferrer"
       >
-        شارك على واتساب
+        مشاركة عبر واتساب
       </a>
     </div>
   );

@@ -96,7 +96,7 @@ export function VariantEditor({
             {o.values.map((val) => (
               <span key={val} className="badge bg-[#e3e3e3] text-[13px]">
                 {val}
-                <button type="button" aria-label={`احذف ${val}`} onClick={() => sync(options.map((x, i) => (i === oi ? { ...x, values: x.values.filter((v) => v !== val) } : x)))}>
+                <button type="button" aria-label={`حذف ${val}`} onClick={() => sync(options.map((x, i) => (i === oi ? { ...x, values: x.values.filter((v) => v !== val) } : x)))}>
                   ✕
                 </button>
               </span>
@@ -145,13 +145,13 @@ export function VariantEditor({
                 <th className="p-2 font-medium">
                   السعر{" "}
                   <button type="button" className="text-[#005bd3]" onClick={() => fillAll("price", rows[0]?.price ?? "")}>
-                    (عمّم)
+                    (تعميم)
                   </button>
                 </th>
                 <th className="p-2 font-medium">
                   الكمية{" "}
                   <button type="button" className="text-[#005bd3]" onClick={() => fillAll("stock", rows[0]?.stock ?? "")}>
-                    (عمّم)
+                    (تعميم)
                   </button>
                 </th>
                 <th className="hidden p-2 font-medium sm:table-cell">SKU</th>
@@ -174,7 +174,7 @@ export function VariantEditor({
               ))}
             </tbody>
           </table>
-          <p className="p-2 text-xs text-muted">اترك الكمية فاضية إذا كانت مفتوحة. حط 0 إذا الخيار خالص.</p>
+          <p className="p-2 text-xs text-muted">اترك الكمية فارغة إذا كانت غير محدودة، وأدخل 0 إذا نفد الخيار.</p>
         </div>
       )}
     </div>

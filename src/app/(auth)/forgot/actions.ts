@@ -21,9 +21,9 @@ async function ownerByEmail(email: string) {
 
 /** Sends a 6-digit code to the store's Telegram. The answer is the same whether or not the email exists. */
 export async function requestResetCode(_: ResetState, form: FormData): Promise<ResetState> {
-  if (!hasSupabase) return { error: "قاعدة البيانات غير مربوطة بعد" };
+  if (!hasSupabase) return { error: "قاعدة البيانات غير مرتبطة بعد" };
   const email = String(form.get("email") ?? "").trim().toLowerCase().slice(0, 120);
-  if (!/^\S+@\S+\.\S+$/.test(email)) return { error: "اكتب إيميل صحيح" };
+  if (!/^\S+@\S+\.\S+$/.test(email)) return { error: "أدخل بريداً إلكترونياً صحيحاً" };
   const owner = await ownerByEmail(email);
   if (owner) {
     const admin = supabaseAdmin();
@@ -36,7 +36,7 @@ export async function requestResetCode(_: ResetState, form: FormData): Promise<R
         .from("store_admin")
         .update({ reset_code_hash: hash(code, owner.store_id), reset_expires: new Date(Date.now() + CODE_MINUTES * 60000).toISOString(), reset_attempts: 0 })
         .eq("store_id", owner.store_id);
-      await sendTelegram(chat, `🔑 كود تغيير كلمة السر لمتجر ${owner.store_name}:\n\n${code}\n\nصالح لـ${CODE_MINUTES} دقيقة. إذا ما طلبته أنت، تجاهل هالرسالة.`);
+      await sendTelegram(chat, `🔑 رمز تغيير كلمة المرور لمتجر ${owner.store_name}:\n\n${code}\n\nصالح لمدة ${CODE_MINUTES} دقيقة. إذا لم تطلبه، فتجاهل هذه الرسالة.`);
     }
   }
   return { step: "code", email };
@@ -47,11 +47,11 @@ export async function resetWithCode(_: ResetState, form: FormData): Promise<Rese
   const code = String(form.get("code") ?? "").replace(/\D/g, "");
   const password = String(form.get("password") ?? "");
   const back = { step: "code" as const, email };
-  if (code.length !== 6) return { ...back, error: "الكود 6 أرقام" };
-  if (password.length < 8) return { ...back, error: "كلمة السر لازم تكون 8 أحرف أو أكتر" };
+  if (code.length !== 6) return { ...back, error: "الرمز مكوّن من 6 أرقام" };
+  if (password.length < 8) return { ...back, error: "يجب ألا تقل كلمة المرور عن 8 أحرف" };
 
   const owner = await ownerByEmail(email);
-  const wrong = { ...back, error: "الكود غلط أو انتهى. اطلب كود جديد." };
+  const wrong = { ...back, error: "الرمز غير صحيح أو منتهي الصلاحية. اطلب رمزاً جديداً." };
   if (!owner) return wrong;
   const admin = supabaseAdmin();
   const { data: row } = await admin.from("store_admin").select("reset_code_hash, reset_expires, reset_attempts").eq("store_id", owner.store_id).maybeSingle();
@@ -63,7 +63,7 @@ export async function resetWithCode(_: ResetState, form: FormData): Promise<Rese
     return wrong;
   }
   const { error } = await admin.auth.admin.updateUserById(owner.user_id, { password });
-  if (error) return { ...back, error: "ما قدرنا نغيّر كلمة السر، جرب مرة تانية" };
+  if (error) return { ...back, error: "تعذّر تغيير كلمة المرور، حاول مرة أخرى" };
   await admin.from("store_admin").update({ reset_code_hash: null, reset_expires: null, reset_attempts: 0 }).eq("store_id", owner.store_id);
   const db = await supabaseUser();
   await db.auth.signInWithPassword({ email, password });

@@ -10,9 +10,9 @@ const MAX_BYTES = 4 * 1024 * 1024;
  * Returns the public path served by our own domain (/api/media/...).
  */
 export async function saveImage(storeId: string, file: File, maxSize = 1200): Promise<string> {
-  if (!file || file.size === 0) throw new Error("ما في صورة");
-  if (file.size > MAX_BYTES) throw new Error("الصورة كبيرة كتير");
-  if (!/^image\/(jpeg|png|webp|gif|heic|heif|avif)$/.test(file.type)) throw new Error("نوع الملف لازم يكون صورة");
+  if (!file || file.size === 0) throw new Error("لم تُحدَّد صورة");
+  if (file.size > MAX_BYTES) throw new Error("حجم الصورة كبير جداً");
+  if (!/^image\/(jpeg|png|webp|gif|heic|heif|avif)$/.test(file.type)) throw new Error("يجب أن يكون الملف صورة");
 
   const input = Buffer.from(await file.arrayBuffer());
   let output: Buffer;
@@ -23,7 +23,7 @@ export async function saveImage(storeId: string, file: File, maxSize = 1200): Pr
       .webp({ quality: 80 })
       .toBuffer();
   } catch {
-    throw new Error("ما قدرنا نقرأ الصورة، جرب صورة تانية");
+    throw new Error("تعذّرت قراءة الصورة، جرّب صورة أخرى");
   }
 
   const path = `${storeId}/${randomUUID()}.webp`;
@@ -32,7 +32,7 @@ export async function saveImage(storeId: string, file: File, maxSize = 1200): Pr
     cacheControl: "31536000",
     upsert: false,
   });
-  if (error) throw new Error("ما قدرنا نرفع الصورة، جرب مرة تانية");
+  if (error) throw new Error("تعذّر رفع الصورة، حاول مرة أخرى");
   return `/api/media/${path}`;
 }
 

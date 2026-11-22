@@ -68,7 +68,7 @@ export function DesignEditor({ initial, previewUrl, publicUrl, collections }: { 
             <span>اللون الأساسي</span>
             {color && (
               <button type="button" className="text-xs text-muted underline" onClick={() => setColor("")}>
-                رجّع لون القالب
+                استعادة لون القالب
               </button>
             )}
           </div>
@@ -77,7 +77,7 @@ export function DesignEditor({ initial, previewUrl, publicUrl, collections }: { 
 
         <section className="space-y-3 card p-5">
           <h2 className="font-semibold">أقسام الصفحة الرئيسية</h2>
-          <p className="text-xs text-muted">رتّب الأقسام بالأسهم، واضغط على أي قسم لتعدّل محتواه.</p>
+          <p className="text-xs text-muted">رتّب الأقسام بالأسهم، واضغط على أي قسم لتعديل محتواه.</p>
           <ul className="space-y-2">
             {sections.map((s, i) => (
               <li key={i} className={`rounded-theme border border-black/10 ${s.hidden ? "opacity-50" : ""}`}>
@@ -85,13 +85,13 @@ export function DesignEditor({ initial, previewUrl, publicUrl, collections }: { 
                   <button type="button" className="flex-1 px-1 text-right font-semibold" onClick={() => setOpen(open === i ? null : i)}>
                     {open === i ? "▾" : "▸"} {SECTION_LABELS[s.type]}
                   </button>
-                  <IconBtn onClick={() => move(i, -1)} label="لفوق" disabled={i === 0}>
+                  <IconBtn onClick={() => move(i, -1)} label="إلى الأعلى" disabled={i === 0}>
                     ↑
                   </IconBtn>
-                  <IconBtn onClick={() => move(i, 1)} label="لتحت" disabled={i === sections.length - 1}>
+                  <IconBtn onClick={() => move(i, 1)} label="إلى الأسفل" disabled={i === sections.length - 1}>
                     ↓
                   </IconBtn>
-                  <IconBtn onClick={() => update(i, { hidden: !s.hidden })} label={s.hidden ? "أظهر" : "اخفي"}>
+                  <IconBtn onClick={() => update(i, { hidden: !s.hidden })} label={s.hidden ? "إظهار" : "إخفاء"}>
                     {s.hidden ? "🙈" : "👁"}
                   </IconBtn>
                   <IconBtn
@@ -99,7 +99,7 @@ export function DesignEditor({ initial, previewUrl, publicUrl, collections }: { 
                       setSections((cur) => cur.filter((_, j) => j !== i));
                       setOpen(null);
                     }}
-                    label="احذف"
+                    label="حذف"
                   >
                     ✕
                   </IconBtn>
@@ -122,16 +122,16 @@ export function DesignEditor({ initial, previewUrl, publicUrl, collections }: { 
 
         <div className="sticky bottom-0 space-y-2 bg-surface py-3">
           <FormMessage state={state} />
-          <SubmitButton className="w-full">احفظ التصميم</SubmitButton>
+          <SubmitButton className="w-full">حفظ التصميم</SubmitButton>
         </div>
       </div>
 
       <div className="hidden lg:block">
         <div className="sticky top-4 overflow-hidden rounded-theme border border-black/10 bg-white">
           <div className="flex items-center justify-between border-b border-black/5 px-3 py-2 text-xs text-muted">
-            <span>معاينة (بتتحدث بعد الحفظ)</span>
+            <span>معاينة (تُحدَّث بعد الحفظ)</span>
             <a href={publicUrl} target="_blank" rel="noopener noreferrer" className="text-primary">
-              افتح بصفحة جديدة ↗
+              فتح في صفحة جديدة ↗
             </a>
           </div>
           <iframe key={state?.ok ?? "initial"} src={previewUrl} className="h-[80vh] w-full" title="معاينة المتجر" />
@@ -161,7 +161,7 @@ function AddSection({ onAdd }: { onAdd: (t: SectionType) => void }) {
         ))}
       </select>
       <button type="button" onClick={() => onAdd(type)} className="btn btn-outline !py-2 text-sm">
-        + أضف قسم
+        + إضافة قسم
       </button>
     </div>
   );
@@ -187,7 +187,7 @@ function SectionFields({ section: s, onChange, collections }: { section: Section
       return (
         <>
           <Text label="العنوان" value={s.title} onChange={(title) => onChange({ title })} />
-          <Text label="النص تحت العنوان" value={s.subtitle} onChange={(subtitle) => onChange({ subtitle })} long />
+          <Text label="النص أسفل العنوان" value={s.subtitle} onChange={(subtitle) => onChange({ subtitle })} long />
           <Text label="نص الزر" value={s.buttonText} onChange={(buttonText) => onChange({ buttonText })} />
           <SingleImage label="صورة الخلفية" value={s.image ?? ""} onChange={(image) => onChange({ image: image || undefined })} />
         </>
@@ -198,7 +198,7 @@ function SectionFields({ section: s, onChange, collections }: { section: Section
       return (
         <>
           <Text label="العنوان" value={s.title} onChange={(title) => onChange({ title })} />
-          <Field label="كم منتج يظهر">
+          <Field label="عدد المنتجات المعروضة">
             <input type="number" min={2} max={24} className="input" value={s.limit ?? 8} onChange={(e) => onChange({ limit: Number(e.target.value) })} />
           </Field>
         </>
@@ -218,15 +218,15 @@ function SectionFields({ section: s, onChange, collections }: { section: Section
           {s.items.map((item, i) => (
             <div key={i} className="space-y-2 rounded-theme bg-surface p-2">
               <input className="input" placeholder="اسم الزبون" value={item.name} onChange={(e) => onChange({ items: s.items.map((x, j) => (j === i ? { ...x, name: e.target.value } : x)) })} />
-              <textarea className="input" rows={2} placeholder="شو قال" value={item.text} onChange={(e) => onChange({ items: s.items.map((x, j) => (j === i ? { ...x, text: e.target.value } : x)) })} />
+              <textarea className="input" rows={2} placeholder="رأي الزبون" value={item.text} onChange={(e) => onChange({ items: s.items.map((x, j) => (j === i ? { ...x, text: e.target.value } : x)) })} />
               <button type="button" className="text-xs text-red-700" onClick={() => onChange({ items: s.items.filter((_, j) => j !== i) })}>
-                احذف الرأي
+                حذف الرأي
               </button>
             </div>
           ))}
           {s.items.length < 6 && (
             <button type="button" className="text-sm text-primary" onClick={() => onChange({ items: [...s.items, { name: "", text: "" }] })}>
-              + أضف رأي
+              + إضافة رأي
             </button>
           )}
         </>
@@ -244,7 +244,7 @@ function SectionFields({ section: s, onChange, collections }: { section: Section
           <Text label="العنوان" value={s.title} onChange={(title) => onChange({ title })} />
           <Field label="المجموعة">
             <select className="input" value={s.collectionId ?? ""} onChange={(e) => onChange({ collectionId: e.target.value || undefined })}>
-              <option value="">اختار مجموعة</option>
+              <option value="">اختر مجموعة</option>
               {collections.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.title}
@@ -252,7 +252,7 @@ function SectionFields({ section: s, onChange, collections }: { section: Section
               ))}
             </select>
           </Field>
-          <Field label="كم منتج يظهر">
+          <Field label="عدد المنتجات المعروضة">
             <input type="number" min={2} max={24} className="input" value={s.limit ?? 8} onChange={(e) => onChange({ limit: Number(e.target.value) })} />
           </Field>
         </>
@@ -264,7 +264,7 @@ function SectionFields({ section: s, onChange, collections }: { section: Section
           <Text label="العنوان" value={s.title} onChange={(title) => onChange({ title })} />
           <Text label="النص" value={s.text} onChange={(text) => onChange({ text })} />
           <Text label="نص الزر" value={s.buttonText} onChange={(buttonText) => onChange({ buttonText })} />
-          <Field label="الزر بيفتح" hint="مثلاً /products أو /collections/offers">
+          <Field label="رابط الزر" hint="مثلاً: /products أو /collections/offers">
             <input className="input" dir="ltr" value={s.link ?? ""} onChange={(e) => onChange({ link: e.target.value })} />
           </Field>
         </>
@@ -279,14 +279,14 @@ function SectionFields({ section: s, onChange, collections }: { section: Section
                 <input className="input" placeholder="العنوان" value={item.title} onChange={(e) => onChange({ items: s.items.map((x, j) => (j === i ? { ...x, title: e.target.value } : x)) })} />
                 <input className="input" placeholder="وصف قصير" value={item.text ?? ""} onChange={(e) => onChange({ items: s.items.map((x, j) => (j === i ? { ...x, text: e.target.value } : x)) })} />
               </div>
-              <button type="button" className="text-muted" onClick={() => onChange({ items: s.items.filter((_, j) => j !== i) })} aria-label="احذف">
+              <button type="button" className="text-muted" onClick={() => onChange({ items: s.items.filter((_, j) => j !== i) })} aria-label="حذف">
                 ✕
               </button>
             </div>
           ))}
           {s.items.length < 6 && (
             <button type="button" className="text-sm text-primary" onClick={() => onChange({ items: [...s.items, { icon: "⭐", title: "", text: "" }] })}>
-              + أضف ميزة
+              + إضافة ميزة
             </button>
           )}
         </>
@@ -300,12 +300,12 @@ function SectionFields({ section: s, onChange, collections }: { section: Section
               <input className="input" placeholder="السؤال" value={item.q} onChange={(e) => onChange({ items: s.items.map((x, j) => (j === i ? { ...x, q: e.target.value } : x)) })} />
               <textarea className="input" rows={2} placeholder="الجواب" value={item.a} onChange={(e) => onChange({ items: s.items.map((x, j) => (j === i ? { ...x, a: e.target.value } : x)) })} />
               <button type="button" className="text-xs text-red-700" onClick={() => onChange({ items: s.items.filter((_, j) => j !== i) })}>
-                احذف السؤال
+                حذف السؤال
               </button>
             </div>
           ))}
           <button type="button" className="text-sm text-primary" onClick={() => onChange({ items: [...s.items, { q: "", a: "" }] })}>
-            + أضف سؤال
+            + إضافة سؤال
           </button>
         </>
       );
@@ -334,11 +334,11 @@ function SingleImage({ label, value, onChange }: { label: string; value: string;
           <div className="flex h-16 w-24 items-center justify-center rounded-theme bg-surface text-xs text-muted">بلا صورة</div>
         )}
         <button type="button" className="btn btn-outline !py-1.5 text-xs" disabled={busy} onClick={() => input.current?.click()}>
-          {busy ? "جاري الرفع..." : value ? "غيّر" : "ارفع صورة"}
+          {busy ? "جارٍ الرفع..." : value ? "تغيير" : "رفع صورة"}
         </button>
         {value && (
           <button type="button" className="text-xs text-muted underline" onClick={() => onChange("")}>
-            شيل
+            إزالة
           </button>
         )}
       </div>
@@ -358,7 +358,7 @@ function SingleImage({ label, value, onChange }: { label: string; value: string;
           const res = await uploadImage(form);
           setBusy(false);
           if (res.url) onChange(res.url);
-          else setError(res.error || "صار خطأ");
+          else setError(res.error || "حدث خطأ");
           e.target.value = "";
         }}
       />

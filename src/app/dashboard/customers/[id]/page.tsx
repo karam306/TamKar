@@ -66,7 +66,7 @@ export default async function CustomerPage({
         back="/dashboard/customers"
         actions={
           <Link href={`/dashboard/orders/new?customer=${c.id}`} className="btn">
-            طلب جديد لهالزبون
+            طلب جديد لهذا الزبون
           </Link>
         }
       />
@@ -142,9 +142,9 @@ export default async function CustomerPage({
                 rows={3}
                 defaultValue={c.note ?? ""}
                 className="input"
-                placeholder="مثلاً: بيفضّل التوصيل المسا"
+                placeholder="مثلاً: يفضّل التوصيل مساءً"
               />
-              <button className="btn btn-outline">احفظ</button>
+              <button className="btn btn-outline">حفظ</button>
             </form>
           </Card>
         </div>

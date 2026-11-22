@@ -49,11 +49,11 @@ function Created({ state }: { state: TeamState }) {
   if (state?.error)
     return <p className="text-[13px] text-[#8e1f0b]">{state.error}</p>;
   if (!state?.created) return null;
-  const msg = `حسابك على لوحة تحكم المتجر:\nالرابط: ${typeof window !== "undefined" ? window.location.origin : ""}/login\nالإيميل: ${state.created.email}\nكلمة السر: ${state.created.password}`;
+  const msg = `حسابك على لوحة تحكم المتجر:\nالرابط: ${typeof window !== "undefined" ? window.location.origin : ""}/login\nالبريد الإلكتروني: ${state.created.email}\nكلمة المرور: ${state.created.password}`;
   return (
     <div className="space-y-2 rounded-lg bg-[#f7f7f7] p-3 text-[13px]">
       <div className="font-semibold">
-        ⚠️ ابعتها للموظف هلق، ما رح تنعرض مرة تانية
+        ⚠️ أرسلها إلى الموظف الآن، فلن تُعرض مرة أخرى
       </div>
       <div dir="ltr" className="text-right">
         {state.created.email} ·{" "}
@@ -65,7 +65,7 @@ function Created({ state }: { state: TeamState }) {
         rel="noopener noreferrer"
         className="btn inline-block !bg-[#25D366]"
       >
-        ابعتها عالواتساب
+        إرسالها عبر واتساب
       </a>
     </div>
   );
@@ -75,12 +75,12 @@ export function AddStaffForm() {
   const [state, action] = useActionState(addStaff, undefined);
   return (
     <section className="card space-y-3 p-4">
-      <h2 className="text-sm font-semibold">ضيف موظف</h2>
+      <h2 className="text-sm font-semibold">إضافة موظف</h2>
       <form action={action} className="grid gap-3 sm:grid-cols-2">
         <Field label="اسم الموظف">
           <input name="name" className="input" placeholder="مثلاً: سامر" />
         </Field>
-        <Field label="إيميله">
+        <Field label="بريده الإلكتروني">
           <input
             name="email"
             required
@@ -90,11 +90,11 @@ export function AddStaffForm() {
           />
         </Field>
         <div className="space-y-2 sm:col-span-2">
-          <div className="text-[13px] font-semibold">شو بيقدر يشوف؟</div>
+          <div className="text-[13px] font-semibold">ما الأقسام التي يمكنه الوصول إليها؟</div>
           <PermBoxes value={DEFAULT_PERMS} />
         </div>
         <div className="sm:col-span-2">
-          <SubmitButton>أنشئ حساب الموظف</SubmitButton>
+          <SubmitButton>إنشاء حساب الموظف</SubmitButton>
         </div>
       </form>
       <Created state={state} />
@@ -128,13 +128,13 @@ export function StaffRow({
           <form action={reset}>
             <input type="hidden" name="user_id" value={userId} />
             <button className="btn btn-outline !py-1 text-xs">
-              كلمة سر جديدة
+              كلمة مرور جديدة
             </button>
           </form>
           <form action={removeStaff}>
             <input type="hidden" name="user_id" value={userId} />
             <button className="btn btn-outline !py-1 text-xs text-red-700">
-              احذف
+              حذف
             </button>
           </form>
         </span>
@@ -144,12 +144,12 @@ export function StaffRow({
           الصلاحيات:{" "}
           {perms.length
             ? perms.map((p) => PERM_LABELS[p].label).join("، ")
-            : "ولا شي"}
+            : "لا شيء"}
         </summary>
         <form action={savePerms} className="mt-2 space-y-2">
           <input type="hidden" name="user_id" value={userId} />
           <PermBoxes value={perms} />
-          <SubmitButton>احفظ الصلاحيات</SubmitButton>
+          <SubmitButton>حفظ الصلاحيات</SubmitButton>
           {permState?.ok && <p className="text-green-700">{permState.ok}</p>}
           {permState?.error && (
             <p className="text-[#8e1f0b]">{permState.error}</p>

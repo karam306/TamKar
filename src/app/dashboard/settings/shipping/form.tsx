@@ -47,11 +47,11 @@ export function ShippingForm({
       <section className="card space-y-3 p-4">
         <h2 className="text-sm font-semibold">🏪 الاستلام من المحل</h2>
         <p className="text-[13px] text-muted">
-          دايماً شغال. الزبون بيطلب أونلاين وبيجي ياخد طلبه من محلك.
+          متاح دائماً. يطلب الزبون عبر الإنترنت ويستلم طلبه من محلك.
         </p>
         <Field
           label="مكان ووقت الاستلام"
-          hint="بيظهر للزبون بالسلة وبرسالة الواتساب. مثلاً: حمص، شارع الحضارة جانب صيدلية الشفاء، من 10 الصبح لـ 9 المسا"
+          hint="يظهر للزبون في السلة وفي رسالة واتساب. مثلاً: حمص، شارع الحضارة بجانب صيدلية الشفاء، من 10 صباحاً حتى 9 مساءً"
         >
           <input
             name="pickup_note"
@@ -66,14 +66,14 @@ export function ShippingForm({
         <h2 className="text-sm font-semibold">🏬 الفروع {!pro && "🔒"}</h2>
         {!pro ? (
           <p className="rounded-lg bg-[#f4f0ff] p-3 text-[13px]">
-            عندك أكتر من محل؟ بالباقة الاحترافية بتضيف لغاية 5 فروع، والزبون
-            بيختار من وين يستلم، والطلب بيوصل لواتساب الفرع نفسه.
+            لديك أكثر من محل؟ تتيح لك الباقة الاحترافية إضافة حتى 5 فروع، فيختار الزبون
+            مكان الاستلام، ويصل الطلب إلى واتساب الفرع نفسه.
           </p>
         ) : (
           <>
             <p className="text-[13px] text-muted">
-              الزبون بيختار من أي فرع بيستلم، والطلب بيروح لواتساب هالفرع. المحل
-              الرئيسي (فوق) بيضل أول خيار.
+              يختار الزبون الفرع الذي يستلم منه، ويصل الطلب إلى واتساب ذلك الفرع. ويبقى المحل
+              الرئيسي (أعلاه) الخيار الأول.
             </p>
             {branches.map((b, i) => (
               <div
@@ -124,7 +124,7 @@ export function ShippingForm({
                     onClick={() =>
                       setBranches(branches.filter((_, k) => k !== i))
                     }
-                    aria-label="احذف"
+                    aria-label="حذف"
                   >
                     ✕
                   </button>
@@ -142,7 +142,7 @@ export function ShippingForm({
                   ])
                 }
               >
-                + ضيف فرع
+                + إضافة فرع
               </button>
             )}
           </>
@@ -159,10 +159,10 @@ export function ShippingForm({
             className="mt-1 h-4 w-4 accent-black"
           />
           <span>
-            <span className="block text-sm font-semibold">🚚 عندي توصيل</span>
+            <span className="block text-sm font-semibold">🚚 لدي خدمة توصيل</span>
             <span className="block text-[13px] text-muted">
-              إذا فعّلته، الزبون بيختار بالسلة بين الاستلام من المحل أو التوصيل
-              لعنده.
+              عند تفعيله، يختار الزبون في السلة بين الاستلام من المحل والتوصيل
+              إليه.
             </span>
           </span>
         </label>
@@ -179,11 +179,11 @@ export function ShippingForm({
             />
             <span>
               <span className="block text-sm font-semibold">
-                🎁 إرسال الطلب كهدية
+                🎁 إرسال الطلب هديةً
               </span>
               <span className="block text-[13px] text-muted">
-                الزبون بيقدر يختار &quot;ابعته كهدية&quot; لما يطلب توصيل: بيكتب
-                اسم ورقم الشخص اللي رح يستلم، ورسالة للكرت، وإذا بدو تخفوا
+                يمكن للزبون اختيار &quot;إرسال الطلب هدية&quot; عند طلب التوصيل: فيكتب
+                اسم المستلم ورقمه، ورسالة البطاقة، ويحدد إن كان يريد إخفاء
                 الأسعار.
               </span>
             </span>
@@ -192,8 +192,8 @@ export function ShippingForm({
         <section className="card space-y-3 p-4">
           <h2 className="text-sm font-semibold">سعر التوصيل حسب المدينة</h2>
           <p className="text-[13px] text-muted">
-            الزبون بيختار مدينته بالسلة، وبيظهر سعر التوصيل تلقائياً. المدن اللي
-            مش بالقائمة بياخدوا السعر العام تحت.
+            يختار الزبون مدينته في السلة، ويظهر سعر التوصيل تلقائياً. وتُطبَّق على المدن
+            غير المدرجة في القائمة الرسوم العامة أدناه.
           </p>
           {rates.length > 0 && (
             <ul className="divide-y divide-black/5 rounded-lg border border-black/10">
@@ -229,7 +229,7 @@ export function ShippingForm({
                     type="button"
                     className="px-2 text-muted hover:text-red-700"
                     onClick={() => setRates(rates.filter((_, j) => j !== i))}
-                    aria-label="احذف"
+                    aria-label="حذف"
                   >
                     ✕
                   </button>
@@ -253,18 +253,18 @@ export function ShippingForm({
               className="rounded-lg border border-dashed border-black/20 px-2.5 py-1 text-[13px]"
               onClick={() => setRates([...rates, { city: "", fee: "" }])}
             >
-              + مدينة أو منطقة تانية
+              + مدينة أو منطقة أخرى
             </button>
           </div>
           <p className="text-xs text-muted">
-            حط 0 للمدن اللي التوصيل فيها مجاني.
+            أدخل 0 للمدن التي يكون التوصيل إليها مجانياً.
           </p>
         </section>
 
         <section className="card grid gap-3 p-4 sm:grid-cols-2">
           <Field
             label={`السعر العام للتوصيل (${unit})`}
-            hint="للمدن اللي مش بالقائمة. اتركه فاضي إذا مجاني"
+            hint="للمدن غير المدرجة في القائمة. اتركه فارغاً إذا كان مجانياً"
           >
             <input
               name="default_fee"
@@ -275,8 +275,8 @@ export function ShippingForm({
             />
           </Field>
           <Field
-            label={`توصيل مجاني للطلبات فوق (${unit})`}
-            hint="اختياري، مثلاً 50"
+            label={`توصيل مجاني للطلبات التي تتجاوز (${unit})`}
+            hint="اختياري، مثلاً: 50"
           >
             <input
               name="free_over"
@@ -290,7 +290,7 @@ export function ShippingForm({
       </div>
 
       <FormMessage state={state} />
-      <SubmitButton>احفظ</SubmitButton>
+      <SubmitButton>حفظ</SubmitButton>
     </form>
   );
 }

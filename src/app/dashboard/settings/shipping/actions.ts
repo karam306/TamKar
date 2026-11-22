@@ -38,7 +38,7 @@ export async function saveShipping(
     Number.isNaN(freeOver) ||
     clean.some((r) => r.fee === null || Number.isNaN(r.fee))
   ) {
-    return { error: "في سعر توصيل غير صحيح" };
+    return { error: "يوجد سعر توصيل غير صحيح" };
   }
   let rawBranches: {
     id?: unknown;
@@ -68,7 +68,7 @@ export async function saveShipping(
         .slice(0, LIMITS.pro.branches - 1)
     : [];
   if (branches.some((b) => !/^\d{9,15}$/.test(b.whatsapp)))
-    return { error: "في فرع رقم واتسابه غير صحيح" };
+    return { error: "يوجد فرع رقم واتسابه غير صحيح" };
   const { error } = await db
     .from("stores")
     .update({
@@ -87,8 +87,8 @@ export async function saveShipping(
       },
     })
     .eq("id", store.id);
-  if (error) return { error: "ما قدرنا نحفظ، جرب مرة تانية" };
+  if (error) return { error: "تعذّر الحفظ، حاول مرة أخرى" };
   revalidatePath("/dashboard/settings/shipping");
   refresh();
-  return { ok: "✓ انحفظ" };
+  return { ok: "✓ تم الحفظ" };
 }

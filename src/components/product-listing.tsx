@@ -54,7 +54,7 @@ export async function ProductListing({
       )}
 
       {items.length === 0 ? (
-        <p className="py-16 text-center text-muted">ما في منتجات مطابقة</p>
+        <p className="py-16 text-center text-muted">لا توجد منتجات مطابقة</p>
       ) : (
         <>
           <p className="mb-3 text-sm text-muted">{total} منتج</p>

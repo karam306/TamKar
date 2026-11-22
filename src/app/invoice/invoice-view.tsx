@@ -33,7 +33,7 @@ export function InvoiceView({ store, order: o }: { store: Pick<Store, "name" | "
           <div dir="ltr" className="text-right">
             {o.phone}
           </div>
-          <div>{o.fulfillment === "pickup" ? `استلام من ${o.branch || "المحل"}` : `${o.city}، ${o.address}`}</div>
+          <div>{o.fulfillment === "pickup" ? `الاستلام من ${o.branch || "المحل"}` : `${o.city}، ${o.address}`}</div>
         </div>
         <div>
           <div className="mb-1 font-semibold">الدفع</div>
@@ -86,7 +86,6 @@ export function InvoiceView({ store, order: o }: { store: Pick<Store, "name" | "
           <span>{money(Number(o.total))}</span>
         </div>
       </div>
-      {o.notes && <p className="mt-6 text-muted">ملاحظات: {o.notes}</p>}
       {o.notes && <p className="mt-6 text-muted">ملاحظات: {o.notes}</p>}
       <footer className="mt-12 text-center text-muted">شكراً لتسوقكم من {store.name}</footer>
     </>

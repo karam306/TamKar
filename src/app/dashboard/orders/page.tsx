@@ -69,11 +69,11 @@ export default async function OrdersPage({
       />
       {!sp.q && !sp.status && orders.length === 0 ? (
         <EmptyState
-          title="طلباتك رح تظهر هون"
-          text="أول ما يطلب حدا من متجرك رح يوصلك الطلب هون. وإذا إجاك طلب على الهاتف أو واتساب، فيك تسجله يدوياً."
+          title="ستظهر طلباتك هنا"
+          text="عندما يطلب أحد من متجرك، يظهر الطلب هنا. وإذا وصلك طلب عبر الهاتف أو واتساب، يمكنك تسجيله يدوياً."
           action={
             <Link href="/dashboard/orders/new" className="btn">
-              أنشئ طلب يدوي
+              إنشاء طلب يدوي
             </Link>
           }
         />
@@ -149,7 +149,7 @@ export default async function OrdersPage({
                         className="mr-1 text-xs text-muted"
                         title={
                           o.fulfillment === "pickup"
-                            ? "استلام من المحل"
+                            ? "الاستلام من المحل"
                             : "توصيل"
                         }
                       >
@@ -181,7 +181,7 @@ export default async function OrdersPage({
             </table>
           </div>
           {orders.length === 0 && (
-            <p className="p-10 text-center text-muted">ما في طلبات مطابقة</p>
+            <p className="p-10 text-center text-muted">لا توجد طلبات مطابقة</p>
           )}
           <Pager
             page={page}

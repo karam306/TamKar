@@ -9,4 +9,4 @@ export async function productRoom(db: SupabaseClient, store: { id: string; plan?
   return Math.max(0, LIMITS.basic.products - (count ?? 0));
 }
 
-export const LIMIT_MSG = `الباقة الأساسية لغاية ${LIMITS.basic.products} منتج. رقّي للاحترافي لتضيف بلا حدود.`;
+export const LIMIT_MSG = `تتيح الباقة الأساسية حتى ${LIMITS.basic.products} منتج. رقِّ إلى الباقة الاحترافية لإضافة منتجات دون حدود.`;

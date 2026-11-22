@@ -87,7 +87,7 @@ export function PaidButton({ id }: { id: string }) {
         <input type="hidden" name="id" value={id} />
         <input type="hidden" name="paid" value={paid ? "0" : "1"} />
         <button className={paid ? "btn btn-outline" : "btn"}>
-          {paid ? "رجّعه غير مدفوع" : "تم استلام المبلغ"}
+          {paid ? "إعادته إلى غير مدفوع" : "تم استلام المبلغ"}
         </button>
       </form>
     </div>
@@ -96,7 +96,7 @@ export function PaidButton({ id }: { id: string }) {
 
 export const LivePaidLabel = () => {
   const p = useLive().live.payment;
-  return <>{p === "pending" || !p ? "باقي للتحصيل عند الاستلام" : "مدفوع"}</>;
+  return <>{p === "pending" || !p ? "يُحصَّل عند الاستلام" : "مدفوع"}</>;
 };
 
 export function StatusSelect({ id }: { id: string }) {
@@ -122,7 +122,7 @@ export function StatusSelect({ id }: { id: string }) {
           </option>
         ))}
       </select>
-      <button className="btn btn-outline">غيّر</button>
+      <button className="btn btn-outline">تغيير</button>
     </form>
   );
 }

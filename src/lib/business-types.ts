@@ -2,8 +2,8 @@
 export const BUSINESS_TYPES = [
   { id: "clothing", label: "ملابس وأحذية" },
   { id: "accessories", label: "إكسسوارات ومجوهرات" },
-  { id: "phones", label: "موبايلات وإلكترونيات" },
-  { id: "computers", label: "كمبيوتر ولابتوبات وقطع" },
+  { id: "phones", label: "هواتف وإلكترونيات" },
+  { id: "computers", label: "حواسيب ولوازمها" },
   { id: "food", label: "مطاعم وحلويات" },
   { id: "beauty", label: "عطور وتجميل" },
   { id: "home", label: "أدوات منزلية ومطبخ" },

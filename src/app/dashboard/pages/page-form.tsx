@@ -15,7 +15,7 @@ export function PageForm({ page }: { page?: StorePage }) {
         <Field label="العنوان">
           <input name="title" required defaultValue={page?.title} className="input" />
         </Field>
-        <Field label="المحتوى" hint='اكتب "## " بأول السطر ليصير عنوان، واترك سطر فاضي بين الفقرات'>
+        <Field label="المحتوى" hint='اكتب "## " في بداية السطر لجعله عنواناً، واترك سطراً فارغاً بين الفقرات'>
           <textarea name="body" rows={16} defaultValue={page?.body ?? ""} className="input leading-7" />
         </Field>
       </section>
@@ -32,7 +32,7 @@ export function PageForm({ page }: { page?: StorePage }) {
           </Field>
         </section>
         <FormMessage state={state} />
-        <SubmitButton className="w-full">احفظ</SubmitButton>
+        <SubmitButton className="w-full">حفظ</SubmitButton>
       </div>
     </form>
   );

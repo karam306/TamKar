@@ -14,10 +14,10 @@ export function SettingsForm({ store }: { store: S }) {
         <Field label="اسم المتجر">
           <input name="name" required defaultValue={store.name} className="input" />
         </Field>
-        <Field label="جملة تعريفية" hint="بتظهر تحت اسم المتجر وبنتائج البحث">
+        <Field label="جملة تعريفية" hint="تظهر أسفل اسم المتجر وفي نتائج البحث">
           <input name="tagline" defaultValue={store.tagline} className="input" />
         </Field>
-        <Field label="رقم واتساب للطلبات" hint="الطلبات رح توصل على هالرقم">
+        <Field label="رقم واتساب للطلبات" hint="تصل الطلبات إلى هذا الرقم">
           <input name="whatsapp" required defaultValue={store.whatsapp} inputMode="tel" className="input" dir="ltr" style={{ textAlign: "right" }} />
         </Field>
         <Field label="المدينة">
@@ -34,7 +34,7 @@ export function SettingsForm({ store }: { store: S }) {
         </Field>
       </div>
       <FormMessage state={state} />
-      <SubmitButton>احفظ</SubmitButton>
+      <SubmitButton>حفظ</SubmitButton>
     </form>
   );
 }

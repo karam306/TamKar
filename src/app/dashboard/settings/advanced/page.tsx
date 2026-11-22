@@ -12,17 +12,17 @@ export default async function AdvancedSettingsPage() {
       href: "/dashboard/marketing",
       icon: "📈",
       title: "Meta Pixel وكتالوج المنتجات",
-      text: "لربط متجرك بإعلانات فيسبوك وانستغرام. إذا حدا عم يعملك إعلاناتك، هو بيعبي هالقسم.",
+      text: "لربط متجرك بإعلانات فيسبوك وإنستغرام. إذا كانت جهة أخرى تدير إعلاناتك، فهي التي تملأ هذا القسم.",
       status: !isPro(store) ? "🔒 احترافي" : s.meta_pixel_id ? "✓ مربوط" : null,
     },
-    { href: "/dashboard/seo", icon: "🔎", title: "Google والسوشال ميديا", text: "كيف بيظهر متجرك ببحث Google، صورة المشاركة، وروابط حساباتك." },
-    { href: "/dashboard/products/import", icon: "📊", title: "استيراد وتصدير Excel", text: "ضيف أو عدّل كتير منتجات مرة وحدة من ملف Excel.", status: !isPro(store) ? "🔒 احترافي" : null },
-    { href: "/dashboard/navigation", icon: "🧭", title: "قوائم المتجر", text: "الروابط اللي فوق وتحت بالمتجر. جاهزة من الأول، غيّرها إذا بدك." },
+    { href: "/dashboard/seo", icon: "🔎", title: "Google ومواقع التواصل", text: "ظهور متجرك في بحث Google، وصورة المشاركة، وروابط حساباتك." },
+    { href: "/dashboard/products/import", icon: "📊", title: "استيراد وتصدير Excel", text: "إضافة عدد كبير من المنتجات أو تعديلها دفعة واحدة من ملف Excel.", status: !isPro(store) ? "🔒 احترافي" : null },
+    { href: "/dashboard/navigation", icon: "🧭", title: "قوائم المتجر", text: "الروابط في أعلى المتجر وأسفله. تأتي جاهزة، ويمكنك تعديلها." },
   ];
   return (
     <div>
       <PageHeader title="إعدادات متقدمة" back="/dashboard/settings" />
-      <p className="mb-4 text-[13px] text-muted">متجرك شغال تمام بدون ما تلمس شي من هون.</p>
+      <p className="mb-4 text-[13px] text-muted">يعمل متجرك بشكل كامل دون الحاجة إلى تعديل أي إعداد هنا.</p>
       <div className="grid gap-3 sm:grid-cols-2">
         {items.map((i) => (
           <Link key={i.href} href={i.href} className="card flex gap-3 p-4 transition hover:shadow-md">

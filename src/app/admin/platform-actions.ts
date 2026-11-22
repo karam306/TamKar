@@ -14,17 +14,17 @@ export async function activateTelegram(): Promise<Res> {
   await requirePlatformAdmin();
   const h = await headers();
   const host = h.get("x-forwarded-host") || h.get("host");
-  if (!host || host.startsWith("localhost")) return { error: "لازم تكبسها من الموقع الحقيقي، مو من localhost" };
+  if (!host || host.startsWith("localhost")) return { error: "يجب الضغط عليه من الموقع الفعلي، لا من localhost" };
   const r = await tg("setWebhook", {
     url: `https://${host}/api/telegram`,
     secret_token: webhookSecret(),
     allowed_updates: ["message"],
     drop_pending_updates: true,
   });
-  if (!r.ok) return { error: `تيليغرام رفض (${r.description ?? ""}). تأكد إنو TELEGRAM_BOT_TOKEN صحيح بـ Vercel` };
+  if (!r.ok) return { error: `رفض تيليغرام الطلب (${r.description ?? ""}). تأكد من صحة TELEGRAM_BOT_TOKEN في Vercel` };
   revalidatePath("/admin");
   refresh();
-  return { ok: `✓ البوت @${(await botUsername()) ?? ""} صار شغّال على ${host}` };
+  return { ok: `✓ البوت @${(await botUsername()) ?? ""} يعمل الآن على ${host}` };
 }
 
 /** Code: capital letters and numbers. Made from the name when left empty. */
@@ -38,17 +38,17 @@ export async function addSalesman(_: Res, form: FormData): Promise<Res> {
   const name = str(form, "name", 80);
   const phone = str(form, "phone", 20).replace(/[^\d+]/g, "") || null;
   const code = (str(form, "code", 12).toUpperCase().replace(/[^A-Z0-9]/g, "") || makeCode(name)).slice(0, 12);
-  if (name.length < 2) return { error: "اكتب اسم المندوب" };
-  if (code.length < 3) return { error: "الكود لازم يكون 3 أحرف أو أرقام إنكليزية على الأقل" };
+  if (name.length < 2) return { error: "أدخل اسم المندوب" };
+  if (code.length < 3) return { error: "يجب أن يتكوّن الرمز من 3 أحرف أو أرقام إنجليزية على الأقل" };
   const { error } = await supabaseAdmin().from("salesmen").insert({ name, phone, code });
   if (error) {
-    if (error.code === "23505") return { error: "هالكود مستخدم لمندوب تاني" };
-    if (error.code === "42P01" || error.code === "PGRST205") return { error: "لازم تشغّل ملف 010 بـ Supabase أول" };
-    return { error: `ما قدرنا نضيف المندوب (${error.message.slice(0, 60)})` };
+    if (error.code === "23505") return { error: "هذا الرمز مستخدم لمندوب آخر" };
+    if (error.code === "42P01" || error.code === "PGRST205") return { error: "يجب تشغيل الملف 010 في Supabase أولاً" };
+    return { error: `تعذّرت إضافة المندوب (${error.message.slice(0, 60)})` };
   }
   revalidatePath("/admin/salesmen");
   refresh();
-  return { ok: `✓ انضاف ${name}، الكود ${code}` };
+  return { ok: `✓ أُضيف ${name}، والرمز ${code}` };
 }
 
 export async function toggleSalesman(form: FormData) {

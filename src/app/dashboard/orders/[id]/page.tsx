@@ -107,7 +107,7 @@ export default async function OrderPage({
         />
         {returned && (
           <p className="mb-4 rounded-lg bg-green-50 p-3 text-[13px] font-semibold text-green-800">
-            ✓ انسجّل. المخزون والحساب اتحدّثوا.
+            ✓ تم التسجيل، وحُدِّث المخزون والحساب.
           </p>
         )}
         <p className="-mt-3 mb-5 text-[13px] text-muted">
@@ -199,7 +199,7 @@ export default async function OrderPage({
                 </div>
                 {returns.some((r) => Number(r.extra_charge) > 0) && (
                   <div className="flex justify-between">
-                    <span>دفع زيادة (تبديل)</span>
+                    <span>مبلغ إضافي (تبديل)</span>
                     <span>
                       +
                       {money(
@@ -211,7 +211,7 @@ export default async function OrderPage({
                 {refunded > 0 && (
                   <>
                     <div className="flex justify-between text-[#8e1f0b]">
-                      <span>رجّعنا للزبون</span>
+                      <span>المبلغ المُعاد للزبون</span>
                       <span>-{money(refunded)}</span>
                     </div>
                     <div className="flex justify-between border-t border-black/5 pt-2 font-semibold">
@@ -246,7 +246,7 @@ export default async function OrderPage({
                       </div>
                       {r.items.length > 0 && (
                         <div>
-                          <span className="text-muted">رجع: </span>
+                          <span className="text-muted">المُرتجَع: </span>
                           {r.items
                             .map(
                               (i) =>
@@ -254,18 +254,18 @@ export default async function OrderPage({
                             )
                             .join("، ")}
                           {r.restocked ? (
-                            <span className="text-muted"> · رجع للمخزون</span>
+                            <span className="text-muted"> · أُعيد إلى المخزون</span>
                           ) : (
                             <span className="text-muted">
                               {" "}
-                              · ما رجع للمخزون
+                              · لم يُعَد إلى المخزون
                             </span>
                           )}
                         </div>
                       )}
                       {r.new_items.length > 0 && (
                         <div>
-                          <span className="text-muted">أخد بدالها: </span>
+                          <span className="text-muted">البديل: </span>
                           {r.new_items
                             .map(
                               (i) =>
@@ -277,11 +277,11 @@ export default async function OrderPage({
                       <div className="flex flex-wrap gap-x-4">
                         {Number(r.refund_amount) > 0 && (
                           <span className="text-[#8e1f0b]">
-                            رجّعنا {money(Number(r.refund_amount))}
+                            أُعيد {money(Number(r.refund_amount))}
                           </span>
                         )}
                         {Number(r.extra_charge) > 0 && (
-                          <span>دفع زيادة {money(Number(r.extra_charge))}</span>
+                          <span>مبلغ إضافي {money(Number(r.extra_charge))}</span>
                         )}
                         {r.method && (
                           <span className="text-muted">{r.method}</span>
@@ -301,11 +301,11 @@ export default async function OrderPage({
                 <input type="hidden" name="id" value={o.id} />
                 <input
                   name="message"
-                  placeholder="اكتب ملاحظة للسجل..."
+                  placeholder="أضف ملاحظة إلى السجل..."
                   className="input"
                   maxLength={1000}
                 />
-                <button className="btn btn-outline">أضف</button>
+                <button className="btn btn-outline">إضافة</button>
               </form>
               <ol className="relative space-y-3 border-r-2 border-black/10 pr-4 text-[13px]">
                 {(events ?? []).map((e) => (
@@ -331,7 +331,7 @@ export default async function OrderPage({
                   </div>
                   {o.gift.to_phone && (
                     <div>
-                      <span className="text-muted">رقمه: </span>
+                      <span className="text-muted">رقم الهاتف: </span>
                       <a
                         href={`tel:${o.gift.to_phone}`}
                         dir="ltr"
@@ -343,13 +343,13 @@ export default async function OrderPage({
                   )}
                   {o.gift.message && (
                     <div className="mt-2 rounded-lg bg-[#fff8e6] p-2">
-                      <div className="text-[11px] text-muted">رسالة الكرت</div>
+                      <div className="text-[11px] text-muted">رسالة البطاقة</div>
                       <p className="whitespace-pre-line">{o.gift.message}</p>
                     </div>
                   )}
                   {o.gift.hide_prices && (
                     <p className="mt-2 font-semibold text-[#8a6116]">
-                      ⚠️ لا تحط فاتورة أو أسعار مع الهدية
+                      ⚠️ لا تُرفق فاتورة أو أسعاراً مع الهدية
                     </p>
                   )}
                 </div>
@@ -384,7 +384,7 @@ export default async function OrderPage({
                   <a
                     href={whatsappLink(
                       normalizeWhatsapp(o.phone),
-                      `مرحبا ${o.customer_name}، معك ${store.name} بخصوص طلبك رقم #${o.number}`,
+                      `مرحباً ${o.customer_name}، معك ${store.name} بخصوص طلبك رقم #${o.number}`,
                     )}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -398,7 +398,7 @@ export default async function OrderPage({
                 </div>
                 {o.fulfillment === "pickup" ? (
                   <div className="pt-3 font-semibold">
-                    🏪 استلام من {o.branch || "المحل"}
+                    🏪 الاستلام من {o.branch || "المحل"}
                   </div>
                 ) : (
                   <>
@@ -418,9 +418,9 @@ export default async function OrderPage({
                   rows={3}
                   defaultValue={o.merchant_note ?? ""}
                   className="input"
-                  placeholder="ما بيشوفها الزبون"
+                  placeholder="لا يراها الزبون"
                 />
-                <button className="btn btn-outline">احفظ</button>
+                <button className="btn btn-outline">حفظ</button>
               </form>
             </Card>
 
@@ -441,9 +441,9 @@ export default async function OrderPage({
                           defaultChecked
                           className="h-4 w-4 accent-black"
                         />
-                        رجّع الكميات للمخزون
+                        إعادة الكميات إلى المخزون
                       </label>
-                      <button className="btn !bg-[#c70a24]">ألغِ الطلب</button>
+                      <button className="btn !bg-[#c70a24]">إلغاء الطلب</button>
                     </form>
                   </details>
                 </div>

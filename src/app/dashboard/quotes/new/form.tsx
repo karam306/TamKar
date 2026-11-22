@@ -71,7 +71,7 @@ export function QuoteForm({ currency }: { currency: Currency }) {
           className="text-[13px] font-semibold text-[#005bd3] hover:underline"
           onClick={() => setLines([...lines, { key: `custom${lines.length}`, title: "", price: 0, qty: 1 }])}
         >
-          + بند مش موجود بالمنتجات (خدمة، تركيب، منتج خاص...)
+          + بند غير موجود في المنتجات (خدمة، تركيب، منتج خاص...)
         </button>
 
         {lines.length > 0 && (
@@ -90,14 +90,14 @@ export function QuoteForm({ currency }: { currency: Currency }) {
                 </div>
                 <input type="number" min={1} className="input" value={l.qty} onChange={(e) => update(i, { qty: Number(e.target.value) })} aria-label="الكمية" />
                 <input inputMode="decimal" dir="ltr" className="input" value={l.price} onChange={(e) => update(i, { price: Number(e.target.value.replace(/[^\d.]/g, "")) })} aria-label="السعر" />
-                <button type="button" className="text-muted hover:text-red-700" onClick={() => setLines(lines.filter((_, k) => k !== i))} aria-label="احذف">
+                <button type="button" className="text-muted hover:text-red-700" onClick={() => setLines(lines.filter((_, k) => k !== i))} aria-label="حذف">
                   ✕
                 </button>
               </li>
             ))}
           </ul>
         )}
-        <p className="text-xs text-muted">فيك تغيّر سعر أي منتج بالعرض (سعر جملة أو سعر خاص) بدون ما يتغير سعره بالمتجر.</p>
+        <p className="text-xs text-muted">يمكنك تغيير سعر أي منتج في العرض (سعر جملة أو سعر خاص) دون أن يتغيّر سعره في المتجر.</p>
       </section>
 
       <div className="space-y-4">
@@ -125,7 +125,7 @@ export function QuoteForm({ currency }: { currency: Currency }) {
           <Field label="خصم (مبلغ)">
             <input name="discount" inputMode="decimal" dir="ltr" className="input" value={discount} onChange={(e) => setDiscount(e.target.value)} />
           </Field>
-          <Field label="أجرة توصيل (اختياري)">
+          <Field label="رسوم التوصيل (اختياري)">
             <input name="delivery_fee" inputMode="decimal" dir="ltr" className="input" value={delivery} onChange={(e) => setDelivery(e.target.value)} />
           </Field>
           <Field label="العرض صالح لمدة">
@@ -144,7 +144,7 @@ export function QuoteForm({ currency }: { currency: Currency }) {
             <span>{formatPrice(Math.max(0, total), currency)}</span>
           </div>
           <FormMessage state={state} />
-          <SubmitButton>احفظ العرض</SubmitButton>
+          <SubmitButton>حفظ العرض</SubmitButton>
         </section>
       </div>
     </form>

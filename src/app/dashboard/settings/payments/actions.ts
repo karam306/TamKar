@@ -18,7 +18,7 @@ export async function savePayments(_: FormState, form: FormData): Promise<FormSt
     let account = String(form.get(`${id}_account`) ?? "").trim();
     if (id === "sham_cash") {
       account = account.replace(/\s+/g, "");
-      if (!/^[A-Za-z0-9]{16,64}$/.test(account)) return { error: "رمز محفظة شام كاش لازم يكون حروف إنكليزية وأرقام بس (عادة 32)" };
+      if (!/^[A-Za-z0-9]{16,64}$/.test(account)) return { error: "يجب أن يتكوّن رمز محفظة شام كاش من أحرف إنجليزية وأرقام فقط (عادةً 32)" };
     } else {
       account = account.replace(/[^\d+]/g, "");
       if (account.replace(/\D/g, "").length < 9) return { error: `رقم ${WALLETS[id].name} غير صحيح` };
@@ -30,22 +30,22 @@ export async function savePayments(_: FormState, form: FormData): Promise<FormSt
       try {
         qr = await saveImage(store.id, file, 800);
       } catch (e) {
-        return { error: e instanceof Error ? e.message : "ما قدرنا نرفع الصورة" };
+        return { error: e instanceof Error ? e.message : "تعذّر رفع الصورة" };
       }
     }
     wallets.push({ id, account, holder: String(form.get(`${id}_holder`) ?? "").trim().slice(0, 80) || null, qr });
   }
 
   const cod = form.get("cod") === "on";
-  if (!cod && wallets.length === 0) return { error: "لازم تخلي طريقة دفع وحدة على الأقل" };
+  if (!cod && wallets.length === 0) return { error: "يجب إبقاء طريقة دفع واحدة على الأقل" };
 
   const { error } = await db
     .from("stores")
     .update({ shipping: { ...(store.shipping ?? {}), payments: { cod, wallets } } })
     .eq("id", store.id);
-  if (error) return { error: "ما قدرنا نحفظ، جرب مرة تانية" };
+  if (error) return { error: "تعذّر الحفظ، حاول مرة أخرى" };
   revalidatePath("/dashboard/settings/payments");
   revalidatePath("/dashboard/settings");
   refresh();
-  return { ok: "✓ انحفظ" };
+  return { ok: "✓ تم الحفظ" };
 }

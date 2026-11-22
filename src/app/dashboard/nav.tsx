@@ -260,7 +260,7 @@ export function MobileMenu({
           <button
             type="button"
             className="absolute inset-0 bg-black/40"
-            aria-label="سكّر القائمة"
+            aria-label="إغلاق القائمة"
             onClick={() => setOpen(false)}
           />
           <div className="absolute inset-y-0 right-0 flex w-72 flex-col bg-[#ebebeb] shadow-xl">
@@ -270,7 +270,7 @@ export function MobileMenu({
                 type="button"
                 onClick={() => setOpen(false)}
                 className="p-1"
-                aria-label="سكّر"
+                aria-label="إغلاق"
               >
                 ✕
               </button>
@@ -290,7 +290,7 @@ export function MobileMenu({
                 rel="noopener noreferrer"
                 className="mt-4 block rounded-lg px-2.5 py-1.5 text-[13px] hover:bg-black/5"
               >
-                شوف متجرك ↗
+                عرض متجرك ↗
               </a>
             </div>
           </div>

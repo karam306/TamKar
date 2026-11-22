@@ -139,8 +139,8 @@ export function CartView({
         <div className="mb-4 text-5xl">🎉</div>
         <h1 className="mb-2 text-3xl">تم استلام طلبك</h1>
         <p className="mb-8 text-muted">
-          رقم الطلب #{done.number}. آخر خطوة: ابعت الطلب للمتجر على واتساب
-          ليأكدوه معك.
+          رقم الطلب #{done.number}. الخطوة الأخيرة: أرسل الطلب إلى المتجر عبر واتساب
+          لتأكيده معك.
         </p>
         <a
           href={done.whatsappUrl}
@@ -148,10 +148,10 @@ export function CartView({
           rel="noopener noreferrer"
           className="btn w-full !bg-[#25D366]"
         >
-          أرسل الطلب على واتساب
+          أرسل الطلب عبر واتساب
         </a>
         <StoreLink href="/" className="mt-4 inline-block text-sm text-primary">
-          الرجوع للمتجر
+          العودة إلى المتجر
         </StoreLink>
       </div>
     );
@@ -170,7 +170,7 @@ export function CartView({
   if (lines.length === 0) {
     return (
       <div className="mx-auto max-w-lg px-4 py-24 text-center">
-        <h1 className="mb-4 text-2xl">السلة فاضية</h1>
+        <h1 className="mb-4 text-2xl">السلة فارغة</h1>
         <StoreLink href="/products" className="btn">
           تصفح المنتجات
         </StoreLink>
@@ -305,14 +305,14 @@ export function CartView({
             <div className="text-muted">
               {pickupNote ||
                 (storeCity
-                  ? `من محلنا بـ${storeCity}. منتواصل معك لنحدد الوقت.`
-                  : "منتواصل معك لنحدد الوقت والمكان.")}
+                  ? `من محلنا في ${storeCity}. سنتواصل معك لتحديد الموعد.`
+                  : "سنتواصل معك لتحديد الموعد والمكان.")}
             </div>
           </div>
         )}
         {method === "pickup" && branches.length > 0 && (
           <div className="mb-4 space-y-2">
-            <div className="text-sm font-semibold">🏪 من أي فرع بدك تستلم؟</div>
+            <div className="text-sm font-semibold">🏪 من أي فرع تريد الاستلام؟</div>
             {[
               { id: "", name: "الفرع الرئيسي", note: pickupNote || storeCity },
               ...branches,
@@ -359,7 +359,7 @@ export function CartView({
           <input
             name="phone"
             required
-            placeholder="رقم الموبايل (مثال 0912345678)"
+            placeholder="رقم الهاتف المحمول (مثال: 0912345678)"
             className="input"
             inputMode="tel"
             autoComplete="tel"
@@ -376,14 +376,14 @@ export function CartView({
                 className="input"
               >
                 <option value="" disabled>
-                  اختار المدينة
+                  اختر المدينة
                 </option>
                 {cities.map((c) => (
                   <option key={c} value={c}>
                     {c}
                   </option>
                 ))}
-                <option value="أخرى">مدينة تانية</option>
+                <option value="أخرى">مدينة أخرى</option>
               </select>
             ) : (
               <input
@@ -415,24 +415,24 @@ export function CartView({
                   onChange={(e) => setIsGift(e.target.checked)}
                   className="h-5 w-5"
                 />
-                🎁 ابعت الطلب كهدية لحدا تاني
+                🎁 إرسال الطلب هديةً إلى شخص آخر
               </label>
               {isGift && (
                 <div className="mt-3 space-y-2">
                   <p className="text-xs text-muted">
-                    العنوان والمدينة فوق هنن عنوان الشخص اللي رح يستلم الهدية.
-                    اسمك ورقمك منستخدمهم لنتواصل معك أنت.
+                    العنوان والمدينة أعلاه هما عنوان مستلم الهدية.
+                    أما اسمك ورقمك فنستخدمهما للتواصل معك.
                   </p>
                   <input
                     name="gift_name"
                     required
-                    placeholder="اسم اللي رح يستلم الهدية"
+                    placeholder="اسم مستلم الهدية"
                     className="input"
                     maxLength={80}
                   />
                   <input
                     name="gift_phone"
-                    placeholder="رقمه (اختياري، ليتواصل معه المندوب)"
+                    placeholder="رقم هاتفه (اختياري، ليتواصل معه المندوب)"
                     className="input"
                     inputMode="tel"
                     dir="ltr"
@@ -440,7 +440,7 @@ export function CartView({
                   />
                   <textarea
                     name="gift_message"
-                    placeholder="رسالة على كرت الهدية (اختياري)"
+                    placeholder="رسالة على بطاقة الهدية (اختياري)"
                     rows={2}
                     className="input"
                     maxLength={300}
@@ -452,7 +452,7 @@ export function CartView({
                       defaultChecked
                       className="h-4 w-4"
                     />{" "}
-                    لا تحطوا فاتورة أو أسعار مع الهدية
+                    عدم إرفاق فاتورة أو أسعار مع الهدية
                   </label>
                 </div>
               )}
@@ -472,7 +472,7 @@ export function CartView({
                 setCodeInput(e.target.value);
                 setCodeError("");
               }}
-              placeholder="كود الخصم"
+              placeholder="رمز الخصم"
               className="input"
               dir="ltr"
             />
@@ -503,7 +503,7 @@ export function CartView({
                 <span>التوصيل</span>
                 <span>
                   {!city
-                    ? "اختار المدينة"
+                    ? "اختر المدينة"
                     : shown
                       ? shown.shipping
                         ? formatPrice(shown.shipping, currency)
@@ -539,9 +539,9 @@ export function CartView({
                   <span>
                     {p === "cod"
                       ? method === "pickup"
-                        ? "كاش بالمحل عند الاستلام"
-                        : "كاش عند الاستلام"
-                      : `ادفع هلق عبر ${WALLETS[p].name}`}
+                        ? "نقداً في المحل عند الاستلام"
+                        : "نقداً عند الاستلام"
+                      : `الدفع الآن عبر ${WALLETS[p].name}`}
                   </span>
                 </label>
               ))}
@@ -549,8 +549,8 @@ export function CartView({
           ) : (
             <p className="text-sm text-muted">
               {payment === "cod"
-                ? `💵 ${method === "pickup" ? "الدفع بالمحل عند الاستلام" : "الدفع عند الاستلام"}`
-                : `${WALLETS[payment].icon} الدفع بتحويل ${WALLETS[payment].name}، بنعطيك التفاصيل بعد تأكيد الطلب`}
+                ? `💵 ${method === "pickup" ? "الدفع في المحل عند الاستلام" : "الدفع عند الاستلام"}`
+                : `${WALLETS[payment].icon} الدفع بتحويل عبر ${WALLETS[payment].name}، وستظهر لك التفاصيل بعد تأكيد الطلب`}
             </p>
           )}
           {error && (
@@ -559,7 +559,7 @@ export function CartView({
             </p>
           )}
           <button type="submit" disabled={pending} className="btn w-full">
-            {pending ? "جاري الإرسال..." : "تأكيد الطلب"}
+            {pending ? "جارٍ الإرسال..." : "تأكيد الطلب"}
           </button>
         </form>
       </section>

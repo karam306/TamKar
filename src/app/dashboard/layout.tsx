@@ -29,7 +29,7 @@ export default async function DashboardLayout({
         className="mx-auto max-w-lg p-10 text-center font-sans"
       >
         <h1 className="mb-3 text-2xl">لوحة التحكم غير مفعّلة بعد</h1>
-        <p className="text-muted">لازم نربط قاعدة البيانات (Supabase) أول.</p>
+        <p className="text-muted">يجب ربط قاعدة البيانات (Supabase) أولاً.</p>
       </div>
     );
   }
@@ -84,7 +84,7 @@ export default async function DashboardLayout({
               rel="noopener noreferrer"
               className="block rounded-lg px-2 py-1.5 hover:bg-surface"
             >
-              شوف متجرك ↗
+              عرض متجرك ↗
             </a>
             {!staff && (
               <Link
@@ -154,13 +154,13 @@ function SubscriptionBanner({
   const state = subState({ status, plan, paid_until: paidUntil });
   const left = daysLeft(paidUntil);
   const msg: Partial<Record<typeof state, string>> = {
-    suspended: "متجرك متوقف حالياً وما حدا بيقدر يشوفه.",
-    expired: "اشتراكك خلص ومتجرك متوقف عن الزبائن.",
-    grace: "اشتراكك خلص. المتجر رح يتوقف خلال أيام إذا ما تجدد.",
-    expiring: `اشتراكك بيخلص بعد ${left} يوم.`,
+    suspended: "متجرك متوقف حالياً ولا يمكن لأحد زيارته.",
+    expired: "انتهى اشتراكك، ومتجرك متوقف أمام الزبائن.",
+    grace: "انتهى اشتراكك. سيتوقف المتجر خلال أيام ما لم يُجدَّد.",
+    expiring: `ينتهي اشتراكك بعد ${left} يوم.`,
     trial:
       left != null
-        ? `أنت بالفترة التجريبية، باقي ${Math.max(0, left)} يوم.`
+        ? `أنت في الفترة التجريبية، ومتبقٍّ ${Math.max(0, left)} يوم.`
         : "",
   };
   const text = msg[state];
@@ -173,7 +173,7 @@ function SubscriptionBanner({
       <span>{text}</span>
       {SUPPORT && (
         <a
-          href={`https://wa.me/${SUPPORT}?text=${encodeURIComponent("مرحبا، بدي جدد اشتراك متجري")}`}
+          href={`https://wa.me/${SUPPORT}?text=${encodeURIComponent("مرحباً، أرغب في تجديد اشتراك متجري")}`}
           target="_blank"
           rel="noopener noreferrer"
           className="font-semibold underline"

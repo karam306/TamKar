@@ -53,7 +53,7 @@ export function ImageUploader({
       form.append("file", new File([blob], "image", { type: blob.type || file.type }));
       const res = await upload(form);
       if (res.url) setImages((cur) => [...cur, res.url!]);
-      else setError(res.error || "صار خطأ برفع الصورة");
+      else setError(res.error || "حدث خطأ أثناء رفع الصورة");
       setBusy((b) => b - 1);
     }
     if (input.current) input.current.value = "";
@@ -81,17 +81,17 @@ export function ImageUploader({
             <div className="absolute inset-x-0 bottom-0 flex justify-between bg-black/50 p-1 text-white">
               {max > 1 ? (
                 <span className="flex gap-1">
-                  <button type="button" onClick={() => move(i, -1)} aria-label="قدّم">
+                  <button type="button" onClick={() => move(i, -1)} aria-label="تقديم">
                     →
                   </button>
-                  <button type="button" onClick={() => move(i, 1)} aria-label="أخّر">
+                  <button type="button" onClick={() => move(i, 1)} aria-label="تأخير">
                     ←
                   </button>
                 </span>
               ) : (
                 <span />
               )}
-              <button type="button" onClick={() => setImages((cur) => cur.filter((x) => x !== src))} aria-label="احذف">
+              <button type="button" onClick={() => setImages((cur) => cur.filter((x) => x !== src))} aria-label="حذف">
                 ✕
               </button>
             </div>
@@ -99,7 +99,7 @@ export function ImageUploader({
         ))}
         {Array.from({ length: busy }).map((_, i) => (
           <div key={`b${i}`} className="flex aspect-square animate-pulse items-center justify-center rounded-theme bg-surface text-xs text-muted">
-            جاري الرفع...
+            جارٍ الرفع...
           </div>
         ))}
         {images.length + busy < max && (

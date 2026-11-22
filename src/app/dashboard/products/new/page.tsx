@@ -10,15 +10,15 @@ export default async function NewProductPage() {
   if ((await productRoom(m.db, m.store)) < 1)
     return (
       <div>
-        <PageHeader title="أضف منتج" back="/dashboard/products" />
-        <ProGate feature="إضافة أكتر من 100 منتج" />
+        <PageHeader title="إضافة منتج" back="/dashboard/products" />
+        <ProGate feature="إضافة أكثر من 100 منتج" />
       </div>
     );
   const { categories, collections, optionPresets, specPresets } =
     await formData(m);
   return (
     <div>
-      <PageHeader title="أضف منتج" back="/dashboard/products" />
+      <PageHeader title="إضافة منتج" back="/dashboard/products" />
       <ProductForm
         currency={m.store.currency}
         categories={categories}

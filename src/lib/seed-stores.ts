@@ -25,7 +25,7 @@ type Pack = {
 export const SEED_SLUGS = ["matbakh-test", "lamar-test", "yasmine-test"];
 
 const CUSTOMERS = [
-  { name: "أم محمد", phone: "0933111222", city: "حمص", address: "الإنشاءات، جانب جامع الصحابة" },
+  { name: "أم محمد", phone: "0933111222", city: "حمص", address: "الإنشاءات، بجانب جامع الصحابة" },
   { name: "رنا الحسن", phone: "0944222333", city: "دمشق", address: "المزة فيلات، بناء 12" },
   { name: "أبو سامر", phone: "0955333444", city: "حماة", address: "حي الشريعة، الشارع الرئيسي" },
   { name: "لين خليل", phone: "0966444555", city: "حلب", address: "الفرقان، قرب دوار الكرة الأرضية" },
@@ -41,12 +41,12 @@ const PACKS: Pack[] = [
     name: "بيت المطبخ",
     sub: "paid",
     stock: { k1: 12, k2: 25, k3: 40, k4: 6, k5: 15, k6: 3, k7: 4, k8: 0 },
-    shipping: { delivery: true, pickup_note: "حمص، شارع الحضارة جانب صيدلية الشفاء، من 10 الصبح لـ 9 المسا", branches: [{ id: "inshaat", name: "فرع الإنشاءات", note: "حمص، الإنشاءات، جانب جامع الصحابة", whatsapp: "963933000111" }], default_fee: 3, free_over: 60, rates: [{ city: "حمص", fee: 0 }, { city: "حماة", fee: 2 }, { city: "دمشق", fee: 3 }] },
+    shipping: { delivery: true, pickup_note: "حمص، شارع الحضارة بجانب صيدلية الشفاء، من 10 صباحاً حتى 9 مساءً", branches: [{ id: "inshaat", name: "فرع الإنشاءات", note: "حمص، الإنشاءات، بجانب جامع الصحابة", whatsapp: "963933000111" }], default_fee: 3, free_over: 60, rates: [{ city: "حمص", fee: 0 }, { city: "حماة", fee: 2 }, { city: "دمشق", fee: 3 }] },
     discounts: [
       { code: "WELCOME10", title: "خصم 10% لأول طلب", kind: "percent", value: 10 },
       { code: "FREESHIP", title: "توصيل مجاني فوق 30$", kind: "free_shipping", value: 0, min: 30 },
       { code: null, title: "خصم 5$ على الطلبات فوق 80$", kind: "fixed", value: 5, min: 80, automatic: true },
-      { code: "OLD20", title: "كود منتهي (للتجربة)", kind: "percent", value: 20, expired: true },
+      { code: "OLD20", title: "رمز منتهي الصلاحية (للتجربة)", kind: "percent", value: 20, expired: true },
     ],
     orders: [
       { c: 0, items: [["k1", 1], ["k3", 2]], status: "delivered", daysAgo: 13, pickup: true },
@@ -66,10 +66,10 @@ const PACKS: Pack[] = [
     name: "لمار",
     sub: "trial",
     stock: { f2: 10, f3: 30, f4: 14, f5: 50, f6: 2 },
-    shipping: { delivery: true, pickup_note: "دمشق، الشعلان، من 11 الصبح لـ 10 المسا", default_fee: 2.5, free_over: 75, rates: [{ city: "دمشق", fee: 1 }, { city: "ريف دمشق", fee: 2 }] },
+    shipping: { delivery: true, pickup_note: "دمشق، الشعلان، من 11 صباحاً حتى 10 مساءً", default_fee: 2.5, free_over: 75, rates: [{ city: "دمشق", fee: 1 }, { city: "ريف دمشق", fee: 2 }] },
     discounts: [
-      { code: "LAMAR15", title: "خصم 15% على كل شي", kind: "percent", value: 15, limit: 50 },
-      { code: "SHAL3", title: "3$ خصم فوق 40$", kind: "fixed", value: 3, min: 40 },
+      { code: "LAMAR15", title: "خصم 15% على جميع المنتجات", kind: "percent", value: 15, limit: 50 },
+      { code: "SHAL3", title: "خصم 3$ على الطلبات فوق 40$", kind: "fixed", value: 3, min: 40 },
       { code: null, title: "توصيل مجاني فوق 60$", kind: "free_shipping", value: 0, min: 60, automatic: true },
     ],
     orders: [
@@ -87,10 +87,10 @@ const PACKS: Pack[] = [
     name: "حلويات الياسمين",
     sub: "expiring",
     stock: { h1: 20, h2: 15, h3: 25, h4: 5, h5: 8, h6: 10 },
-    shipping: { delivery: false, pickup_note: "دمشق، الميدان، جانب جامع الدقاق، من 9 الصبح لـ 11 بالليل", default_fee: 15000, free_over: 500000, rates: [{ city: "دمشق", fee: 10000 }, { city: "ريف دمشق", fee: 20000 }] },
+    shipping: { delivery: false, pickup_note: "دمشق، الميدان، بجانب جامع الدقاق، من 9 صباحاً حتى 11 ليلاً", default_fee: 15000, free_over: 500000, rates: [{ city: "دمشق", fee: 10000 }, { city: "ريف دمشق", fee: 20000 }] },
     discounts: [
       { code: "EID", title: "عرض العيد 10%", kind: "percent", value: 10 },
-      { code: "BOX50", title: "50 ألف خصم فوق 400 ألف", kind: "fixed", value: 50000, min: 400000 },
+      { code: "BOX50", title: "خصم 50 ألفاً على الطلبات فوق 400 ألف", kind: "fixed", value: 50000, min: 400000 },
     ],
     orders: [
       { c: 5, items: [["h2", 1], ["h1", 1]], status: "delivered", daysAgo: 10 },
@@ -127,14 +127,14 @@ export async function seedStores(adminEmail: string, origin: string, whatsapp: s
     const base = { name: pack.name, slug: pack.slug, email, password, orders: 0 };
     const { data: taken } = await db.from("stores").select("id").eq("slug", pack.slug).maybeSingle();
     if (taken) {
-      results.push({ ...base, password: "", error: "موجود من قبل. احذف المتاجر التجريبية أول وبعدين أعد الإنشاء" });
+      results.push({ ...base, password: "", error: "موجود مسبقاً. احذف المتاجر التجريبية أولاً ثم أعد الإنشاء" });
       continue;
     }
     try {
       results.push({ ...base, orders: await seedOne(pack, email, password, origin, whatsapp) });
     } catch (e) {
       console.error("seed", pack.slug, e);
-      results.push({ ...base, password: "", error: e instanceof Error ? e.message : "صار خطأ" });
+      results.push({ ...base, password: "", error: e instanceof Error ? e.message : "حدث خطأ" });
     }
   }
   return results;
@@ -145,7 +145,7 @@ async function seedOne(pack: Pack, email: string, password: string, origin: stri
   const demo = demoStores.find((s) => s.id === pack.from)!;
 
   const { data: u, error: ue } = await db.auth.admin.createUser({ email, password, email_confirm: true });
-  if (ue || !u.user) throw new Error(/already|registered|exists/i.test(ue?.message ?? "") ? `في حساب بالإيميل ${email}` : "ما قدرنا ننشئ الحساب");
+  if (ue || !u.user) throw new Error(/already|registered|exists/i.test(ue?.message ?? "") ? `يوجد حساب بالبريد الإلكتروني ${email}` : "تعذّر إنشاء الحساب");
 
   const paidUntil = pack.sub === "trial" ? ymd(new Date(Date.now() + 14 * 86400000)) : pack.sub === "paid" ? ymd(new Date(Date.now() + 90 * 86400000)) : ymd(new Date(Date.now() + 2 * 86400000));
   const { data: store, error: se } = await db
@@ -172,7 +172,7 @@ async function seedOne(pack: Pack, email: string, password: string, origin: stri
     .single();
   if (se || !store) {
     await db.auth.admin.deleteUser(u.user.id);
-    throw new Error("ما قدرنا ننشئ المتجر");
+    throw new Error("تعذّر إنشاء المتجر");
   }
   const sid = store.id as string;
 
@@ -294,7 +294,7 @@ async function seedOne(pack: Pack, email: string, password: string, origin: stri
       const upto = flow.indexOf(o.status);
       const labels: Record<string, string> = o.pickup || !pack.shipping.delivery
         ? { confirmed: "تم تأكيد الطلب مع الزبون", shipped: "الطلب جاهز للاستلام", delivered: "استلم الزبون طلبه ودفع" }
-        : { confirmed: "تم تأكيد الطلب مع الزبون", shipped: "انشحن الطلب مع شركة التوصيل", delivered: "انسلم الطلب وانقبض المبلغ" };
+        : { confirmed: "تم تأكيد الطلب مع الزبون", shipped: "شُحن الطلب مع شركة التوصيل", delivered: "سُلّم الطلب وقُبض المبلغ" };
       flow.slice(0, upto + 1).forEach((s, k) => events.push({ message: labels[s], at: new Date(at.getTime() + (k + 1) * 5 * 3600000) }));
       await db
         .from("orders")
@@ -313,7 +313,7 @@ async function seedOne(pack: Pack, email: string, password: string, origin: stri
   for (const r of ords ?? []) if (!last.has(r.customer_id) || last.get(r.customer_id)! < r.created_at) last.set(r.customer_id, r.created_at);
   for (const [cid, at] of last) await db.from("customers").update({ last_order_at: at, created_at: at }).eq("id", cid);
   const firstCid = [...last.keys()][0];
-  if (firstCid) await db.from("customers").update({ note: "زبونة دائمة، بتحب التوصيل المسائي" }).eq("id", firstCid);
+  if (firstCid) await db.from("customers").update({ note: "زبونة دائمة، تفضّل التوصيل المسائي" }).eq("id", firstCid);
 
   // Visits for the analytics page (last 21 days)
   const stats = Array.from({ length: 21 }, (_, i) => {
@@ -331,9 +331,9 @@ async function seedOne(pack: Pack, email: string, password: string, origin: stri
   await db.from("store_stats").insert(stats);
 
   // Subscription record for the paid store
-  await db.from("store_admin").insert({ store_id: sid, owner_name: "متجر تجريبي", note: "متجر تجريبي للتجربة. ممكن تحذفه من صفحة البيانات التجريبية" });
+  await db.from("store_admin").insert({ store_id: sid, owner_name: "متجر تجريبي", note: "متجر تجريبي. يمكن حذفه من صفحة المتاجر التجريبية" });
   if (pack.sub !== "trial") {
-    await db.from("subscription_payments").insert({ store_id: sid, amount: pack.sub === "paid" ? 45 : 15, currency: "USD", months: pack.sub === "paid" ? 3 : 1, method: "كاش", note: "دفعة تجريبية", paid_until: paidUntil });
+    await db.from("subscription_payments").insert({ store_id: sid, amount: pack.sub === "paid" ? 45 : 15, currency: "USD", months: pack.sub === "paid" ? 3 : 1, method: "نقداً", note: "دفعة تجريبية", paid_until: paidUntil });
   }
   return count;
 }

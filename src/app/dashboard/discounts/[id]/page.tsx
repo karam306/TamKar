@@ -31,7 +31,7 @@ export default async function EditDiscountPage({
         </summary>
         <form action={deleteDiscount} className="mt-3 flex items-center gap-3">
           <input type="hidden" name="id" value={d.id} />
-          <button className="btn !bg-[#c70a24]">احذف</button>
+          <button className="btn !bg-[#c70a24]">حذف</button>
         </form>
       </details>
     </div>

@@ -39,7 +39,7 @@ export const NEXT_STEP: Partial<
   Record<OrderStatus, { to: OrderStatus; label: string }>
 > = {
   new: { to: "confirmed", label: "تأكيد الطلب" },
-  confirmed: { to: "shipped", label: "طلع للتوصيل" },
+  confirmed: { to: "shipped", label: "خرج للتوصيل" },
   shipped: { to: "delivered", label: "تم التوصيل" },
 };
 

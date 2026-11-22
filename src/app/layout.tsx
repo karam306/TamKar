@@ -4,7 +4,7 @@ import { BRAND } from "@/lib/brand";
 
 export const metadata: Metadata = {
   title: BRAND,
-  description: "افتح متجرك أونلاين خلال دقائق",
+  description: "أنشئ متجرك الإلكتروني خلال دقائق",
 };
 
 export const viewport: Viewport = { width: "device-width", initialScale: 1 };

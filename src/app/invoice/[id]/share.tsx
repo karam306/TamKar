@@ -19,13 +19,13 @@ export function ShareInvoice({ orderId, phone, number, storeName }: { orderId: s
         const url = await invoiceLink(orderId);
         setBusy(false);
         if (!url) return w?.close();
-        const text = `مرحبا، هي فاتورة طلبك رقم #${number} من ${storeName}:\n${window.location.origin}${url}`;
+        const text = `مرحباً، هذه فاتورة طلبك رقم #${number} من ${storeName}:\n${window.location.origin}${url}`;
         const wa = `https://wa.me/${normalizeWhatsapp(phone)}?text=${encodeURIComponent(text)}`;
         if (w) w.location.href = wa;
         else window.location.href = wa;
       }}
     >
-      {busy ? "..." : "ابعت الفاتورة للزبون عالواتساب"}
+      {busy ? "..." : "إرسال الفاتورة إلى الزبون عبر واتساب"}
     </button>
   );
 }

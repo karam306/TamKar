@@ -31,7 +31,7 @@ export async function disconnectTelegram() {
 export async function testTelegram(): Promise<{ ok?: string; error?: string }> {
   const { store } = await requireOwner();
   const chat = await storeChat(store.id);
-  if (!chat) return { error: "تيليغرام مو مربوط" };
-  const r = await sendTelegram(chat, `🔔 رسالة تجربة من ${store.name}. الإشعارات شغّالة.`);
-  return r.ok ? { ok: "✓ انبعتت، شوف تيليغرام" } : { error: "ما وصلت. يمكن وقفت البوت؟ جرّب تربط من جديد." };
+  if (!chat) return { error: "تيليغرام غير مرتبط" };
+  const r = await sendTelegram(chat, `🔔 رسالة تجريبية من ${store.name}. الإشعارات تعمل.`);
+  return r.ok ? { ok: "✓ أُرسلت، تحقق من تيليغرام" } : { error: "لم تصل الرسالة. ربما أوقفت البوت؟ حاول الربط من جديد." };
 }

@@ -4,7 +4,7 @@ import { useFormStatus } from "react-dom";
 
 export type FormState = { error?: string; ok?: string } | undefined;
 
-export function SubmitButton({ children, pendingText = "جاري الحفظ...", className = "" }: { children: React.ReactNode; pendingText?: string; className?: string }) {
+export function SubmitButton({ children, pendingText = "جارٍ الحفظ...", className = "" }: { children: React.ReactNode; pendingText?: string; className?: string }) {
   const { pending } = useFormStatus();
   return (
     <button type="submit" disabled={pending} className={`btn ${className}`}>

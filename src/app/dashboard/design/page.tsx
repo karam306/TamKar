@@ -35,10 +35,10 @@ export default async function DesignPage() {
               </option>
             ))}
           </select>
-          <button className="btn">طبّق القالب</button>
+          <button className="btn">تطبيق القالب</button>
           <span className="text-muted">
-            بيغيّر الألوان وأقسام الصفحة الرئيسية، وبيضيف الصفحات الناقصة.
-            منتجاتك ما بتتأثر.
+            يغيّر الألوان وأقسام الصفحة الرئيسية، ويضيف الصفحات الناقصة.
+            لا تتأثر منتجاتك.
           </span>
         </form>
       </details>

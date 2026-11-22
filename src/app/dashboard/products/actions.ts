@@ -17,7 +17,7 @@ export async function uploadImage(
   try {
     return { url: await saveImage(store.id, form.get("file") as File) };
   } catch (e) {
-    return { error: e instanceof Error ? e.message : "صار خطأ" };
+    return { error: e instanceof Error ? e.message : "حدث خطأ" };
   }
 }
 
@@ -64,7 +64,7 @@ function cleanVariants(
 
   const combos = combinations(options);
   if (combos.length > 100)
-    return { error: "عدد الخيارات كبير كتير (الحد 100)" };
+    return { error: "عدد الخيارات كبير جداً (الحد الأقصى 100)" };
   const sent = Array.isArray(rawVariants)
     ? (rawVariants as Partial<Variant>[])
     : [];
@@ -80,9 +80,9 @@ function cleanVariants(
     const stock = toNum(match?.stock);
     const title = combo.join(" / ");
     if (price === null || Number.isNaN(price))
-      return { error: `اكتب سعر للخيار "${title}"` };
+      return { error: `أدخل سعراً للخيار "${title}"` };
     if (Number.isNaN(stock) || Number.isNaN(compare))
-      return { error: `في رقم غير صحيح بالخيار "${title}"` };
+      return { error: `يوجد رقم غير صحيح في الخيار "${title}"` };
     variants.push({
       id:
         typeof match?.id === "string" && /^[\w-]{1,40}$/.test(match.id)
@@ -126,8 +126,8 @@ export async function saveProduct(
   const withVariants = v.variants.length > 0;
   if (withVariants) price = Math.min(...v.variants.map((x) => x.price));
 
-  if (!title) return { error: "اكتب اسم المنتج" };
-  if (price === null || Number.isNaN(price)) return { error: "اكتب سعر صحيح" };
+  if (!title) return { error: "أدخل اسم المنتج" };
+  if (price === null || Number.isNaN(price)) return { error: "أدخل سعراً صحيحاً" };
   if (Number.isNaN(compare)) return { error: "السعر قبل الخصم غير صحيح" };
   if (Number.isNaN(stockRaw)) return { error: "الكمية غير صحيحة" };
 
@@ -179,14 +179,14 @@ export async function saveProduct(
       .update(row)
       .eq("id", id)
       .eq("store_id", store.id);
-    if (error) return { error: "ما قدرنا نحفظ، جرب مرة تانية" };
+    if (error) return { error: "تعذّر الحفظ، حاول مرة أخرى" };
     await deleteImages(
       store.id,
       ((old?.images as string[]) ?? []).filter((u) => !images.includes(u)),
     );
     revalidatePath("/dashboard/products");
     refresh();
-    return { ok: "✓ انحفظ المنتج" };
+    return { ok: "✓ تم حفظ المنتج" };
   }
   if ((await productRoom(db, store)) < 1) return { error: LIMIT_MSG };
   const { data, error } = await db
@@ -194,7 +194,7 @@ export async function saveProduct(
     .insert(row)
     .select("id")
     .single();
-  if (error || !data) return { error: "ما قدرنا نحفظ، جرب مرة تانية" };
+  if (error || !data) return { error: "تعذّر الحفظ، حاول مرة أخرى" };
   revalidatePath("/dashboard/products");
   refresh();
   redirect(`/dashboard/products/${data.id}?created=1`);

@@ -27,8 +27,8 @@ export function WalletPay({
     <div className="mx-auto max-w-md px-4 py-10">
       <div className="mb-6 text-center">
         <div className="mb-2 text-4xl">{info.icon}</div>
-        <h1 className="mb-1 text-2xl">آخر خطوة: الدفع عبر {info.name}</h1>
-        <p className="text-sm text-muted">انحفظ طلبك رقم #{number}. حوّل المبلغ، وبعدين ابعتلنا الإيصال على واتساب.</p>
+        <h1 className="mb-1 text-2xl">الخطوة الأخيرة: الدفع عبر {info.name}</h1>
+        <p className="text-sm text-muted">تم حفظ طلبك رقم #{number}. حوّل المبلغ، ثم أرسل إلينا الإيصال عبر واتساب.</p>
       </div>
 
       <div className="space-y-3 rounded-theme bg-surface p-4">
@@ -44,7 +44,7 @@ export function WalletPay({
           <div className="rounded-theme bg-white p-3 text-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={wallet.qr} alt={`QR ${info.name}`} className="mx-auto max-h-64 w-auto" />
-            <p className="mt-2 text-xs text-muted">إذا عم تدفع من موبايل تاني، امسح هالرمز من التطبيق</p>
+            <p className="mt-2 text-xs text-muted">إذا كنت تدفع من هاتف آخر، امسح هذا الرمز من التطبيق</p>
           </div>
         )}
       </div>
@@ -58,17 +58,17 @@ export function WalletPay({
         ))}
         <li className="flex gap-3">
           <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-xs text-white">{info.steps.length + 1}</span>
-          <span className="pt-0.5">ابعت الطلب على واتساب وارفق صورة الإيصال</span>
+          <span className="pt-0.5">أرسل الطلب عبر واتساب وأرفق صورة الإيصال</span>
         </li>
       </ol>
 
       <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="btn w-full !bg-[#25D366]">
-        دفعت، ابعت الطلب على واتساب
+        تم الدفع، أرسل الطلب عبر واتساب
       </a>
-      <p className="mt-3 text-center text-xs text-muted">المحل بيأكد طلبك بعد ما توصله الدفعة.</p>
+      <p className="mt-3 text-center text-xs text-muted">يؤكد المحل طلبك بعد وصول الدفعة.</p>
       <div className="mt-4 text-center">
         <StoreLink href="/" className="text-sm text-primary">
-          الرجوع للمتجر
+          العودة إلى المتجر
         </StoreLink>
       </div>
     </div>
@@ -103,7 +103,7 @@ function CopyRow({ label, shown, value, big, mono }: { label: string; shown: str
         </div>
       </div>
       <button type="button" onClick={copy} className="btn btn-outline shrink-0 !px-3 !py-1.5 text-sm">
-        {copied ? "✓ انتسخ" : "انسخ"}
+        {copied ? "✓ تم النسخ" : "نسخ"}
       </button>
     </div>
   );

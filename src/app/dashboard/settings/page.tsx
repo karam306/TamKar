@@ -18,7 +18,7 @@ export default async function SettingsPage() {
           <span className="text-2xl">{store.shipping?.delivery ? "🚚" : "🏪"}</span>
           <span className="flex-1">
             <b className="block text-sm">الاستلام والتوصيل</b>
-            <span className="text-[13px] text-muted">{store.shipping?.delivery ? "استلام من المحل + توصيل" : "استلام من المحل بس"}</span>
+            <span className="text-[13px] text-muted">{store.shipping?.delivery ? "الاستلام من المحل والتوصيل" : "الاستلام من المحل فقط"}</span>
           </span>
           <span className="text-muted">←</span>
         </Link>
@@ -27,7 +27,7 @@ export default async function SettingsPage() {
           <span className="flex-1">
             <b className="block text-sm">طرق الدفع</b>
             <span className="text-[13px] text-muted">
-              {storeWallets(store).length ? `كاش + ${storeWallets(store).map((w) => WALLETS[w.id].short).join("، ")}` : "كاش عند الاستلام. ضيف شام كاش أو سيرياتل كاش"}
+              {storeWallets(store).length ? `نقداً + ${storeWallets(store).map((w) => WALLETS[w.id].short).join("، ")}` : "نقداً عند الاستلام. أضف شام كاش أو سيرياتل كاش"}
             </span>
           </span>
           <span className="text-muted">←</span>
@@ -36,7 +36,7 @@ export default async function SettingsPage() {
           <span className="text-2xl">🔔</span>
           <span className="flex-1">
             <b className="block text-sm">إشعارات تيليغرام</b>
-            <span className="text-[13px] text-muted">{tgChat ? "✓ مربوط" : "خلي كل طلب جديد يوصلك فوراً"}</span>
+            <span className="text-[13px] text-muted">{tgChat ? "✓ مربوط" : "لتصلك الطلبات الجديدة فوراً"}</span>
           </span>
           <span className="text-muted">←</span>
         </Link>
@@ -44,7 +44,7 @@ export default async function SettingsPage() {
           <span className="text-2xl">👥</span>
           <span className="flex-1">
             <b className="block text-sm">الموظفين {!isPro(store) && "🔒"}</b>
-            <span className="text-[13px] text-muted">حسابات لموظفينك يستلموا الطلبات</span>
+            <span className="text-[13px] text-muted">حسابات لموظفيك لإدارة الطلبات</span>
           </span>
           <span className="text-muted">←</span>
         </Link>
@@ -70,14 +70,14 @@ export default async function SettingsPage() {
       <section className="space-y-2 card p-5 text-sm">
         <h2 className="text-lg">الحساب والاشتراك</h2>
         <p>
-          الإيميل: <span dir="ltr">{user.email}</span>
+          البريد الإلكتروني: <span dir="ltr">{user.email}</span>
         </p>
         <p>
           رابط المتجر: <span dir="ltr">{store.slug}</span>
         </p>
         <p>الباقة: {PLAN_LABELS[store.plan ?? ""] ?? store.plan}</p>
         {!isPro(store) && <ProGate feature="الموظفين والفروع والفواتير وربط الإعلانات" compact />}
-        {paid && <p>الاشتراك فعّال لغاية: {paid}</p>}
+        {paid && <p>الاشتراك فعّال حتى: {paid}</p>}
       </section>
     </div>
   );

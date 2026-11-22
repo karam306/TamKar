@@ -65,7 +65,7 @@ export async function setPaid(form: FormData) {
     await addEvent(
       id,
       store.id,
-      paid ? "تم استلام المبلغ" : "رجع الطلب لحالة غير مدفوع",
+      paid ? "تم استلام المبلغ" : "أُعيد الطلب إلى حالة غير مدفوع",
     );
   revalidatePath(`/dashboard/orders/${id}`);
   refresh();
@@ -121,7 +121,7 @@ export async function createManualOrder(
   try {
     items = JSON.parse(String(form.get("items") ?? "[]"));
   } catch {}
-  if (!items.length) return { error: "ضيف منتج واحد على الأقل" };
+  if (!items.length) return { error: "أضف منتجاً واحداً على الأقل" };
   const res = await createOrder(
     own,
     {
@@ -169,7 +169,7 @@ export async function processReturn(
   try {
     p = JSON.parse(String(form.get("payload") ?? "{}"));
   } catch {
-    return { error: "صار خطأ، جرب مرة تانية" };
+    return { error: "حدث خطأ، حاول مرة أخرى" };
   }
   const lines = (a: unknown) =>
     (Array.isArray(a) ? a : [])
@@ -203,19 +203,19 @@ export async function processReturn(
       error.code === "42883" ||
       /process_return/.test(m)
     )
-      return { error: "لازم يتشغّل تحديث 011 بقاعدة البيانات أول" };
+      return { error: "يجب تشغيل التحديث 011 في قاعدة البيانات أولاً" };
     if (m.includes("TOO_MANY_RETURNED"))
-      return { error: "عم ترجّع قطع أكتر من اللي انطلبت (أو رجعت قبل)" };
+      return { error: "الكمية المُعادة أكبر من الكمية المطلوبة (أو أُعيدت من قبل)" };
     if (m.includes("REFUND_TOO_BIG"))
-      return { error: "المبلغ اللي عم ترجعه أكبر من اللي دفعه الزبون" };
+      return { error: "المبلغ المُعاد أكبر مما دفعه الزبون" };
     if (m.includes("NOTHING_TO_DO"))
-      return { error: "اختار قطع ترجع، أو منتج للتبديل، أو مبلغ" };
+      return { error: "اختر قطعاً لإعادتها، أو منتجاً للتبديل، أو مبلغاً" };
     if (m.includes("ORDER_CANCELLED")) return { error: "الطلب ملغي" };
     const out = m.match(/OUT_OF_STOCK:([^\n]+)/);
-    if (out) return { error: `ما في كمية كافية من ${out[1]}` };
+    if (out) return { error: `لا تتوفر كمية كافية من ${out[1]}` };
     const vr = m.match(/VARIANT_REQUIRED:([^\n]+)/);
-    if (vr) return { error: `اختار المقاس أو اللون لـ ${vr[1]}` };
-    return { error: "ما قدرنا نسجل الاسترجاع، جرب مرة تانية" };
+    if (vr) return { error: `اختر المقاس أو اللون للمنتج ${vr[1]}` };
+    return { error: "تعذّر تسجيل الاسترجاع، حاول مرة أخرى" };
   }
   revalidatePath(`/dashboard/orders/${id}`);
   revalidatePath("/dashboard/orders");

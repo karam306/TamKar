@@ -64,7 +64,7 @@ export default async function EditCollectionPage({
       />
       {created && (
         <p className="card mb-4 p-3 text-[13px]">
-          ✓ انعملت المجموعة. ضيف منتجات إلها من تحت.
+          ✓ أُنشئت المجموعة. أضف إليها منتجات من الأسفل.
         </p>
       )}
       <CollectionForm collection={collection} />
@@ -77,7 +77,7 @@ export default async function EditCollectionPage({
           <input
             name="q"
             defaultValue={q}
-            placeholder="ابحث عن منتج لتضيفه..."
+            placeholder="ابحث عن منتج لإضافته..."
             className="input"
           />
           <button className="btn btn-outline">بحث</button>
@@ -89,7 +89,7 @@ export default async function EditCollectionPage({
           >
             <input type="hidden" name="id" value={id} />
             {candidates.length === 0 ? (
-              <p className="p-2 text-muted">ما في نتائج</p>
+              <p className="p-2 text-muted">لا توجد نتائج</p>
             ) : (
               candidates.map((p) => (
                 <label
@@ -107,7 +107,7 @@ export default async function EditCollectionPage({
               ))
             )}
             {candidates.length > 0 && (
-              <button className="btn">أضف المحددين</button>
+              <button className="btn">إضافة المحدد</button>
             )}
           </form>
         )}
@@ -139,7 +139,7 @@ export default async function EditCollectionPage({
                   value={p.id as string}
                 />
                 <button className="text-xs text-muted hover:text-red-700">
-                  شيل
+                  إزالة
                 </button>
               </form>
             </li>
@@ -156,8 +156,8 @@ export default async function EditCollectionPage({
           className="mt-3 flex items-center gap-3"
         >
           <input type="hidden" name="id" value={id} />
-          <span className="text-muted">المنتجات ما بتنحذف، بس المجموعة.</span>
-          <button className="btn !bg-[#c70a24]">احذف</button>
+          <span className="text-muted">تُحذف المجموعة فقط، ولا تُحذف المنتجات.</span>
+          <button className="btn !bg-[#c70a24]">حذف</button>
         </form>
       </details>
     </div>

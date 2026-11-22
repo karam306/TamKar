@@ -64,8 +64,8 @@ export function ReturnForm({
       <section className="card grid grid-cols-2 gap-2 p-2">
         {(
           [
-            ["refund", "↩ استرجاع", "الزبون رجّع قطع، وبترجعله مصاريه"],
-            ["exchange", "🔄 تبديل", "الزبون رجّع قطع وأخد غيرها (مقاس تاني، لون، منتج تاني)"],
+            ["refund", "↩ استرجاع", "أعاد الزبون قطعاً، وتُعيد إليه المبلغ"],
+            ["exchange", "🔄 تبديل", "أعاد الزبون قطعاً وأخذ غيرها (مقاس أو لون أو منتج آخر)"],
           ] as const
         ).map(([k, label, hint]) => (
           <button
@@ -84,8 +84,8 @@ export function ReturnForm({
       </section>
 
       <section className="card space-y-3 p-4">
-        <h2 className="text-sm font-semibold">شو رجّع الزبون؟</h2>
-        {nothingLeft && <p className="text-[13px] text-muted">كل قطع هالطلب رجعت من قبل.</p>}
+        <h2 className="text-sm font-semibold">ما الذي أعاده الزبون؟</h2>
+        {nothingLeft && <p className="text-[13px] text-muted">أُعيدت جميع قطع هذا الطلب من قبل.</p>}
         <ul className="divide-y divide-black/5">
           {lines.map((l, i) => (
             <li key={`${l.productId}|${l.variantId ?? ""}`} className="flex items-center gap-3 py-2.5 text-[13px]">
@@ -99,8 +99,8 @@ export function ReturnForm({
                 <div className="font-semibold">{l.title}</div>
                 <div className="text-xs text-muted">
                   {l.variantTitle ? `${l.variantTitle} · ` : ""}
-                  {money(l.price)} · انطلب {l.ordered}
-                  {l.remaining < l.ordered ? ` · رجع منهم ${l.ordered - l.remaining}` : ""}
+                  {money(l.price)} · الكمية المطلوبة {l.ordered}
+                  {l.remaining < l.ordered ? ` · أُعيد منها ${l.ordered - l.remaining}` : ""}
                 </div>
               </div>
               <Stepper value={qty[i]} max={l.remaining} onChange={(n) => setQty(qty.map((q, j) => (j === i ? n : q)))} />
@@ -109,7 +109,7 @@ export function ReturnForm({
         </ul>
         <label className="flex items-center gap-2 text-[13px]">
           <input type="checkbox" checked={restock} onChange={(e) => setRestock(e.target.checked)} className="h-4 w-4 accent-black" />
-          رجّع القطع للمخزون (شيلها إذا القطعة تالفة وما رح تنباع)
+          إعادة القطع إلى المخزون (ألغِ التحديد إذا كانت القطعة تالفة ولن تُباع)
         </label>
       </section>
 
@@ -117,23 +117,23 @@ export function ReturnForm({
 
       <section className="card space-y-3 p-4 text-[13px]">
         <h2 className="text-sm font-semibold">الحساب</h2>
-        <Row label="قيمة القطع اللي رجعت" value={money(back)} />
+        <Row label="قيمة القطع المُعادة" value={money(back)} />
         {kind === "exchange" && <Row label="قيمة القطع الجديدة" value={money(out)} />}
-        {hadDiscount && back > 0 && <p className="rounded-lg bg-[#fff4d6] p-2">الطلب كان عليه خصم، يمكن لازم ترجّع أقل من السعر الكامل. عدّل المبلغ تحت إذا لزم.</p>}
+        {hadDiscount && back > 0 && <p className="rounded-lg bg-[#fff4d6] p-2">كان على الطلب خصم، وقد يلزم إعادة مبلغ أقل من السعر الكامل. عدّل المبلغ أدناه عند الحاجة.</p>}
         {extra > 0 ? (
           <label className="block space-y-1">
-            <span className="font-semibold">الزبون بيدفع زيادة</span>
+            <span className="font-semibold">المبلغ الإضافي الذي يدفعه الزبون</span>
             <input value={amount ?? String(extra)} onChange={(e) => setAmount(e.target.value)} inputMode="decimal" className="input" dir="ltr" />
           </label>
         ) : (
           <label className="block space-y-1">
-            <span className="font-semibold">المبلغ اللي رجّعته للزبون</span>
+            <span className="font-semibold">المبلغ المُعاد للزبون</span>
             <input value={amount ?? String(suggested)} onChange={(e) => setAmount(e.target.value)} inputMode="decimal" className="input" dir="ltr" />
-            <span className="text-xs text-muted">أكتر شي فيك ترجّع {money(maxRefund)}. حط 0 إذا ما رجّعت مصاري (مثلاً بدّل بنفس السعر).</span>
+            <span className="text-xs text-muted">الحد الأقصى للمبلغ المُعاد {money(maxRefund)}. أدخل 0 إذا لم تُعِد أي مبلغ (مثلاً عند التبديل بالسعر نفسه).</span>
           </label>
         )}
         <label className="block space-y-1">
-          <span className="font-semibold">كيف رجّعت أو استلمت المبلغ؟</span>
+          <span className="font-semibold">طريقة إعادة المبلغ أو استلامه</span>
           <select value={method} onChange={(e) => setMethod(e.target.value)} className="input">
             {methods.map((m) => (
               <option key={m}>{m}</option>
@@ -147,7 +147,7 @@ export function ReturnForm({
       </section>
 
       <FormMessage state={state} />
-      <SubmitButton pendingText="جاري التسجيل...">{kind === "exchange" ? "سجّل التبديل" : "سجّل الاسترجاع"}</SubmitButton>
+      <SubmitButton pendingText="جارٍ التسجيل...">{kind === "exchange" ? "تسجيل التبديل" : "تسجيل الاسترجاع"}</SubmitButton>
     </form>
   );
 }
@@ -164,11 +164,11 @@ function Row({ label, value }: { label: string; value: string }) {
 function Stepper({ value, max, onChange }: { value: number; max: number; onChange: (n: number) => void }) {
   return (
     <div className="flex items-center rounded-lg border border-black/15">
-      <button type="button" disabled={value <= 0} onClick={() => onChange(value - 1)} className="px-2.5 py-1 text-lg leading-none disabled:opacity-30" aria-label="نقّص">
+      <button type="button" disabled={value <= 0} onClick={() => onChange(value - 1)} className="px-2.5 py-1 text-lg leading-none disabled:opacity-30" aria-label="إنقاص">
         −
       </button>
       <span className="w-7 text-center font-semibold">{value}</span>
-      <button type="button" disabled={value >= max} onClick={() => onChange(value + 1)} className="px-2.5 py-1 text-lg leading-none disabled:opacity-30" aria-label="زيد">
+      <button type="button" disabled={value >= max} onClick={() => onChange(value + 1)} className="px-2.5 py-1 text-lg leading-none disabled:opacity-30" aria-label="زيادة">
         +
       </button>
     </div>
@@ -198,7 +198,7 @@ function ExchangePicker({ currency, lines, setLines }: { currency: Currency; lin
 
   return (
     <section className="card space-y-3 p-4">
-      <h2 className="text-sm font-semibold">شو أخد بدالها؟</h2>
+      <h2 className="text-sm font-semibold">ما البديل الذي أخذه؟</h2>
       {lines.length > 0 && (
         <ul className="divide-y divide-black/5 rounded-lg border border-black/10">
           {lines.map((l) => (
@@ -244,7 +244,7 @@ function ExchangePicker({ currency, lines, setLines }: { currency: Currency; lin
                 <span className="font-semibold">{p.title}</span>
                 <span className="text-muted">
                   {money(Number(p.price))}
-                  {p.stock != null && ` · ${p.stock} بالمخزون`}
+                  {p.stock != null && ` · ${p.stock} في المخزون`}
                 </span>
               </button>
             </li>

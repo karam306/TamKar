@@ -256,11 +256,11 @@ export function validateCustomer(
   const city = clean(input.city, 60);
   const address = clean(input.address, 300);
   const notes = clean(input.notes, 500);
-  if (name.length < 2) return { ok: false, error: "اكتب الاسم من فضلك" };
+  if (name.length < 2) return { ok: false, error: "يُرجى إدخال الاسم" };
   if (phone.replace(/\D/g, "").length < 9)
     return { ok: false, error: "رقم الهاتف غير صحيح" };
   if (method === "delivery" && (!city || address.length < 4))
-    return { ok: false, error: "اكتب المدينة والعنوان بالتفصيل" };
+    return { ok: false, error: "يُرجى إدخال المدينة والعنوان بالتفصيل" };
   return { ok: true, value: { name, phone, city, address, notes, method } };
 }
 
@@ -275,23 +275,23 @@ function orderError(message: string): string {
     case "NOT_AVAILABLE":
       return `المنتج "${detail?.trim()}" لم يعد متوفراً`;
     case "VARIANT_REQUIRED":
-      return `اختار المقاس أو اللون لـ "${detail?.trim()}"`;
+      return `اختر المقاس أو اللون للمنتج "${detail?.trim()}"`;
     case "EMPTY":
-      return "السلة فاضية";
+      return "السلة فارغة";
     case "BAD_CODE":
-      return "كود الخصم غير صحيح";
+      return "رمز الخصم غير صحيح";
     case "CODE_EXPIRED":
-      return "كود الخصم منتهي";
+      return "انتهت صلاحية رمز الخصم";
     case "CODE_USED_UP":
-      return "كود الخصم انستخدم لآخر مرة";
+      return "استُنفد استخدام رمز الخصم";
     case "NO_DELIVERY":
-      return "هالمتجر ما عنده توصيل، الاستلام من المحل";
+      return "لا يوفّر هذا المتجر خدمة التوصيل، الاستلام من المحل فقط";
     case "CODE_DELIVERY_ONLY":
-      return "هالكود للتوصيل المجاني، بيشتغل بس إذا اخترت التوصيل";
+      return "هذا الرمز للتوصيل المجاني، ويعمل فقط عند اختيار التوصيل";
     case "CODE_MIN":
-      return `كود الخصم بيشتغل على طلبات من ${detail} وفوق`;
+      return `يسري رمز الخصم على الطلبات بقيمة ${detail} فأكثر`;
     default:
-      return "صار خطأ، جرب مرة تانية";
+      return "حدث خطأ، حاول مرة أخرى";
   }
 }
 
@@ -418,7 +418,7 @@ export async function createOrder(
       qty: Math.floor(Number(i.qty)),
     }))
     .filter((i) => Number.isFinite(i.qty) && i.qty >= 1 && i.qty <= 999);
-  if (clean.length === 0) return { ok: false, error: "السلة فاضية" };
+  if (clean.length === 0) return { ok: false, error: "السلة فارغة" };
   const choices = paymentChoices(store);
   const payment: PaymentMethod =
     customer.payment && choices.includes(customer.payment)
@@ -426,7 +426,7 @@ export async function createOrder(
       : choices[0];
   const gift = cleanGift(store, c.value.method, customer.gift);
   if (gift === "missing")
-    return { ok: false, error: "اكتب اسم الشخص اللي رح يستلم الهدية" };
+    return { ok: false, error: "أدخل اسم مستلم الهدية" };
 
   if (!hasSupabase || isDemoStore(store.id)) {
     // Demo stores: nothing is saved.
@@ -448,7 +448,7 @@ export async function createOrder(
         qty: i.qty,
       });
     }
-    if (!lines.length) return { ok: false, error: "السلة فاضية" };
+    if (!lines.length) return { ok: false, error: "السلة فارغة" };
     const subtotal = lines.reduce((s, l) => s + l.price * l.qty, 0);
     const v = c.value;
     const pr = demoPricing(

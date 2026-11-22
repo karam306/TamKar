@@ -21,14 +21,14 @@ export default async function SalesmenPage() {
 
   return (
     <div className="space-y-4">
-      <PageHeader title="المندوبين" />
-      <Card title="ضيف مندوب">
+      <PageHeader title="المندوبون" />
+      <Card title="إضافة مندوب">
         <AddSalesmanForm />
       </Card>
 
       {salesmen.length === 0 ? (
         <Card>
-          <p className="py-6 text-center text-[13px] text-muted">ما في مندوبين لسا. ضيف أول واحد من فوق.</p>
+          <p className="py-6 text-center text-[13px] text-muted">لا يوجد مندوبون بعد. أضف أول مندوب من الأعلى.</p>
         </Card>
       ) : (
         salesmen.map((m) => {
@@ -49,14 +49,14 @@ export default async function SalesmenPage() {
                 <form action={toggleSalesman}>
                   <input type="hidden" name="id" value={m.id} />
                   <input type="hidden" name="active" value={m.active ? "0" : "1"} />
-                  <button className="text-[13px] text-muted hover:underline">{m.active ? "أوقف" : "فعّل"}</button>
+                  <button className="text-[13px] text-muted hover:underline">{m.active ? "إيقاف" : "تفعيل"}</button>
                 </form>
               }
             >
               <div className="mb-3 grid grid-cols-3 gap-2 text-center">
                 <Num label="كل المتاجر" value={mine.length} />
-                <Num label="هالشهر" value={thisMonth.length} />
-                <Num label="عم تدفع" value={paying.length} />
+                <Num label="هذا الشهر" value={thisMonth.length} />
+                <Num label="تدفع حالياً" value={paying.length} />
               </div>
               <CopyRef link={link} phone={m.phone} />
               {mine.length > 0 && (
@@ -67,7 +67,7 @@ export default async function SalesmenPage() {
                         {s.name}
                       </Link>
                       <span className="text-muted">{new Date(s.created_at).toLocaleDateString("en-GB")}</span>
-                      <span>{s.plan === "trial" ? "تجريبي" : paying.includes(s) ? "✓ عم يدفع" : "متوقف"}</span>
+                      <span>{s.plan === "trial" ? "تجريبي" : paying.includes(s) ? "✓ يدفع" : "متوقف"}</span>
                     </li>
                   ))}
                 </ul>
@@ -78,7 +78,7 @@ export default async function SalesmenPage() {
       )}
 
       {heard.size > 0 && (
-        <Card title="من وين سمعوا عنا">
+        <Card title="كيف عرفوا بنا">
           <ul className="space-y-1 text-[13px]">
             {[...heard.entries()]
               .sort((a, b) => b[1] - a[1])

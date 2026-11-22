@@ -32,7 +32,7 @@ export default async function ReturnPage({ params }: { params: Promise<{ id: str
   }));
   const extras = returns.reduce((t, r) => t + Number(r.extra_charge), 0);
   const maxRefund = Math.max(0, Number(o.total) + extras - Number((o as { refunded?: number }).refunded ?? 0));
-  const methods = ["كاش", ...storeWallets(store).map((w) => WALLETS[w.id].name), "غير هيك"];
+  const methods = ["نقداً", ...storeWallets(store).map((w) => WALLETS[w.id].name), "طريقة أخرى"];
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -47,7 +47,7 @@ export default async function ReturnPage({ params }: { params: Promise<{ id: str
           maxRefund={maxRefund}
           hadDiscount={Number(o.discount_amount ?? 0) > 0}
           methods={methods}
-          defaultMethod={o.payment_method && o.payment_method !== "cod" ? WALLETS[o.payment_method]?.name ?? "كاش" : "كاش"}
+          defaultMethod={o.payment_method && o.payment_method !== "cod" ? WALLETS[o.payment_method]?.name ?? "نقداً" : "نقداً"}
         />
       )}
     </div>

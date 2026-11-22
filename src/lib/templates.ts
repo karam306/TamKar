@@ -1,9 +1,9 @@
 import type { Section, SectionType, ThemeId } from "./types";
 
 export const THEMES: { id: ThemeId; name: string; description: string; color: string }[] = [
-  { id: "classic", name: "الكلاسيكي", description: "هادئ ومرتب، بيناسب أغلب المتاجر", color: "#0f5c4d" },
+  { id: "classic", name: "الكلاسيكي", description: "هادئ ومنظّم، يناسب معظم المتاجر", color: "#0f5c4d" },
   { id: "bold", name: "الجريء", description: "خط عريض وزوايا حادة، للأزياء والإلكترونيات", color: "#c2185b" },
-  { id: "soft", name: "الناعم", description: "ألوان دافئة وزوايا مدورة، للحلويات والهدايا", color: "#8d5a2b" },
+  { id: "soft", name: "الناعم", description: "ألوان دافئة وزوايا دائرية، للحلويات والهدايا", color: "#8d5a2b" },
 ];
 
 export const SECTION_LABELS: Record<SectionType, string> = {
@@ -24,31 +24,31 @@ export const SECTION_LABELS: Record<SectionType, string> = {
 export function newSection(type: SectionType): Section {
   switch (type) {
     case "announcement":
-      return { type, text: "توصيل لكل المحافظات" };
+      return { type, text: "توصيل إلى جميع المحافظات" };
     case "hero":
-      return { type, title: "أهلاً بكم بمتجرنا", subtitle: "اكتشف منتجاتنا واطلب بكل سهولة", buttonText: "شوف المنتجات" };
+      return { type, title: "أهلاً بكم في متجرنا", subtitle: "اكتشف منتجاتنا واطلب بسهولة", buttonText: "تصفّح المنتجات" };
     case "categories":
       return { type, title: "تصفح حسب القسم" };
     case "featured_products":
       return { type, title: "منتجاتنا", limit: 8 };
     case "image_text":
-      return { type, title: "مين نحنا", text: "احكي لزبائنك قصة متجرك وشو بيميزك." };
+      return { type, title: "من نحن", text: "عرّف زبائنك بقصة متجرك وما يميّزه." };
     case "testimonials":
-      return { type, title: "شو قالوا زباينا", items: [{ name: "زبون", text: "تجربة ممتازة وتوصيل سريع" }] };
+      return { type, title: "آراء زبائننا", items: [{ name: "زبون", text: "تجربة ممتازة وتوصيل سريع" }] };
     case "whatsapp_cta":
-      return { type, title: "عندك سؤال؟", text: "احكينا على واتساب ومنرد عليك بسرعة" };
+      return { type, title: "لديك سؤال؟", text: "تواصل معنا عبر واتساب وسنرد عليك في أقرب وقت" };
     case "collection_products":
       return { type, title: "وصل حديثاً", limit: 8 };
     case "image_banner":
-      return { type, title: "عرض خاص", text: "خصومات لفترة محدودة", buttonText: "شوف العرض", link: "/products" };
+      return { type, title: "عرض خاص", text: "خصومات لفترة محدودة", buttonText: "اطّلع على العرض", link: "/products" };
     case "features":
       return {
         type,
         items: [
-          { icon: "🚚", title: "توصيل سريع", text: "لكل المحافظات" },
-          { icon: "💵", title: "الدفع عند الاستلام", text: "ادفع لما يوصلك" },
+          { icon: "🚚", title: "توصيل سريع", text: "إلى جميع المحافظات" },
+          { icon: "💵", title: "الدفع عند الاستلام", text: "ادفع عند استلام طلبك" },
           { icon: "✅", title: "جودة مضمونة", text: "منتجات أصلية" },
-          { icon: "💬", title: "دعم على واتساب", text: "منرد بسرعة" },
+          { icon: "💬", title: "دعم عبر واتساب", text: "نرد بسرعة" },
         ],
       };
     case "faq":
@@ -56,19 +56,19 @@ export function newSection(type: SectionType): Section {
         type,
         title: "أسئلة شائعة",
         items: [
-          { q: "كيف بدفع؟", a: "الدفع نقداً عند استلام الطلب." },
-          { q: "قديش بياخد التوصيل؟", a: "عادة من يوم لـ 3 أيام حسب المدينة." },
+          { q: "كيف أدفع؟", a: "الدفع نقداً عند استلام الطلب." },
+          { q: "كم يستغرق التوصيل؟", a: "عادةً من يوم إلى 3 أيام حسب المدينة." },
         ],
       };
     case "rich_text":
-      return { type, title: "عن متجرنا", text: "اكتب هون أي شي بدك تحكيه لزبائنك." };
+      return { type, title: "عن متجرنا", text: "اكتب هنا ما تود إخبار زبائنك به." };
   }
 }
 
 /** Home page every new store starts with. The merchant can change all of it. */
 export function defaultSections(storeName: string): Section[] {
   return [
-    { type: "hero", title: storeName, subtitle: "اكتشف منتجاتنا واطلب بكل سهولة، والدفع عند الاستلام", buttonText: "شوف المنتجات" },
+    { type: "hero", title: storeName, subtitle: "اكتشف منتجاتنا واطلب بسهولة، والدفع عند الاستلام", buttonText: "تصفّح المنتجات" },
     newSection("categories"),
     newSection("featured_products"),
     newSection("whatsapp_cta"),

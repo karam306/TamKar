@@ -11,7 +11,7 @@ export function SpecsEditor({ initial, presets }: { initial: { name: string; val
       <input type="hidden" name="specs" value={JSON.stringify(rows)} />
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-semibold">المواصفات</h2>
-        <span className="text-xs text-muted">بتظهر كجدول بصفحة المنتج</span>
+        <span className="text-xs text-muted">تظهر كجدول في صفحة المنتج</span>
       </div>
       {rows.length > 0 && (
         <ul className="space-y-2">
@@ -19,7 +19,7 @@ export function SpecsEditor({ initial, presets }: { initial: { name: string; val
             <li key={i} className="flex items-center gap-2">
               <input className="input !w-40" placeholder="الاسم" value={r.name} onChange={(e) => setRows(rows.map((x, j) => (j === i ? { ...x, name: e.target.value } : x)))} />
               <input className="input flex-1" placeholder="القيمة" value={r.value} onChange={(e) => setRows(rows.map((x, j) => (j === i ? { ...x, value: e.target.value } : x)))} />
-              <button type="button" className="px-2 text-muted hover:text-red-700" onClick={() => setRows(rows.filter((_, j) => j !== i))} aria-label="احذف">
+              <button type="button" className="px-2 text-muted hover:text-red-700" onClick={() => setRows(rows.filter((_, j) => j !== i))} aria-label="حذف">
                 ✕
               </button>
             </li>
@@ -33,7 +33,7 @@ export function SpecsEditor({ initial, presets }: { initial: { name: string; val
           </button>
         ))}
         <button type="button" className="rounded-lg border border-dashed border-black/20 px-2.5 py-1 text-[13px]" onClick={() => setRows([...rows, { name: "", value: "" }])}>
-          + مواصفة تانية
+          + مواصفة أخرى
         </button>
       </div>
     </section>

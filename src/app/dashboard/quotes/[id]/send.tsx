@@ -9,11 +9,11 @@ export function SendQuote({ token, phone, number, storeName }: { token: string; 
       type="button"
       className="btn !bg-[#25D366]"
       onClick={() => {
-        const text = `مرحبا، هاد عرض السعر رقم ${number} من ${storeName}:\n${window.location.origin}/q/${token}`;
+        const text = `مرحباً، هذا عرض السعر رقم ${number} من ${storeName}:\n${window.location.origin}/q/${token}`;
         window.open(`https://wa.me/${normalizeWhatsapp(phone)}?text=${encodeURIComponent(text)}`, "_blank");
       }}
     >
-      ابعت العرض عالواتساب
+      إرسال العرض عبر واتساب
     </button>
   );
 }

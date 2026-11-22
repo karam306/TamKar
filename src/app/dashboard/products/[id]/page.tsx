@@ -67,7 +67,7 @@ export default async function EditProductPage({
       />
       {created && (
         <p className="card mb-4 border-r-4 border-[#29845a] p-3 text-[13px]">
-          ✓ انضاف المنتج
+          ✓ أُأضف المنتج
         </p>
       )}
       <ProductForm
@@ -84,9 +84,9 @@ export default async function EditProductPage({
         </summary>
         <form action={deleteProduct} className="mt-3 flex items-center gap-3">
           <input type="hidden" name="id" value={product.id} />
-          <span className="text-muted">الحذف نهائي وما بيرجع.</span>
+          <span className="text-muted">الحذف نهائي ولا يمكن التراجع عنه.</span>
           <button type="submit" className="btn !bg-[#c70a24]">
-            احذف المنتج
+            حذف المنتج
           </button>
         </form>
       </details>

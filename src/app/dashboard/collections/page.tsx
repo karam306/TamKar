@@ -33,8 +33,8 @@ export default async function CollectionsPage() {
       />
       {collections.length === 0 ? (
         <EmptyState
-          title="رتّب منتجاتك بمجموعات"
-          text="مثلاً: وصل حديثاً، عروض، أطقم كاملة. المجموعات بتظهر بالصفحة الرئيسية لمتجرك وإلها صفحة خاصة."
+          title="نظّم منتجاتك في مجموعات"
+          text="مثلاً: وصل حديثاً، وعروض، وأطقم كاملة. تظهر المجموعات في الصفحة الرئيسية لمتجرك، ولكل منها صفحة خاصة."
           action={
             <Link href="/dashboard/collections/new" className="btn">
               أنشئ مجموعة

@@ -28,12 +28,12 @@ export default async function AdminHome() {
         title="نظرة عامة"
         actions={
           <Link href="/admin/stores/new" className="btn">
-            أنشئ متجر لتاجر
+            إنشاء متجر لتاجر
           </Link>
         }
       />
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Tile label="كل المتاجر" value={stores.length} sub={`${newThisMonth} جديد هالشهر`} />
+        <Tile label="كل المتاجر" value={stores.length} sub={`${newThisMonth} جديد هذا الشهر`} />
         <Tile label="مدفوعة وفعّالة" value={count(["active", "expiring"])} />
         <Tile label="تجريبية" value={count(["trial"])} />
         <Tile label="منتهية أو موقوفة" value={count(["expired", "grace", "suspended"])} />
@@ -47,7 +47,7 @@ export default async function AdminHome() {
       <TelegramCard ready={telegramReady()} bot={telegramReady() ? await botUsername() : null} connected={stores.filter((s) => s.telegram).length} total={stores.length} />
 
       {helpWanted.length > 0 && (
-        <Card title={`🙋 طلبوا مساعدة بالتجهيز والإعلانات (${helpWanted.length})`}>
+        <Card title={`🙋 طلبوا المساعدة في التجهيز والإعلانات (${helpWanted.length})`}>
           <ul className="divide-y divide-black/5 text-[13px]">
             {helpWanted.map((s) => (
               <li key={s.id} className="flex items-center justify-between gap-3 py-2.5">
@@ -64,9 +64,9 @@ export default async function AdminHome() {
         </Card>
       )}
 
-      <Card title="بحاجة متابعة (اشتراكات قربت تخلص أو خلصت)">
+      <Card title="بحاجة إلى متابعة (اشتراكات قاربت على الانتهاء أو انتهت)">
         {attention.length === 0 ? (
-          <p className="py-4 text-center text-[13px] text-muted">كل الاشتراكات تمام ✓</p>
+          <p className="py-4 text-center text-[13px] text-muted">جميع الاشتراكات سليمة ✓</p>
         ) : (
           <ul className="divide-y divide-black/5 text-[13px]">
             {attention.map(({ s, st }) => {
@@ -76,7 +76,7 @@ export default async function AdminHome() {
                   <Link href={`/admin/stores/${s.id}`} className="flex items-center justify-between gap-3 py-2.5 hover:bg-[#f7f7f7]">
                     <span className="font-semibold">{s.name}</span>
                     <span className={`badge ${SUB_LABELS[st].className}`}>{SUB_LABELS[st].label}</span>
-                    <span className="text-muted">{left == null ? "" : left >= 0 ? `باقي ${left} يوم` : `من ${-left} يوم`}</span>
+                    <span className="text-muted">{left == null ? "" : left >= 0 ? `متبقٍّ ${left} يوم` : `منذ ${-left} يوم`}</span>
                   </Link>
                 </li>
               );

@@ -33,8 +33,8 @@ export default async function CustomersPage({
       <PageHeader title="الزبائن" />
       {!sp.q && customers.length === 0 ? (
         <EmptyState
-          title="زبائنك رح يظهروا هون"
-          text="كل زبون بيطلب من متجرك (أو بتسجله بطلب يدوي) بينضاف هون تلقائياً مع كل طلباته."
+          title="سيظهر زبائنك هنا"
+          text="يُضاف هنا تلقائياً كل زبون يطلب من متجرك (أو تسجّله بطلب يدوي) مع جميع طلباته."
         />
       ) : (
         <div className="card overflow-hidden">

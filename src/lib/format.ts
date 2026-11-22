@@ -59,7 +59,7 @@ export function whatsappOrderLink(
         : "",
     `المجموع: ${formatPrice(order.total, store.currency)}`,
     wallet
-      ? `الدفع: ${wallet.name}. رح أبعتلكم صورة إيصال التحويل`
+      ? `الدفع: ${wallet.name}. سأرسل لكم صورة إيصال التحويل`
       : "الدفع: عند الاستلام",
     "",
     `الاسم: ${order.customer_name}`,
@@ -84,8 +84,8 @@ export function giftLines(g?: GiftInfo | null): string[] {
     "",
     "🎁 هدية",
     `المستلم: ${g.to_name}${g.to_phone ? ` (${g.to_phone})` : ""}`,
-    g.message ? `رسالة الكرت: ${g.message}` : "",
-    g.hide_prices ? "بدون فاتورة أو أسعار مع الهدية" : "",
+    g.message ? `رسالة البطاقة: ${g.message}` : "",
+    g.hide_prices ? "دون فاتورة أو أسعار مع الهدية" : "",
   ].filter(Boolean);
 }
 

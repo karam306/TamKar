@@ -15,7 +15,7 @@ export async function savePage(
   const title = String(form.get("title") ?? "")
     .trim()
     .slice(0, 100);
-  if (!title) return { error: "اكتب عنوان الصفحة" };
+  if (!title) return { error: "أدخل عنوان الصفحة" };
   const raw = String(form.get("handle") ?? "")
     .trim()
     .toLowerCase();
@@ -39,13 +39,13 @@ export async function savePage(
     return {
       error:
         res.error.code === "23505"
-          ? "في صفحة تانية بنفس الرابط"
-          : "ما قدرنا نحفظ، جرب مرة تانية",
+          ? "توجد صفحة أخرى بالرابط نفسه"
+          : "تعذّر الحفظ، حاول مرة أخرى",
     };
   revalidatePath("/dashboard/pages");
   refresh();
   if (!id) redirect(`/dashboard/pages/${res.data.id}`);
-  return { ok: "✓ انحفظت الصفحة" };
+  return { ok: "✓ تم حفظ الصفحة" };
 }
 
 export async function deletePage(form: FormData) {

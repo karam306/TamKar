@@ -27,7 +27,7 @@ export default async function TestDataPage() {
       <PageHeader title="متاجر تجريبية" />
       {logins.length > 0 && (
         <section className="card space-y-2 p-4">
-          <h2 className="text-sm font-semibold">إيميلات الدخول للمتاجر التجريبية</h2>
+          <h2 className="text-sm font-semibold">عناوين البريد الإلكتروني للمتاجر التجريبية</h2>
           {logins.map((l) => (
             <div key={l.slug} className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-black/10 p-3 text-[13px]">
               <b>{l.name}</b>

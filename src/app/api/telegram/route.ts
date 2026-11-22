@@ -24,21 +24,21 @@ export async function POST(req: Request) {
   if (start) {
     const { data } = await admin.from("store_admin").select("store_id, stores(name)").eq("telegram_token", start[1].toLowerCase()).maybeSingle();
     if (!data) {
-      await sendTelegram(chat, "هالرابط انتهى أو انستخدم قبل. ارجع للوحة متجرك على نمى: الإعدادات، إشعارات تيليغرام، واكبس اربط مرة تانية.");
+      await sendTelegram(chat, "انتهت صلاحية هذا الرابط أو استُخدم من قبل. عُد إلى لوحة متجرك على نمى: الإعدادات، ثم إشعارات تيليغرام، واضغط «ربط» مرة أخرى.");
     } else {
       await admin.from("store_admin").update({ telegram_chat_id: chat, telegram_token: null }).eq("store_id", data.store_id);
       const name = (data as unknown as { stores?: { name?: string } }).stores?.name ?? "متجرك";
-      await sendTelegram(chat, `✅ تم ربط ${name}.\nمن هلق كل طلب جديد رح يوصلك هون فوراً.\n\nلتوقف الإشعارات ابعت /stop`);
+      await sendTelegram(chat, `✅ تم ربط ${name}.\nمن الآن ستصلك هنا رسالة فورية بكل طلب جديد.\n\nلإيقاف الإشعارات أرسل /stop`);
     }
     return Response.json({ ok: true });
   }
 
   if (/^\/stop\b/.test(text)) {
     const { data } = await admin.from("store_admin").update({ telegram_chat_id: null }).eq("telegram_chat_id", chat).select("store_id");
-    await sendTelegram(chat, data?.length ? "تمام، وقفنا إشعارات الطلبات. فيك ترجع تربطها من لوحة متجرك." : "هالمحادثة مو مربوطة بأي متجر.");
+    await sendTelegram(chat, data?.length ? "تم إيقاف إشعارات الطلبات. يمكنك إعادة ربطها من لوحة متجرك." : "هذه المحادثة غير مرتبطة بأي متجر.");
     return Response.json({ ok: true });
   }
 
-  await sendTelegram(chat, "أهلاً 👋 هاد بوت إشعارات نمى.\nلتربط متجرك: افتح لوحة المتجر، الإعدادات، إشعارات تيليغرام، واكبس اربط.");
+  await sendTelegram(chat, "أهلاً بك. هذا بوت إشعارات نمى.\nلربط متجرك: افتح لوحة المتجر، ثم الإعدادات، ثم إشعارات تيليغرام، واضغط «ربط».");
   return Response.json({ ok: true });
 }

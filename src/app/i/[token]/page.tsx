@@ -21,7 +21,7 @@ export default async function SharedInvoice({ params }: { params: Promise<{ toke
   return (
     <div data-theme="classic" className="mx-auto max-w-2xl bg-white p-6 font-sans text-[14px] print:p-0">
       <div className="mb-6 flex justify-end print:hidden">
-        <PrintButton label="احفظ الفاتورة PDF" />
+        <PrintButton label="حفظ الفاتورة PDF" />
       </div>
       <InvoiceView store={store as Store} order={data as Order} />
     </div>

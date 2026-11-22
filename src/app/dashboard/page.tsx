@@ -63,12 +63,12 @@ export default async function DashboardHome({
   const steps = [
     {
       done: productCount > 0,
-      label: "ضيف أول منتج",
+      label: "أضف أول منتج",
       href: "/dashboard/products/new",
     },
     {
       done: telegramDone,
-      label: "اربط تيليغرام ليوصلك كل طلب فوراً",
+      label: "اربط تيليغرام لتصلك الطلبات فوراً",
       href: "/dashboard/settings/notifications",
     },
     {
@@ -87,18 +87,18 @@ export default async function DashboardHome({
     <div className="space-y-6">
       {owner_only && (
         <div className="rounded-lg bg-[#fff4d6] p-3 text-[13px]">
-          هالصفحة لصاحب المتجر بس.
+          هذه الصفحة مخصصة لصاحب المتجر فقط.
         </div>
       )}
       {no_access && (
         <div className="rounded-lg bg-[#fff4d6] p-3 text-[13px]">
-          ما عندك صلاحية على هالقسم. اطلبها من صاحب المتجر.
+          ليست لديك صلاحية الوصول إلى هذا القسم. اطلبها من صاحب المتجر.
         </div>
       )}
       {welcome && (
         <div className="rounded-theme bg-primary p-5 text-white">
-          <h1 className="text-2xl">🎉 مبروك، متجرك صار جاهز!</h1>
-          <p className="mt-1 opacity-90">ضيف منتجاتك وشارك الرابط مع زبائنك.</p>
+          <h1 className="text-2xl">متجرك جاهز</h1>
+          <p className="mt-1 opacity-90">أضف منتجاتك وشارك الرابط مع زبائنك.</p>
         </div>
       )}
 
@@ -109,7 +109,7 @@ export default async function DashboardHome({
           href="/dashboard/orders?status=new"
         />
         <Stat
-          label="مبيعات هالشهر"
+          label="مبيعات هذا الشهر"
           value={formatPrice(monthTotal, store.currency)}
           sub={`${month.length} طلب`}
         />
@@ -156,7 +156,7 @@ export default async function DashboardHome({
         </div>
         {orders.length === 0 ? (
           <p className="py-6 text-center text-sm text-muted">
-            ما في طلبات لسا. أول ما يطلب حدا رح يظهر هون.
+            لا توجد طلبات بعد. ستظهر هنا عند وصول أول طلب.
           </p>
         ) : (
           <ul className="divide-y divide-black/5">

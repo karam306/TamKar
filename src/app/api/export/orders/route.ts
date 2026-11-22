@@ -8,7 +8,7 @@ const STATUS: Record<string, string> = { new: "جديد", confirmed: "مؤكد",
 export async function GET(req: Request) {
   const m = await getMerchant();
   if (!m || m.role !== "owner") return new Response("Unauthorized", { status: 401 });
-  if (!isPro(m.store)) return new Response("التصدير لـ Excel متاح بالباقة الاحترافية", { status: 403, headers: { "content-type": "text/plain; charset=utf-8" } });
+  if (!isPro(m.store)) return new Response("التصدير إلى Excel متاح في الباقة الاحترافية", { status: 403, headers: { "content-type": "text/plain; charset=utf-8" } });
   const status = new URL(req.url).searchParams.get("status");
   const all: Order[] = [];
   for (let from = 0; from < 50000; from += 1000) {
@@ -35,7 +35,7 @@ export async function GET(req: Request) {
     STATUS[o.status] ?? o.status,
     o.notes ?? "",
   ]);
-  const file = await buildSheet("الطلبات", ["رقم الطلب", "التاريخ", "الزبون", "الهاتف", "المدينة", "العنوان", "المنتجات", "المجموع الفرعي", "الخصم", "كود الخصم", "التوصيل", "المجموع", "الدفع", "الحالة", "ملاحظات"], rows);
+  const file = await buildSheet("الطلبات", ["رقم الطلب", "التاريخ", "الزبون", "الهاتف", "المدينة", "العنوان", "المنتجات", "المجموع الفرعي", "الخصم", "رمز الخصم", "التوصيل", "المجموع", "الدفع", "الحالة", "ملاحظات"], rows);
   return new Response(new Uint8Array(file), {
     headers: {
       "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

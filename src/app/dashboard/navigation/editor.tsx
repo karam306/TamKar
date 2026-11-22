@@ -14,10 +14,10 @@ export function MenuEditor({ initial, targets }: { initial: StoreMenus; targets:
   return (
     <form action={action} className="space-y-4">
       <input type="hidden" name="menus" value={JSON.stringify({ header, footer })} />
-      <MenuList title="القائمة العلوية" hint="بتظهر فوق بكل صفحات المتجر، وبقائمة ☰ على الموبايل" links={header} setLinks={setHeader} targets={targets} />
-      <MenuList title="قائمة الأسفل" hint="بتظهر بأسفل المتجر، مناسبة للصفحات (من نحن، سياسة الإرجاع...)" links={footer} setLinks={setFooter} targets={targets} />
+      <MenuList title="القائمة العلوية" hint="تظهر أعلى جميع صفحات المتجر، وفي قائمة ☰ على الهاتف المحمول" links={header} setLinks={setHeader} targets={targets} />
+      <MenuList title="قائمة الأسفل" hint="تظهر أسفل المتجر، وتناسب الصفحات (من نحن، سياسة الإرجاع...)" links={footer} setLinks={setFooter} targets={targets} />
       <FormMessage state={state} />
-      <SubmitButton>احفظ القوائم</SubmitButton>
+      <SubmitButton>حفظ القوائم</SubmitButton>
     </form>
   );
 }
@@ -61,13 +61,13 @@ function MenuList({ title, hint, links, setLinks, targets }: { title: string; hi
                 <input className="input flex-1" dir="ltr" value={l.href} onChange={(e) => setLinks(links.map((x, j) => (j === i ? { ...x, href: e.target.value } : x)))} />
               )}
               <span className="mr-auto flex">
-                <button type="button" className="h-8 w-8 rounded hover:bg-[#f7f7f7]" onClick={() => move(i, -1)} aria-label="لفوق">
+                <button type="button" className="h-8 w-8 rounded hover:bg-[#f7f7f7]" onClick={() => move(i, -1)} aria-label="إلى الأعلى">
                   ↑
                 </button>
-                <button type="button" className="h-8 w-8 rounded hover:bg-[#f7f7f7]" onClick={() => move(i, 1)} aria-label="لتحت">
+                <button type="button" className="h-8 w-8 rounded hover:bg-[#f7f7f7]" onClick={() => move(i, 1)} aria-label="إلى الأسفل">
                   ↓
                 </button>
-                <button type="button" className="h-8 w-8 rounded text-muted hover:bg-[#f7f7f7]" onClick={() => setLinks(links.filter((_, j) => j !== i))} aria-label="احذف">
+                <button type="button" className="h-8 w-8 rounded text-muted hover:bg-[#f7f7f7]" onClick={() => setLinks(links.filter((_, j) => j !== i))} aria-label="حذف">
                   ✕
                 </button>
               </span>
@@ -77,7 +77,7 @@ function MenuList({ title, hint, links, setLinks, targets }: { title: string; hi
       </ul>
       {links.length < 12 && (
         <button type="button" className="text-[13px] font-semibold text-[#005bd3] hover:underline" onClick={() => setLinks([...links, { label: "", href: "/products" }])}>
-          + أضف رابط
+          + إضافة رابط
         </button>
       )}
     </section>

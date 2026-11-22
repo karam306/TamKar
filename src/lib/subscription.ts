@@ -28,8 +28,8 @@ export const isOpen = (s: { status: string; plan?: string | null; paid_until?: s
 export const SUB_LABELS: Record<SubState, { label: string; className: string }> = {
   active: { label: "فعّال", className: "bg-[#affebf] text-[#014b40]" },
   trial: { label: "تجريبي", className: "bg-[#e0f0ff] text-[#00527c]" },
-  expiring: { label: "قرب يخلص", className: "bg-[#ffeb78] text-[#4f4700]" },
-  grace: { label: "خلص (مهلة)", className: "bg-[#ffd6a4] text-[#5e4200]" },
+  expiring: { label: "قارب على الانتهاء", className: "bg-[#ffeb78] text-[#4f4700]" },
+  grace: { label: "منتهٍ (فترة سماح)", className: "bg-[#ffd6a4] text-[#5e4200]" },
   expired: { label: "منتهي", className: "bg-[#fedad9] text-[#8e0b21]" },
   suspended: { label: "موقوف", className: "bg-[#e3e3e3] text-[#616161]" },
 };

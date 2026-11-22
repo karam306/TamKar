@@ -9,7 +9,7 @@ import { loadStores } from "@/app/admin/data";
 const FILTERS: { id: string; label: string; states: SubState[] }[] = [
   { id: "paid", label: "مدفوعة", states: ["active", "expiring"] },
   { id: "trial", label: "تجريبية", states: ["trial"] },
-  { id: "attention", label: "بحاجة متابعة", states: ["expiring", "grace", "expired"] },
+  { id: "attention", label: "بحاجة إلى متابعة", states: ["expiring", "grace", "expired"] },
   { id: "off", label: "موقوفة", states: ["suspended"] },
 ];
 
@@ -45,7 +45,7 @@ export default async function AdminStores({ searchParams }: { searchParams: Prom
           ))}
           <form className="mr-auto">
             {f && <input type="hidden" name="f" value={f} />}
-            <input name="q" defaultValue={q} placeholder="اسم، رابط، إيميل أو رقم" className="input !py-1 w-56" />
+            <input name="q" defaultValue={q} placeholder="اسم، رابط، بريد إلكتروني أو رقم" className="input !py-1 w-56" />
           </form>
         </div>
         <div className="overflow-x-auto">
@@ -55,7 +55,7 @@ export default async function AdminStores({ searchParams }: { searchParams: Prom
                 <th className="p-2 font-medium">المتجر</th>
                 <th className="hidden p-2 font-medium md:table-cell">النوع</th>
                 <th className="p-2 font-medium">الاشتراك</th>
-                <th className="hidden p-2 font-medium sm:table-cell">لغاية</th>
+                <th className="hidden p-2 font-medium sm:table-cell">حتى</th>
                 <th className="p-2 font-medium">طلبات 30 يوم</th>
                 <th className="hidden p-2 font-medium lg:table-cell">مبيعات 30 يوم</th>
                 <th className="hidden p-2 font-medium lg:table-cell">المنتجات</th>
@@ -83,7 +83,7 @@ export default async function AdminStores({ searchParams }: { searchParams: Prom
                       )}
                     </td>
                     <td className="hidden whitespace-nowrap p-2 text-muted sm:table-cell">
-                      {s.paid_until ?? "بدون تاريخ"}
+                      {s.paid_until ?? "دون تاريخ"}
                       {left != null && left >= 0 && left <= 30 && <span> ({left} يوم)</span>}
                     </td>
                     <td className="p-2">{s.orders30}</td>
@@ -95,7 +95,7 @@ export default async function AdminStores({ searchParams }: { searchParams: Prom
             </tbody>
           </table>
         </div>
-        {stores.length === 0 && <p className="p-10 text-center text-muted">ما في متاجر</p>}
+        {stores.length === 0 && <p className="p-10 text-center text-muted">لا توجد متاجر</p>}
       </div>
     </div>
   );

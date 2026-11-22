@@ -20,7 +20,7 @@ export async function saveSeo(_: FormState, form: FormData): Promise<FormState> 
     tiktok: url(form.get("tiktok")),
     telegram: url(form.get("telegram")),
   };
-  if (Object.values(social).some((v) => v === null)) return { error: "في رابط سوشال ميديا غير صحيح" };
+  if (Object.values(social).some((v) => v === null)) return { error: "يوجد رابط غير صحيح لأحد حسابات التواصل الاجتماعي" };
   const { error } = await db
     .from("stores")
     .update({
@@ -32,8 +32,8 @@ export async function saveSeo(_: FormState, form: FormData): Promise<FormState> 
       social,
     })
     .eq("id", store.id);
-  if (error) return { error: "ما قدرنا نحفظ، جرب مرة تانية" };
+  if (error) return { error: "تعذّر الحفظ، حاول مرة أخرى" };
   revalidatePath("/dashboard/seo");
   refresh();
-  return { ok: "✓ انحفظ" };
+  return { ok: "✓ تم الحفظ" };
 }

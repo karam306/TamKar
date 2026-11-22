@@ -91,12 +91,12 @@ type StepId =
   | "password";
 
 const HEARD = [
-  { id: "salesman", icon: "🤝", label: "مندوب زارني بالمحل" },
+  { id: "salesman", icon: "🤝", label: "زارني مندوب في المحل" },
   { id: "instagram", icon: "📸", label: "إنستغرام" },
   { id: "facebook", icon: "👍", label: "فيسبوك" },
   { id: "tiktok", icon: "🎵", label: "تيك توك" },
-  { id: "friend", icon: "🗣️", label: "صديق أو تاجر تاني" },
-  { id: "other", icon: "✨", label: "غير هيك" },
+  { id: "friend", icon: "🗣️", label: "صديق أو تاجر آخر" },
+  { id: "other", icon: "✨", label: "مصدر آخر" },
 ];
 
 function stepsFor(d: Data): StepId[] {
@@ -200,31 +200,31 @@ export default function SignupPage() {
   function check(id: StepId): string {
     switch (id) {
       case "owner_name":
-        return d.owner_name.trim().length < 2 ? "اكتب اسمك" : "";
+        return d.owner_name.trim().length < 2 ? "أدخل اسمك" : "";
       case "store_name":
-        if (d.store_name.trim().length < 2) return "اكتب اسم المتجر";
-        if (slugState.checking) return "لحظة، عم نتأكد من الرابط...";
+        if (d.store_name.trim().length < 2) return "أدخل اسم المتجر";
+        if (slugState.checking) return "لحظة، جارٍ التحقق من الرابط...";
         return slugState.ok ? "" : `الرابط: ${slugState.reason ?? "غير صالح"}`;
       case "business_type":
-        return d.business_type ? "" : "اختار شو بتبيع";
+        return d.business_type ? "" : "اختر نوع نشاطك";
       case "city":
-        return d.city.trim() ? "" : "اختار المدينة";
+        return d.city.trim() ? "" : "اختر المدينة";
       case "currency":
-        return d.currency ? "" : "اختار العملة";
+        return d.currency ? "" : "اختر العملة";
       case "whatsapp":
-        return d.whatsapp.replace(/\D/g, "").length < 9 ? "اكتب رقم واتساب صحيح" : "";
+        return d.whatsapp.replace(/\D/g, "").length < 9 ? "أدخل رقم واتساب صحيحاً" : "";
       case "delivery":
-        return d.delivery ? "" : "اختار وحدة";
+        return d.delivery ? "" : "اختر أحد الخيارين";
       case "delivery_fee":
-        return d.delivery_fee && !(Number(d.delivery_fee.replace(/,/g, "")) >= 0) ? "اكتب رقم، أو اتركها فاضية إذا مجاني" : "";
+        return d.delivery_fee && !(Number(d.delivery_fee.replace(/,/g, "")) >= 0) ? "أدخل رقماً، أو اترك الحقل فارغاً إذا كان التوصيل مجانياً" : "";
       case "wants_help":
-        return d.wants_help ? "" : "اختار وحدة";
+        return d.wants_help ? "" : "اختر أحد الخيارين";
       case "heard_from":
-        return d.heard_from ? "" : "اختار وحدة";
+        return d.heard_from ? "" : "اختر أحد الخيارات";
       case "email":
-        return /^\S+@\S+\.\S+$/.test(d.email.trim()) ? "" : "اكتب إيميل صحيح";
+        return /^\S+@\S+\.\S+$/.test(d.email.trim()) ? "" : "أدخل بريداً إلكترونياً صحيحاً";
       case "password":
-        return d.password.length < 8 ? "كلمة السر لازم تكون 8 أحرف أو أكتر" : "";
+        return d.password.length < 8 ? "يجب ألا تقل كلمة المرور عن 8 أحرف" : "";
       default:
         return "";
     }
@@ -288,31 +288,31 @@ export default function SignupPage() {
         <style>{`@keyframes tkfade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}`}</style>
 
         {step === "welcome" && (
-          <Screen title="أهلاً فيك 👋" sub="منجهزلك متجر أونلاين بدقيقتين. رح نسألك كم سؤال، سؤال سؤال.">
+          <Screen title="أهلاً بك" sub="سنجهّز لك متجراً إلكترونياً في دقيقتين. سنطرح عليك بعض الأسئلة، سؤالاً تلو الآخر.">
             <ul className="space-y-2 text-sm text-muted">
-              <li>✓ 14 يوم مجاناً، بدون بطاقة</li>
-              <li>✓ الطلبات بتوصلك عالواتساب</li>
-              <li>✓ الدفع عند الاستلام، ما في دفع أونلاين</li>
+              <li>✓ تجربة مجانية لمدة 14 يوماً، دون بطاقة</li>
+              <li>✓ تصلك الطلبات عبر واتساب</li>
+              <li>✓ الدفع عند الاستلام، دون دفع إلكتروني</li>
             </ul>
-            <Next onClick={() => next()} label="يلا نبلش" />
+            <Next onClick={() => next()} label="لنبدأ" />
             <p className="mt-4 text-center text-sm text-muted">
-              عندك متجر؟{" "}
+              لديك متجر؟{" "}
               <Link href="/login" className="text-primary">
-                سجّل دخول
+                سجّل الدخول
               </Link>
             </p>
           </Screen>
         )}
 
         {step === "owner_name" && (
-          <Screen title="شو اسمك؟" sub="حتى نعرف مع مين عم نحكي.">
+          <Screen title="ما اسمك؟" sub="لنعرف مع من نتحدث.">
             <TextInput value={d.owner_name} onChange={(v) => set({ owner_name: v })} onEnter={() => next()} placeholder="مثلاً: أحمد" autoComplete="name" />
             <Next onClick={() => next()} />
           </Screen>
         )}
 
         {step === "store_name" && (
-          <Screen title={first ? `تشرفنا ${first}! شو اسم متجرك؟` : "شو اسم متجرك؟"} sub="الاسم اللي بيعرفك فيه زبائنك.">
+          <Screen title={first ? `تشرّفنا يا ${first}. ما اسم متجرك؟` : "ما اسم متجرك؟"} sub="الاسم الذي يعرفك به زبائنك.">
             <TextInput
               value={d.store_name}
               onChange={(v) => set({ store_name: v, ...(editSlug ? {} : { slug: slugify(v) }) })}
@@ -321,7 +321,7 @@ export default function SignupPage() {
             />
             {d.store_name.trim().length > 1 && (
               <div className="mt-3 rounded-theme bg-surface p-3 text-sm">
-                <div className="text-muted">رابط متجرك رح يكون:</div>
+                <div className="text-muted">سيكون رابط متجرك:</div>
                 {editSlug ? (
                   <input
                     value={d.slug}
@@ -337,11 +337,11 @@ export default function SignupPage() {
                 )}
                 <div className="mt-1 flex items-center justify-between text-xs">
                   <span className={slugState.checking ? "text-muted" : slugState.ok ? "text-green-700" : "text-red-700"}>
-                    {slugState.checking ? "عم نتأكد..." : slugState.ok ? "✓ متاح" : slugState.reason}
+                    {slugState.checking ? "جارٍ التحقق..." : slugState.ok ? "✓ متاح" : slugState.reason}
                   </span>
                   {!editSlug && (
                     <button type="button" className="text-primary underline" onClick={() => setEditSlug(true)}>
-                      غيّر الرابط
+                      تغيير الرابط
                     </button>
                   )}
                 </div>
@@ -352,7 +352,7 @@ export default function SignupPage() {
         )}
 
         {step === "business_type" && (
-          <Screen title="شو بتبيع؟" sub="منجهزلك متجر مناسب لنشاطك، بأقسام وخيارات جاهزة.">
+          <Screen title="ماذا تبيع؟" sub="سنجهّز لك متجراً يناسب نشاطك، بأقسام وخيارات جاهزة.">
             <div className="grid grid-cols-2 gap-2">
               {BUSINESS_TYPES.map((b) => (
                 <Choice key={b.id} selected={d.business_type === b.id} onClick={() => choose({ business_type: b.id })}>
@@ -365,7 +365,7 @@ export default function SignupPage() {
         )}
 
         {step === "city" && (
-          <Screen title="وين محلك؟" sub="المدينة اللي فيها محلك أو اللي بتشتغل منها.">
+          <Screen title="أين يقع محلك؟" sub="المدينة التي يقع فيها محلك أو التي تعمل منها.">
             <div className="flex flex-wrap gap-2">
               {CITIES.map((c) => (
                 <button
@@ -383,7 +383,7 @@ export default function SignupPage() {
                 value={CITIES.includes(d.city) ? "" : d.city}
                 onChange={(v) => set({ city: v })}
                 onEnter={() => next()}
-                placeholder="أو اكتب مدينة تانية"
+                placeholder="أو اكتب مدينة أخرى"
                 autoFocus={false}
               />
             </div>
@@ -392,7 +392,7 @@ export default function SignupPage() {
         )}
 
         {step === "currency" && (
-          <Screen title="بأي عملة بتسعّر؟" sub="فيك تغيرها بعدين من الإعدادات.">
+          <Screen title="بأي عملة تسعّر منتجاتك؟" sub="يمكنك تغييرها لاحقاً من الإعدادات.">
             <div className="grid grid-cols-2 gap-2">
               <Choice selected={d.currency === "USD"} onClick={() => choose({ currency: "USD" })}>
                 <span className="text-2xl">$</span>
@@ -407,7 +407,7 @@ export default function SignupPage() {
         )}
 
         {step === "whatsapp" && (
-          <Screen title="شو رقم الواتساب تبعك؟" sub="كل طلب جديد رح يوصلك رسالة عليه.">
+          <Screen title="ما رقم واتساب الخاص بك؟" sub="ستصلك عليه رسالة بكل طلب جديد.">
             <TextInput
               value={d.whatsapp}
               onChange={(v) => set({ whatsapp: v.replace(/[^\d+\s]/g, "") })}
@@ -422,23 +422,23 @@ export default function SignupPage() {
         )}
 
         {step === "delivery" && (
-          <Screen title="عندك توصيل؟" sub="إذا لا، الزبون بيطلب أونلاين وبيجي ياخد طلبه من محلك.">
+          <Screen title="هل لديك خدمة توصيل؟" sub="إن لم تكن لديك، يطلب الزبون عبر الإنترنت ويستلم طلبه من محلك.">
             <div className="grid grid-cols-2 gap-2">
               <Choice selected={d.delivery === "no"} onClick={() => choose({ delivery: "no" })}>
                 <span className="text-2xl">🏪</span>
-                <span className="text-sm">لا، استلام من المحل</span>
+                <span className="text-sm">لا، الاستلام من المحل</span>
               </Choice>
               <Choice selected={d.delivery === "yes"} onClick={() => choose({ delivery: "yes" })}>
                 <span className="text-2xl">🚚</span>
-                <span className="text-sm">إيه، عندي توصيل</span>
+                <span className="text-sm">نعم، لدي توصيل</span>
               </Choice>
             </div>
-            <p className="mt-3 text-xs text-muted">بكل الأحوال الاستلام من المحل بيضل متاح للزبون.</p>
+            <p className="mt-3 text-xs text-muted">في جميع الأحوال، يبقى الاستلام من المحل متاحاً للزبون.</p>
           </Screen>
         )}
 
         {step === "delivery_fee" && (
-          <Screen title="قديش سعر التوصيل؟" sub={`سعر واحد لكل الطلبات. بعدين فيك تحط سعر لكل مدينة. اتركها فاضية إذا التوصيل مجاني.`}>
+          <Screen title="ما رسوم التوصيل؟" sub={`سعر موحّد لجميع الطلبات، ويمكنك لاحقاً تحديد سعر لكل مدينة. اترك الحقل فارغاً إذا كان التوصيل مجانياً.`}>
             <div className="flex items-center gap-2">
               <TextInput
                 value={d.delivery_fee}
@@ -455,12 +455,12 @@ export default function SignupPage() {
         )}
 
         {step === "pickup_note" && (
-          <Screen title="وين بيستلم الزبون طلبه؟" sub="العنوان والأوقات. بتظهر للزبون لما يطلب.">
+          <Screen title="أين يستلم الزبون طلبه؟" sub="العنوان وأوقات الاستلام، وتظهر للزبون عند الطلب.">
             <TextInput
               value={d.pickup_note}
               onChange={(v) => set({ pickup_note: v })}
               onEnter={() => next()}
-              placeholder={`مثلاً: ${d.city || "حمص"}، شارع الحضارة، من 10 الصبح لـ 9 المسا`}
+              placeholder={`مثلاً: ${d.city || "حمص"}، شارع الحضارة، من 10 صباحاً حتى 9 مساءً`}
             />
             <Next onClick={() => next()} />
             <Skip onClick={() => next()} />
@@ -468,18 +468,18 @@ export default function SignupPage() {
         )}
 
         {step === "instagram" && (
-          <Screen title="عندك صفحة انستغرام؟" sub="منحط رابطها بمتجرك. اكتب اسم الحساب بس.">
+          <Screen title="هل لديك حساب على إنستغرام؟" sub="سنضع رابطه في متجرك. اكتب اسم الحساب فقط.">
             <div className="flex items-center gap-2" dir="ltr">
               <span className="text-muted">@</span>
               <TextInput value={d.instagram} onChange={(v) => set({ instagram: v.replace(/[^a-zA-Z0-9._]/g, "") })} onEnter={() => next()} placeholder="mystore" dir="ltr" />
             </div>
             <Next onClick={() => next()} />
-            <Skip onClick={() => (set({ instagram: "" }), next(step, { instagram: "" }))} label="ما عندي" />
+            <Skip onClick={() => (set({ instagram: "" }), next(step, { instagram: "" }))} label="ليس لدي" />
           </Screen>
         )}
 
         {step === "color" && (
-          <Screen title="أي لون بيشبه متجرك؟" sub="لون الأزرار والعناوين. فيك تغيره بعدين.">
+          <Screen title="ما اللون الذي يناسب متجرك؟" sub="لون الأزرار والعناوين، ويمكنك تغييره لاحقاً.">
             <div className="grid grid-cols-4 gap-3">
               {COLORS.map((c) => (
                 <button
@@ -492,25 +492,25 @@ export default function SignupPage() {
                 />
               ))}
             </div>
-            <Skip onClick={() => next(step, { color: "" })} label="اختارولي انتو" />
+            <Skip onClick={() => next(step, { color: "" })} label="اختاروا لي" />
           </Screen>
         )}
 
         {step === "wants_help" && (
-          <Screen title="بدك نساعدك؟" sub="فريقنا بيقدر يضيفلك المنتجات، يجهزلك المتجر، ويعملك إعلانات فيسبوك وانستغرام توصلك زبائن.">
+          <Screen title="هل تريد مساعدتنا؟" sub="يمكن لفريقنا إضافة منتجاتك، وتجهيز متجرك، وإدارة إعلانات فيسبوك وإنستغرام لتصلك بالزبائن.">
             <div className="grid gap-2">
               <Choice selected={d.wants_help === "yes"} onClick={() => choose({ wants_help: "yes" })} row>
                 <span className="text-2xl">🙋</span>
                 <span className="text-right text-sm">
-                  <b className="block">إيه، تواصلوا معي</b>
-                  <span className="text-muted">منحكيك عالواتساب خلال يوم</span>
+                  <b className="block">نعم، تواصلوا معي</b>
+                  <span className="text-muted">سنتواصل معك عبر واتساب خلال يوم</span>
                 </span>
               </Choice>
               <Choice selected={d.wants_help === "no"} onClick={() => choose({ wants_help: "no" })} row>
                 <span className="text-2xl">💪</span>
                 <span className="text-right text-sm">
-                  <b className="block">لا، بجهزه لحالي</b>
-                  <span className="text-muted">فيك تطلب مساعدة بأي وقت</span>
+                  <b className="block">لا، سأجهّزه بنفسي</b>
+                  <span className="text-muted">يمكنك طلب المساعدة في أي وقت</span>
                 </span>
               </Choice>
             </div>
@@ -518,7 +518,7 @@ export default function SignupPage() {
         )}
 
         {step === "heard_from" && (
-          <Screen title="كيف سمعت عن نمى؟" sub="بيساعدنا نعرف وين نوصل لتجار متلك.">
+          <Screen title="كيف عرفت بنمى؟" sub="يساعدنا ذلك على الوصول إلى تجار مثلك.">
             <div className="grid grid-cols-2 gap-2">
               {HEARD.map((h) => (
                 <Choice key={h.id} selected={d.heard_from === h.id} onClick={() => choose({ heard_from: h.id })}>
@@ -531,22 +531,22 @@ export default function SignupPage() {
         )}
 
         {step === "ref_code" && (
-          <Screen title="كود المندوب" sub="المندوب بيعطيك كود قصير. إذا ما بتعرفه، فيك تتخطى.">
-            <TextInput value={d.ref} onChange={(v) => set({ ref: v.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12) })} onEnter={() => next()} placeholder="مثلاً SAMER123" dir="ltr" autoComplete="off" />
+          <Screen title="رمز المندوب" sub="يعطيك المندوب رمزاً قصيراً. إن لم تكن تعرفه، يمكنك التخطي.">
+            <TextInput value={d.ref} onChange={(v) => set({ ref: v.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12) })} onEnter={() => next()} placeholder="مثلاً: SAMER123" dir="ltr" autoComplete="off" />
             <Next onClick={() => next()} />
-            <Skip onClick={() => next(step, { ref: "" })} label="ما بعرفه" />
+            <Skip onClick={() => next(step, { ref: "" })} label="لا أعرفه" />
           </Screen>
         )}
 
         {step === "email" && (
-          <Screen title="آخر شي: إيميلك" sub="فيه بتدخل على لوحة تحكم متجرك.">
+          <Screen title="أخيراً: بريدك الإلكتروني" sub="ستستخدمه لتسجيل الدخول إلى لوحة تحكم متجرك.">
             <TextInput value={d.email} onChange={(v) => set({ email: v.trim() })} onEnter={() => next()} placeholder="name@gmail.com" inputMode="email" dir="ltr" autoComplete="email" />
             <Next onClick={() => next()} />
           </Screen>
         )}
 
         {step === "password" && (
-          <Screen title="اختار كلمة سر" sub="8 أحرف أو أكتر.">
+          <Screen title="اختر كلمة مرور" sub="8 أحرف على الأقل.">
             <div className="relative">
               <TextInput
                 value={d.password}
@@ -560,8 +560,8 @@ export default function SignupPage() {
                 {showPw ? "إخفاء" : "إظهار"}
               </button>
             </div>
-            <Next onClick={() => next()} label={pending ? "عم نجهز متجرك..." : "🚀 افتح متجري"} disabled={pending} />
-            <p className="mt-3 text-center text-xs text-muted">بالضغط على الزر بتوافق على شروط الاستخدام.</p>
+            <Next onClick={() => next()} label={pending ? "جارٍ تجهيز متجرك..." : "أنشئ متجري"} disabled={pending} />
+            <p className="mt-3 text-center text-xs text-muted">بالضغط على الزر، فإنك توافق على شروط الاستخدام.</p>
           </Screen>
         )}
 
@@ -631,7 +631,7 @@ function Next({ onClick, label = "التالي", disabled }: { onClick: () => vo
   );
 }
 
-function Skip({ onClick, label = "تخطي" }: { onClick: () => void; label?: string }) {
+function Skip({ onClick, label = "تخطٍّ" }: { onClick: () => void; label?: string }) {
   return (
     <button type="button" onClick={onClick} className="mt-2 w-full py-2 text-sm text-muted hover:text-text">
       {label}

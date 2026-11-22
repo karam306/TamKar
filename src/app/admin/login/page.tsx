@@ -21,19 +21,19 @@ export default async function AdminLoginPage() {
       <div className="w-full max-w-sm rounded-xl bg-white p-6 shadow-lg sm:p-8">
         {email ? (
           <div className="flex flex-col gap-4 text-center">
-            <h1 className="text-xl font-bold">أنت داخل بحساب تاجر</h1>
+            <h1 className="text-xl font-bold">أنت مسجّل الدخول بحساب تاجر</h1>
             <p className="text-sm text-muted">
-              داخل حالياً بـ{" "}
+              أنت مسجّل حالياً بـ{" "}
               <span dir="ltr" className="font-semibold text-text">
                 {email}
               </span>
-              . اطلع منه لتدخل على لوحة المنصة.
+              . سجّل الخروج منه للدخول إلى لوحة المنصة.
             </p>
             <form action={switchToAdmin}>
-              <button className="btn w-full">اطلع وادخل كمدير</button>
+              <button className="btn w-full">تسجيل الخروج والدخول كمدير</button>
             </form>
             <a href="/dashboard" className="text-sm text-primary">
-              ارجع للوحة المتجر
+              العودة إلى لوحة المتجر
             </a>
           </div>
         ) : (
