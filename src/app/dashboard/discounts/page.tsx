@@ -1,13 +1,21 @@
 import Link from "next/link";
 import { EmptyState, PageHeader } from "@/components/admin-ui";
-import { requireOwner } from "@/lib/auth";
+import { requireAccess } from "@/lib/auth";
 import type { Discount } from "@/lib/types";
 import { describeDiscount, discountState } from "./describe";
 
-export default async function DiscountsPage({ searchParams }: { searchParams: Promise<{ saved?: string }> }) {
-  const { store, db } = await requireOwner();
+export default async function DiscountsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ saved?: string }>;
+}) {
+  const { store, db } = await requireAccess("discounts");
   const { saved } = await searchParams;
-  const { data } = await db.from("discounts").select("*").eq("store_id", store.id).order("created_at", { ascending: false });
+  const { data } = await db
+    .from("discounts")
+    .select("*")
+    .eq("store_id", store.id)
+    .order("created_at", { ascending: false });
   const list = (data ?? []) as Discount[];
 
   return (
@@ -48,15 +56,25 @@ export default async function DiscountsPage({ searchParams }: { searchParams: Pr
                 return (
                   <tr key={d.id} className="relative hover:bg-[#f7f7f7]">
                     <td className="p-2">
-                      <Link href={`/dashboard/discounts/${d.id}`} className="font-semibold after:absolute after:inset-0" dir={d.code ? "ltr" : undefined}>
+                      <Link
+                        href={`/dashboard/discounts/${d.id}`}
+                        className="font-semibold after:absolute after:inset-0"
+                        dir={d.code ? "ltr" : undefined}
+                      >
                         {d.code ?? d.title}
                       </Link>
-                      <div className="text-xs text-muted">{describeDiscount(d, store.currency)}</div>
+                      <div className="text-xs text-muted">
+                        {describeDiscount(d, store.currency)}
+                      </div>
                     </td>
                     <td className="p-2">
-                      <span className={`badge ${st.className}`}>{st.label}</span>
+                      <span className={`badge ${st.className}`}>
+                        {st.label}
+                      </span>
                     </td>
-                    <td className="hidden p-2 text-muted sm:table-cell">{d.automatic ? "تلقائي" : "كود"}</td>
+                    <td className="hidden p-2 text-muted sm:table-cell">
+                      {d.automatic ? "تلقائي" : "كود"}
+                    </td>
                     <td className="p-2">
                       {d.used_count}
                       {d.usage_limit ? ` / ${d.usage_limit}` : ""}

@@ -3,7 +3,13 @@
 import { createContext, useContext, useOptimistic } from "react";
 import type { Order, OrderStatus } from "@/lib/types";
 import { setOrderStatus, setPaid } from "../actions";
-import { nextStep, ORDER_STATUSES, PaymentBadge, StatusBadge, statusLabel } from "../status";
+import {
+  nextStep,
+  ORDER_STATUSES,
+  PaymentBadge,
+  StatusBadge,
+  statusLabel,
+} from "../status";
 
 /**
  * Status and payment change on screen the moment the merchant clicks,
@@ -11,11 +17,23 @@ import { nextStep, ORDER_STATUSES, PaymentBadge, StatusBadge, statusLabel } from
  */
 type Live = { status: OrderStatus; payment: Order["payment_status"] };
 type LiveProps = Live & { pickup: boolean };
-const Ctx = createContext<{ live: Live; set: (l: Partial<Live>) => void; pickup: boolean } | null>(null);
+const Ctx = createContext<{
+  live: Live;
+  set: (l: Partial<Live>) => void;
+  pickup: boolean;
+} | null>(null);
 const useLive = () => useContext(Ctx)!;
 
-export function LiveOrder({ status, payment, pickup, children }: LiveProps & { children: React.ReactNode }) {
-  const [live, set] = useOptimistic<Live, Partial<Live>>({ status, payment }, (cur, patch) => ({ ...cur, ...patch }));
+export function LiveOrder({
+  status,
+  payment,
+  pickup,
+  children,
+}: LiveProps & { children: React.ReactNode }) {
+  const [live, set] = useOptimistic<Live, Partial<Live>>(
+    { status, payment },
+    (cur, patch) => ({ ...cur, ...patch }),
+  );
   return <Ctx.Provider value={{ live, set, pickup }}>{children}</Ctx.Provider>;
 }
 
@@ -23,7 +41,11 @@ export function LiveStatusBadge() {
   const { live, pickup } = useLive();
   return <StatusBadge status={live.status} pickup={pickup} />;
 }
-export const LivePaymentBadge = ({ method }: { method?: Order["payment_method"] }) => <PaymentBadge status={useLive().live.payment} method={method} />;
+export const LivePaymentBadge = ({
+  method,
+}: {
+  method?: Order["payment_method"];
+}) => <PaymentBadge status={useLive().live.payment} method={method} />;
 
 export function NextStepButton({ id }: { id: string }) {
   const { live, set, pickup } = useLive();
@@ -47,7 +69,12 @@ export function NextStepButton({ id }: { id: string }) {
 
 export function PaidButton({ id }: { id: string }) {
   const { live, set } = useLive();
-  if (live.status === "cancelled") return null;
+  if (
+    live.status === "cancelled" ||
+    live.payment === "refunded" ||
+    live.payment === "partially_refunded"
+  )
+    return null;
   const paid = live.payment === "paid";
   return (
     <div className="mt-3 flex justify-end border-t border-black/5 pt-3">
@@ -59,13 +86,18 @@ export function PaidButton({ id }: { id: string }) {
       >
         <input type="hidden" name="id" value={id} />
         <input type="hidden" name="paid" value={paid ? "0" : "1"} />
-        <button className={paid ? "btn btn-outline" : "btn"}>{paid ? "رجّعه غير مدفوع" : "تم استلام المبلغ"}</button>
+        <button className={paid ? "btn btn-outline" : "btn"}>
+          {paid ? "رجّعه غير مدفوع" : "تم استلام المبلغ"}
+        </button>
       </form>
     </div>
   );
 }
 
-export const LivePaidLabel = () => <>{useLive().live.payment === "paid" ? "مدفوع" : "باقي للتحصيل عند الاستلام"}</>;
+export const LivePaidLabel = () => {
+  const p = useLive().live.payment;
+  return <>{p === "pending" || !p ? "باقي للتحصيل عند الاستلام" : "مدفوع"}</>;
+};
 
 export function StatusSelect({ id }: { id: string }) {
   const { live, set, pickup } = useLive();
@@ -78,7 +110,12 @@ export function StatusSelect({ id }: { id: string }) {
       className="flex gap-2"
     >
       <input type="hidden" name="id" value={id} />
-      <select name="status" key={live.status} defaultValue={live.status} className="input">
+      <select
+        name="status"
+        key={live.status}
+        defaultValue={live.status}
+        className="input"
+      >
         {ORDER_STATUSES.filter((s) => s.id !== "cancelled").map((s) => (
           <option key={s.id} value={s.id}>
             {statusLabel(s.id, pickup)}

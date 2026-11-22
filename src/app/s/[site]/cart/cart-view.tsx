@@ -8,7 +8,13 @@ import { contentId } from "@/lib/product-utils";
 import { track } from "@/components/tracking";
 import type { Fulfillment, PaymentMethod, Pricing } from "@/lib/types";
 import { WALLETS } from "@/lib/wallets";
-import { getCartLines, placeOrder, quoteCart, type CartLine, type PlaceOrderResult } from "./actions";
+import {
+  getCartLines,
+  placeOrder,
+  quoteCart,
+  type CartLine,
+  type PlaceOrderResult,
+} from "./actions";
 import { WalletPay } from "./wallet-pay";
 
 const keyOf = (productId: string, variantId?: string) =>
@@ -23,6 +29,7 @@ export function CartView({
   storeCity,
   branches,
   payments,
+  gift: giftAllowed = false,
 }: {
   site: string;
   defaultCity: string;
@@ -32,7 +39,9 @@ export function CartView({
   storeCity: string;
   branches: { id: string; name: string; note: string }[];
   payments: PaymentMethod[];
+  gift?: boolean;
 }) {
+  const [isGift, setIsGift] = useState(false);
   const [payment, setPayment] = useState<PaymentMethod>(payments[0] ?? "cod");
   const [branch, setBranch] = useState("");
   // Pickup from the shop is the default; delivery only when the shop offers it.
@@ -67,13 +76,11 @@ export function CartView({
     getCartLines(
       site,
       itemsKey
-        ? itemsKey
-            .split(",")
-            .map((k) => ({
-              productId: k.split("|")[0],
-              variantId: k.split("|")[1] || undefined,
-              qty: 1,
-            }))
+        ? itemsKey.split(",").map((k) => ({
+            productId: k.split("|")[0],
+            variantId: k.split("|")[1] || undefined,
+            qty: 1,
+          }))
         : [],
     ).then((lines) => {
       if (alive)
@@ -115,7 +122,15 @@ export function CartView({
   }, [site, qtyKey, city, code, ready, method]);
 
   if (done?.wallet) {
-    return <WalletPay number={done.number} total={done.total} currency={currency} whatsappUrl={done.whatsappUrl} wallet={done.wallet} />;
+    return (
+      <WalletPay
+        number={done.number}
+        total={done.total}
+        currency={currency}
+        whatsappUrl={done.whatsappUrl}
+        wallet={done.wallet}
+      />
+    );
   }
 
   if (done) {
@@ -176,6 +191,15 @@ export function CartView({
         method,
         branch: method === "pickup" && branch ? branch : undefined,
         payment,
+        gift:
+          isGift && method === "delivery"
+            ? {
+                to_name: String(form.get("gift_name") || ""),
+                to_phone: String(form.get("gift_phone") || "") || null,
+                message: String(form.get("gift_message") || "") || null,
+                hide_prices: form.get("gift_hide") === "on",
+              }
+            : null,
         items: lines.map((l) => ({
           productId: l.productId,
           variantId: l.variantId,
@@ -193,7 +217,12 @@ export function CartView({
         })),
       );
       clear();
-      setDone({ number: res.number, total: res.total, whatsappUrl: res.whatsappUrl, wallet: res.wallet ?? null });
+      setDone({
+        number: res.number,
+        total: res.total,
+        whatsappUrl: res.whatsappUrl,
+        wallet: res.wallet ?? null,
+      });
       window.scrollTo({ top: 0 });
     });
   }
@@ -273,15 +302,32 @@ export function CartView({
         {method === "pickup" && branches.length === 0 && (
           <div className="mb-4 rounded-theme bg-white p-3 text-sm">
             <div className="font-semibold">🏪 الاستلام من المحل</div>
-            <div className="text-muted">{pickupNote || (storeCity ? `من محلنا بـ${storeCity}. منتواصل معك لنحدد الوقت.` : "منتواصل معك لنحدد الوقت والمكان.")}</div>
+            <div className="text-muted">
+              {pickupNote ||
+                (storeCity
+                  ? `من محلنا بـ${storeCity}. منتواصل معك لنحدد الوقت.`
+                  : "منتواصل معك لنحدد الوقت والمكان.")}
+            </div>
           </div>
         )}
         {method === "pickup" && branches.length > 0 && (
           <div className="mb-4 space-y-2">
             <div className="text-sm font-semibold">🏪 من أي فرع بدك تستلم؟</div>
-            {[{ id: "", name: "الفرع الرئيسي", note: pickupNote || storeCity }, ...branches].map((b) => (
-              <label key={b.id || "main"} className={`flex cursor-pointer gap-2 rounded-theme border-2 bg-white p-3 text-sm ${branch === b.id ? "border-primary" : "border-transparent"}`}>
-                <input type="radio" name="branch_pick" checked={branch === b.id} onChange={() => setBranch(b.id)} className="mt-1" />
+            {[
+              { id: "", name: "الفرع الرئيسي", note: pickupNote || storeCity },
+              ...branches,
+            ].map((b) => (
+              <label
+                key={b.id || "main"}
+                className={`flex cursor-pointer gap-2 rounded-theme border-2 bg-white p-3 text-sm ${branch === b.id ? "border-primary" : "border-transparent"}`}
+              >
+                <input
+                  type="radio"
+                  name="branch_pick"
+                  checked={branch === b.id}
+                  onChange={() => setBranch(b.id)}
+                  className="mt-1"
+                />
                 <span>
                   <b className="block">{b.name}</b>
                   {b.note && <span className="text-muted">{b.note}</span>}
@@ -358,6 +404,60 @@ export function CartView({
               className="input"
             />
           )}
+          {giftAllowed && method === "delivery" && (
+            <div
+              className={`rounded-theme border-2 p-3 ${isGift ? "border-primary bg-white" : "border-transparent bg-white"}`}
+            >
+              <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold">
+                <input
+                  type="checkbox"
+                  checked={isGift}
+                  onChange={(e) => setIsGift(e.target.checked)}
+                  className="h-5 w-5"
+                />
+                🎁 ابعت الطلب كهدية لحدا تاني
+              </label>
+              {isGift && (
+                <div className="mt-3 space-y-2">
+                  <p className="text-xs text-muted">
+                    العنوان والمدينة فوق هنن عنوان الشخص اللي رح يستلم الهدية.
+                    اسمك ورقمك منستخدمهم لنتواصل معك أنت.
+                  </p>
+                  <input
+                    name="gift_name"
+                    required
+                    placeholder="اسم اللي رح يستلم الهدية"
+                    className="input"
+                    maxLength={80}
+                  />
+                  <input
+                    name="gift_phone"
+                    placeholder="رقمه (اختياري، ليتواصل معه المندوب)"
+                    className="input"
+                    inputMode="tel"
+                    dir="ltr"
+                    maxLength={20}
+                  />
+                  <textarea
+                    name="gift_message"
+                    placeholder="رسالة على كرت الهدية (اختياري)"
+                    rows={2}
+                    className="input"
+                    maxLength={300}
+                  />
+                  <label className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      name="gift_hide"
+                      defaultChecked
+                      className="h-4 w-4"
+                    />{" "}
+                    لا تحطوا فاتورة أو أسعار مع الهدية
+                  </label>
+                </div>
+              )}
+            </div>
+          )}
           <textarea
             name="notes"
             placeholder="ملاحظات (اختياري)"
@@ -427,10 +527,21 @@ export function CartView({
                   key={p}
                   className={`flex cursor-pointer items-center gap-2 rounded-theme border-2 bg-white p-3 text-sm ${payment === p ? "border-primary font-semibold" : "border-transparent"}`}
                 >
-                  <input type="radio" name="payment_pick" checked={payment === p} onChange={() => setPayment(p)} />
-                  <span className="text-lg">{p === "cod" ? "💵" : WALLETS[p].icon}</span>
+                  <input
+                    type="radio"
+                    name="payment_pick"
+                    checked={payment === p}
+                    onChange={() => setPayment(p)}
+                  />
+                  <span className="text-lg">
+                    {p === "cod" ? "💵" : WALLETS[p].icon}
+                  </span>
                   <span>
-                    {p === "cod" ? (method === "pickup" ? "كاش بالمحل عند الاستلام" : "كاش عند الاستلام") : `ادفع هلق عبر ${WALLETS[p].name}`}
+                    {p === "cod"
+                      ? method === "pickup"
+                        ? "كاش بالمحل عند الاستلام"
+                        : "كاش عند الاستلام"
+                      : `ادفع هلق عبر ${WALLETS[p].name}`}
                   </span>
                 </label>
               ))}

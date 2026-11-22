@@ -2,19 +2,69 @@
 
 import { useActionState } from "react";
 import { Field, SubmitButton } from "@/components/form-ui";
-import { addStaff, removeStaff, resetStaffPassword, type TeamState } from "./actions";
+import {
+  DEFAULT_PERMS,
+  PERM_LABELS,
+  PERMS,
+  type Perm,
+} from "@/lib/permissions";
+import {
+  addStaff,
+  removeStaff,
+  resetStaffPassword,
+  saveStaffPerms,
+  type TeamState,
+} from "./actions";
+
+/** One checkbox per dashboard tab. */
+function PermBoxes({ value }: { value: Perm[] }) {
+  return (
+    <div className="grid gap-2 sm:grid-cols-2">
+      {PERMS.map((p) => (
+        <label
+          key={p}
+          className="flex cursor-pointer items-start gap-2 rounded-lg border border-black/10 p-2 text-[13px] has-[:checked]:border-black/40 has-[:checked]:bg-[#f7f7f7]"
+        >
+          <input
+            type="checkbox"
+            name={`perm_${p}`}
+            defaultChecked={value.includes(p)}
+            className="mt-0.5 h-4 w-4 accent-black"
+          />
+          <span>
+            <b className="block">
+              {PERM_LABELS[p].icon} {PERM_LABELS[p].label}
+            </b>
+            <span className="text-[12px] text-muted">
+              {PERM_LABELS[p].hint}
+            </span>
+          </span>
+        </label>
+      ))}
+    </div>
+  );
+}
 
 function Created({ state }: { state: TeamState }) {
-  if (state?.error) return <p className="text-[13px] text-[#8e1f0b]">{state.error}</p>;
+  if (state?.error)
+    return <p className="text-[13px] text-[#8e1f0b]">{state.error}</p>;
   if (!state?.created) return null;
   const msg = `حسابك على لوحة تحكم المتجر:\nالرابط: ${typeof window !== "undefined" ? window.location.origin : ""}/login\nالإيميل: ${state.created.email}\nكلمة السر: ${state.created.password}`;
   return (
     <div className="space-y-2 rounded-lg bg-[#f7f7f7] p-3 text-[13px]">
-      <div className="font-semibold">⚠️ ابعتها للموظف هلق، ما رح تنعرض مرة تانية</div>
-      <div dir="ltr" className="text-right">
-        {state.created.email} · <b className="select-all">{state.created.password}</b>
+      <div className="font-semibold">
+        ⚠️ ابعتها للموظف هلق، ما رح تنعرض مرة تانية
       </div>
-      <a href={`https://wa.me/?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer" className="btn inline-block !bg-[#25D366]">
+      <div dir="ltr" className="text-right">
+        {state.created.email} ·{" "}
+        <b className="select-all">{state.created.password}</b>
+      </div>
+      <a
+        href={`https://wa.me/?text=${encodeURIComponent(msg)}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="btn inline-block !bg-[#25D366]"
+      >
         ابعتها عالواتساب
       </a>
     </div>
@@ -31,8 +81,18 @@ export function AddStaffForm() {
           <input name="name" className="input" placeholder="مثلاً: سامر" />
         </Field>
         <Field label="إيميله">
-          <input name="email" required dir="ltr" className="input" inputMode="email" />
+          <input
+            name="email"
+            required
+            dir="ltr"
+            className="input"
+            inputMode="email"
+          />
         </Field>
+        <div className="space-y-2 sm:col-span-2">
+          <div className="text-[13px] font-semibold">شو بيقدر يشوف؟</div>
+          <PermBoxes value={DEFAULT_PERMS} />
+        </div>
         <div className="sm:col-span-2">
           <SubmitButton>أنشئ حساب الموظف</SubmitButton>
         </div>
@@ -42,8 +102,19 @@ export function AddStaffForm() {
   );
 }
 
-export function StaffRow({ userId, email, name }: { userId: string; email: string; name: string }) {
+export function StaffRow({
+  userId,
+  email,
+  name,
+  perms,
+}: {
+  userId: string;
+  email: string;
+  name: string;
+  perms: Perm[];
+}) {
   const [state, reset] = useActionState(resetStaffPassword, undefined);
+  const [permState, savePerms] = useActionState(saveStaffPerms, undefined);
   return (
     <div className="space-y-2 p-4">
       <div className="flex flex-wrap items-center justify-between gap-2 text-[13px]">
@@ -56,14 +127,35 @@ export function StaffRow({ userId, email, name }: { userId: string; email: strin
         <span className="flex gap-2">
           <form action={reset}>
             <input type="hidden" name="user_id" value={userId} />
-            <button className="btn btn-outline !py-1 text-xs">كلمة سر جديدة</button>
+            <button className="btn btn-outline !py-1 text-xs">
+              كلمة سر جديدة
+            </button>
           </form>
           <form action={removeStaff}>
             <input type="hidden" name="user_id" value={userId} />
-            <button className="btn btn-outline !py-1 text-xs text-red-700">احذف</button>
+            <button className="btn btn-outline !py-1 text-xs text-red-700">
+              احذف
+            </button>
           </form>
         </span>
       </div>
+      <details className="text-[13px]">
+        <summary className="cursor-pointer text-[#005bd3]">
+          الصلاحيات:{" "}
+          {perms.length
+            ? perms.map((p) => PERM_LABELS[p].label).join("، ")
+            : "ولا شي"}
+        </summary>
+        <form action={savePerms} className="mt-2 space-y-2">
+          <input type="hidden" name="user_id" value={userId} />
+          <PermBoxes value={perms} />
+          <SubmitButton>احفظ الصلاحيات</SubmitButton>
+          {permState?.ok && <p className="text-green-700">{permState.ok}</p>}
+          {permState?.error && (
+            <p className="text-[#8e1f0b]">{permState.error}</p>
+          )}
+        </form>
+      </details>
       <Created state={state} />
     </div>
   );

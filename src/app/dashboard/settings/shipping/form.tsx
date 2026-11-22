@@ -22,7 +22,15 @@ const CITIES = [
   "الحسكة",
 ];
 
-export function ShippingForm({ initial, currency, pro }: { initial: ShippingSettings; currency: string; pro: boolean }) {
+export function ShippingForm({
+  initial,
+  currency,
+  pro,
+}: {
+  initial: ShippingSettings;
+  currency: string;
+  pro: boolean;
+}) {
   const [branches, setBranches] = useState<Branch[]>(initial.branches ?? []);
   const [state, action] = useActionState(saveShipping, undefined);
   const [delivery, setDelivery] = useState(Boolean(initial.delivery));
@@ -57,24 +65,83 @@ export function ShippingForm({ initial, currency, pro }: { initial: ShippingSett
       <section className="card space-y-3 p-4">
         <h2 className="text-sm font-semibold">🏬 الفروع {!pro && "🔒"}</h2>
         {!pro ? (
-          <p className="rounded-lg bg-[#f4f0ff] p-3 text-[13px]">عندك أكتر من محل؟ بالباقة الاحترافية بتضيف لغاية 5 فروع، والزبون بيختار من وين يستلم، والطلب بيوصل لواتساب الفرع نفسه.</p>
+          <p className="rounded-lg bg-[#f4f0ff] p-3 text-[13px]">
+            عندك أكتر من محل؟ بالباقة الاحترافية بتضيف لغاية 5 فروع، والزبون
+            بيختار من وين يستلم، والطلب بيوصل لواتساب الفرع نفسه.
+          </p>
         ) : (
           <>
-            <p className="text-[13px] text-muted">الزبون بيختار من أي فرع بيستلم، والطلب بيروح لواتساب هالفرع. المحل الرئيسي (فوق) بيضل أول خيار.</p>
+            <p className="text-[13px] text-muted">
+              الزبون بيختار من أي فرع بيستلم، والطلب بيروح لواتساب هالفرع. المحل
+              الرئيسي (فوق) بيضل أول خيار.
+            </p>
             {branches.map((b, i) => (
-              <div key={b.id || i} className="grid gap-2 rounded-lg border border-black/10 p-3 sm:grid-cols-3">
-                <input className="input" placeholder="اسم الفرع" value={b.name} onChange={(e) => setBranches(branches.map((x, k) => (k === i ? { ...x, name: e.target.value } : x)))} />
-                <input className="input" placeholder="العنوان والأوقات" value={b.note ?? ""} onChange={(e) => setBranches(branches.map((x, k) => (k === i ? { ...x, note: e.target.value } : x)))} />
+              <div
+                key={b.id || i}
+                className="grid gap-2 rounded-lg border border-black/10 p-3 sm:grid-cols-3"
+              >
+                <input
+                  className="input"
+                  placeholder="اسم الفرع"
+                  value={b.name}
+                  onChange={(e) =>
+                    setBranches(
+                      branches.map((x, k) =>
+                        k === i ? { ...x, name: e.target.value } : x,
+                      ),
+                    )
+                  }
+                />
+                <input
+                  className="input"
+                  placeholder="العنوان والأوقات"
+                  value={b.note ?? ""}
+                  onChange={(e) =>
+                    setBranches(
+                      branches.map((x, k) =>
+                        k === i ? { ...x, note: e.target.value } : x,
+                      ),
+                    )
+                  }
+                />
                 <div className="flex gap-2">
-                  <input className="input" dir="ltr" placeholder="واتساب الفرع" value={b.whatsapp} onChange={(e) => setBranches(branches.map((x, k) => (k === i ? { ...x, whatsapp: e.target.value } : x)))} />
-                  <button type="button" className="px-2 text-muted hover:text-red-700" onClick={() => setBranches(branches.filter((_, k) => k !== i))} aria-label="احذف">
+                  <input
+                    className="input"
+                    dir="ltr"
+                    placeholder="واتساب الفرع"
+                    value={b.whatsapp}
+                    onChange={(e) =>
+                      setBranches(
+                        branches.map((x, k) =>
+                          k === i ? { ...x, whatsapp: e.target.value } : x,
+                        ),
+                      )
+                    }
+                  />
+                  <button
+                    type="button"
+                    className="px-2 text-muted hover:text-red-700"
+                    onClick={() =>
+                      setBranches(branches.filter((_, k) => k !== i))
+                    }
+                    aria-label="احذف"
+                  >
                     ✕
                   </button>
                 </div>
               </div>
             ))}
             {branches.length < 4 && (
-              <button type="button" className="text-[13px] font-semibold text-[#005bd3] hover:underline" onClick={() => setBranches([...branches, { id: "", name: "", note: "", whatsapp: "" }])}>
+              <button
+                type="button"
+                className="text-[13px] font-semibold text-[#005bd3] hover:underline"
+                onClick={() =>
+                  setBranches([
+                    ...branches,
+                    { id: "", name: "", note: "", whatsapp: "" },
+                  ])
+                }
+              >
                 + ضيف فرع
               </button>
             )}
@@ -102,6 +169,26 @@ export function ShippingForm({ initial, currency, pro }: { initial: ShippingSett
       </section>
 
       <div className={delivery ? "space-y-4" : "hidden"}>
+        <section className="card p-4">
+          <label className="flex cursor-pointer items-start gap-3">
+            <input
+              type="checkbox"
+              name="gift"
+              defaultChecked={Boolean(initial.gift)}
+              className="mt-1 h-4 w-4 accent-black"
+            />
+            <span>
+              <span className="block text-sm font-semibold">
+                🎁 إرسال الطلب كهدية
+              </span>
+              <span className="block text-[13px] text-muted">
+                الزبون بيقدر يختار &quot;ابعته كهدية&quot; لما يطلب توصيل: بيكتب
+                اسم ورقم الشخص اللي رح يستلم، ورسالة للكرت، وإذا بدو تخفوا
+                الأسعار.
+              </span>
+            </span>
+          </label>
+        </section>
         <section className="card space-y-3 p-4">
           <h2 className="text-sm font-semibold">سعر التوصيل حسب المدينة</h2>
           <p className="text-[13px] text-muted">

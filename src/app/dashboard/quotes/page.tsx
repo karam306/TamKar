@@ -1,15 +1,14 @@
 import Link from "next/link";
 import { EmptyState, PageHeader } from "@/components/admin-ui";
 import { ProGate } from "@/components/pro-gate";
-import { requireMerchant } from "@/lib/auth";
+import { requireAccess } from "@/lib/auth";
 import { formatPrice } from "@/lib/format";
 import { isPro } from "@/lib/plans";
 import type { Quote } from "@/lib/types";
 import { STATUS } from "./status";
 
-
 export default async function QuotesPage() {
-  const { store, db } = await requireMerchant();
+  const { store, db } = await requireAccess("quotes");
   if (!isPro(store))
     return (
       <div className="space-y-4">
@@ -17,9 +16,17 @@ export default async function QuotesPage() {
         <ProGate feature="عروض الأسعار PDF" />
       </div>
     );
-  const { data } = await db.from("quotes").select("*").eq("store_id", store.id).order("created_at", { ascending: false }).limit(200);
+  const { data } = await db
+    .from("quotes")
+    .select("*")
+    .eq("store_id", store.id)
+    .order("created_at", { ascending: false })
+    .limit(200);
   const quotes = (data ?? []) as Quote[];
-  const date = new Intl.DateTimeFormat("ar-SY", { dateStyle: "medium", timeZone: "Asia/Damascus" });
+  const date = new Intl.DateTimeFormat("ar-SY", {
+    dateStyle: "medium",
+    timeZone: "Asia/Damascus",
+  });
   return (
     <div>
       <PageHeader
@@ -56,15 +63,24 @@ export default async function QuotesPage() {
               {quotes.map((q) => (
                 <tr key={q.id} className="hover:bg-[#f7f7f7]">
                   <td className="p-2 font-semibold">
-                    <Link href={`/dashboard/quotes/${q.id}`} className="hover:underline">
+                    <Link
+                      href={`/dashboard/quotes/${q.id}`}
+                      className="hover:underline"
+                    >
                       #{q.number}
                     </Link>
                   </td>
-                  <td className="p-2 text-muted">{date.format(new Date(q.created_at))}</td>
+                  <td className="p-2 text-muted">
+                    {date.format(new Date(q.created_at))}
+                  </td>
                   <td className="p-2">{q.customer_name}</td>
-                  <td className="p-2">{formatPrice(Number(q.total), store.currency)}</td>
                   <td className="p-2">
-                    <span className={`badge ${STATUS[q.status].className}`}>● {STATUS[q.status].label}</span>
+                    {formatPrice(Number(q.total), store.currency)}
+                  </td>
+                  <td className="p-2">
+                    <span className={`badge ${STATUS[q.status].className}`}>
+                      ● {STATUS[q.status].label}
+                    </span>
                   </td>
                 </tr>
               ))}

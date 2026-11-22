@@ -1,8 +1,14 @@
 import "server-only";
 import { createHash } from "node:crypto";
 import { supabaseAdmin } from "./supabase";
-import { formatPrice } from "./format";
-import type { Currency, OrderLine, PaymentMethod, Store } from "./types";
+import { formatPrice, giftLines } from "./format";
+import type {
+  Currency,
+  GiftInfo,
+  OrderLine,
+  PaymentMethod,
+  Store,
+} from "./types";
 import { paymentLabel } from "./wallets";
 
 /**
@@ -13,9 +19,13 @@ const TOKEN = process.env.TELEGRAM_BOT_TOKEN?.trim() || "";
 export const telegramReady = () => Boolean(TOKEN);
 
 /** Secret Telegram sends back with every update, so nobody else can post to our webhook. */
-export const webhookSecret = () => createHash("sha256").update(`nama-tg:${TOKEN}`).digest("hex").slice(0, 48);
+export const webhookSecret = () =>
+  createHash("sha256").update(`nama-tg:${TOKEN}`).digest("hex").slice(0, 48);
 
-export async function tg<T = unknown>(method: string, body: Record<string, unknown>): Promise<{ ok: boolean; result?: T; description?: string }> {
+export async function tg<T = unknown>(
+  method: string,
+  body: Record<string, unknown>,
+): Promise<{ ok: boolean; result?: T; description?: string }> {
   if (!TOKEN) return { ok: false, description: "TELEGRAM_BOT_TOKEN missing" };
   try {
     const res = await fetch(`https://api.telegram.org/bot${TOKEN}/${method}`, {
@@ -40,18 +50,32 @@ export async function botUsername(): Promise<string | null> {
   return username;
 }
 
-export const sendTelegram = (chatId: string, text: string, link?: { text: string; url: string }) =>
+export const sendTelegram = (
+  chatId: string,
+  text: string,
+  link?: { text: string; url: string },
+) =>
   tg("sendMessage", {
     chat_id: chatId,
     text,
     disable_web_page_preview: true,
-    ...(link && /^https:\/\//.test(link.url) ? { reply_markup: { inline_keyboard: [[{ text: link.text, url: link.url }]] } } : {}),
+    ...(link && /^https:\/\//.test(link.url)
+      ? {
+          reply_markup: {
+            inline_keyboard: [[{ text: link.text, url: link.url }]],
+          },
+        }
+      : {}),
   });
 
 /** Chat id the store owner connected, if any. */
 export async function storeChat(storeId: string): Promise<string | null> {
   if (!TOKEN) return null;
-  const { data } = await supabaseAdmin().from("store_admin").select("telegram_chat_id").eq("store_id", storeId).maybeSingle();
+  const { data } = await supabaseAdmin()
+    .from("store_admin")
+    .select("telegram_chat_id")
+    .eq("store_id", storeId)
+    .maybeSingle();
   return (data?.telegram_chat_id as string | null) ?? null;
 }
 
@@ -71,6 +95,7 @@ export async function notifyNewOrder(
     notes?: string | null;
     branch?: { name: string } | null;
     payment_method?: PaymentMethod | null;
+    gift?: GiftInfo | null;
   },
   dashboardOrigin: string,
 ) {
@@ -82,17 +107,26 @@ export async function notifyNewOrder(
     const lines = [
       `🛍 طلب جديد #${o.number} بـ${store.name}`,
       "",
-      ...o.items.map((i) => `• ${i.title}${i.variantTitle ? ` (${i.variantTitle})` : ""} × ${i.qty}`),
+      ...o.items.map(
+        (i) =>
+          `• ${i.title}${i.variantTitle ? ` (${i.variantTitle})` : ""} × ${i.qty}`,
+      ),
       "",
       `المجموع: ${formatPrice(o.total, cur)}`,
-      pickup ? `🏪 استلام من المحل${o.branch ? `: ${o.branch.name}` : ""}` : `🚚 توصيل: ${o.city ?? ""}، ${o.address ?? ""}`,
+      pickup
+        ? `🏪 استلام من المحل${o.branch ? `: ${o.branch.name}` : ""}`
+        : `🚚 توصيل: ${o.city ?? ""}، ${o.address ?? ""}`,
       `الدفع: ${paymentLabel(o.payment_method, pickup)}${o.payment_method && o.payment_method !== "cod" ? " (تأكد إنو التحويل وصل)" : ""}`,
       "",
       `👤 ${o.customer_name}`,
       `📞 ${o.phone}`,
+      ...giftLines(o.gift),
       o.notes ? `📝 ${o.notes}` : "",
     ].filter((l, i, a) => !(l === "" && a[i - 1] === ""));
-    await sendTelegram(chat, lines.join("\n").trim(), { text: "افتح الطلب", url: `${dashboardOrigin}/dashboard/orders/${o.id}` });
+    await sendTelegram(chat, lines.join("\n").trim(), {
+      text: "افتح الطلب",
+      url: `${dashboardOrigin}/dashboard/orders/${o.id}`,
+    });
   } catch (e) {
     console.error("notifyNewOrder", e);
   }

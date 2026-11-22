@@ -1,14 +1,24 @@
 import Link from "next/link";
 import { EmptyState, PageHeader } from "@/components/admin-ui";
-import { requireMerchant } from "@/lib/auth";
+import { requireAccess } from "@/lib/auth";
 import type { Collection } from "@/lib/types";
 
 export default async function CollectionsPage() {
-  const { store, db } = await requireMerchant();
-  const { data } = await db.from("collections").select("*").eq("store_id", store.id).order("created_at");
+  const { store, db } = await requireAccess("products");
+  const { data } = await db
+    .from("collections")
+    .select("*")
+    .eq("store_id", store.id)
+    .order("created_at");
   const collections = (data ?? []) as Collection[];
   const counts = await Promise.all(
-    collections.map((c) => db.from("products").select("id", { count: "exact", head: true }).eq("store_id", store.id).contains("collection_ids", [c.id])),
+    collections.map((c) =>
+      db
+        .from("products")
+        .select("id", { count: "exact", head: true })
+        .eq("store_id", store.id)
+        .contains("collection_ids", [c.id]),
+    ),
   );
 
   return (
@@ -44,10 +54,17 @@ export default async function CollectionsPage() {
               {collections.map((c, i) => (
                 <tr key={c.id} className="hover:bg-[#f7f7f7]">
                   <td className="p-2">
-                    <Link href={`/dashboard/collections/${c.id}`} className="flex items-center gap-3 font-semibold hover:underline">
+                    <Link
+                      href={`/dashboard/collections/${c.id}`}
+                      className="flex items-center gap-3 font-semibold hover:underline"
+                    >
                       {c.image ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={c.image} alt="" className="h-10 w-10 rounded-lg object-cover" />
+                        <img
+                          src={c.image}
+                          alt=""
+                          className="h-10 w-10 rounded-lg object-cover"
+                        />
                       ) : (
                         <span className="h-10 w-10 rounded-lg bg-[#e3e3e3]" />
                       )}

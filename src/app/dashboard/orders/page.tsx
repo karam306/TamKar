@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { EmptyState, PageHeader, Pager } from "@/components/admin-ui";
-import { requireMerchant } from "@/lib/auth";
+import { requireAccess } from "@/lib/auth";
 import { formatPrice } from "@/lib/format";
 import type { Order } from "@/lib/types";
 import { ORDER_STATUSES, PaymentBadge, StatusBadge } from "./status";
@@ -13,7 +13,7 @@ export default async function OrdersPage({
 }: {
   searchParams: Promise<SP>;
 }) {
-  const { store, db } = await requireMerchant();
+  const { store, db } = await requireAccess("orders");
   const sp = await searchParams;
   const page = Math.max(1, Number(sp.page) || 1);
 
@@ -154,16 +154,23 @@ export default async function OrdersPage({
                         }
                       >
                         {o.fulfillment === "pickup" ? "🏪" : "🚚"}
+                        {o.gift ? "🎁" : ""}
                       </span>
                     </td>
                     <td className="whitespace-nowrap p-2">
                       {formatPrice(Number(o.total), store.currency)}
                     </td>
                     <td className="hidden p-2 md:table-cell">
-                      <PaymentBadge status={o.payment_status} method={o.payment_method} />
+                      <PaymentBadge
+                        status={o.payment_status}
+                        method={o.payment_method}
+                      />
                     </td>
                     <td className="p-2">
-                      <StatusBadge status={o.status} pickup={o.fulfillment === "pickup"} />
+                      <StatusBadge
+                        status={o.status}
+                        pickup={o.fulfillment === "pickup"}
+                      />
                     </td>
                     <td className="hidden p-2 text-muted sm:table-cell">
                       {o.items.reduce((s, i) => s + i.qty, 0)}

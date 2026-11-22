@@ -1,10 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Card, PageHeader } from "@/components/admin-ui";
-import { requireMerchant } from "@/lib/auth";
+import { requireAccess } from "@/lib/auth";
 import { formatPrice, whatsappLink } from "@/lib/format";
 import { normalizeWhatsapp } from "@/lib/templates";
-import type { Order } from "@/lib/types";
+import type { Order, OrderReturn } from "@/lib/types";
+
+const o_refunded = (d: unknown) =>
+  (d as { refunded?: number | null } | null)?.refunded ?? 0;
 import { addComment, cancelOrder, saveMerchantNote } from "../actions";
 import {
   LiveOrder,
@@ -18,13 +21,16 @@ import {
 
 export default async function OrderPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ returned?: string }>;
 }) {
-  const { store, db } = await requireMerchant();
+  const { returned } = await searchParams;
+  const { store, db } = await requireAccess("orders");
   const { id } = await params;
   if (!/^[0-9a-f-]{36}$/.test(id)) notFound();
-  const [{ data }, { data: events }] = await Promise.all([
+  const [{ data }, { data: events }, { data: returnRows }] = await Promise.all([
     db
       .from("orders")
       .select("*, customer:customers(id, orders_count)")
@@ -37,7 +43,16 @@ export default async function OrderPage({
       .eq("order_id", id)
       .eq("store_id", store.id)
       .order("created_at", { ascending: false }),
+    // Empty until update 011 is run.
+    db
+      .from("order_returns")
+      .select("*")
+      .eq("order_id", id)
+      .eq("store_id", store.id)
+      .order("created_at"),
   ]);
+  const returns = (returnRows ?? []) as OrderReturn[];
+  const refunded = Number(o_refunded(data));
   if (!data) notFound();
   const o = data as Order;
   const customer =
@@ -54,7 +69,11 @@ export default async function OrderPage({
   const qty = o.items.reduce((s, i) => s + i.qty, 0);
 
   return (
-    <LiveOrder status={o.status} payment={o.payment_status} pickup={o.fulfillment === "pickup"}>
+    <LiveOrder
+      status={o.status}
+      payment={o.payment_status}
+      pickup={o.fulfillment === "pickup"}
+    >
       <div>
         <PageHeader
           back="/dashboard/orders"
@@ -67,6 +86,14 @@ export default async function OrderPage({
           }
           actions={
             <>
+              {o.status !== "cancelled" && (
+                <Link
+                  href={`/dashboard/orders/${o.id}/return`}
+                  className="btn btn-outline"
+                >
+                  ↩ استرجاع أو تبديل
+                </Link>
+              )}
               <a
                 href={`/invoice/${o.id}`}
                 target="_blank"
@@ -78,6 +105,11 @@ export default async function OrderPage({
             </>
           }
         />
+        {returned && (
+          <p className="mb-4 rounded-lg bg-green-50 p-3 text-[13px] font-semibold text-green-800">
+            ✓ انسجّل. المخزون والحساب اتحدّثوا.
+          </p>
+        )}
         <p className="-mt-3 mb-5 text-[13px] text-muted">
           {fmt.format(new Date(o.created_at))} ·{" "}
           {o.source === "manual" ? "طلب يدوي" : "من المتجر الإلكتروني"}
@@ -165,9 +197,104 @@ export default async function OrderPage({
                   </span>
                   <span>{money(Number(o.total))}</span>
                 </div>
+                {returns.some((r) => Number(r.extra_charge) > 0) && (
+                  <div className="flex justify-between">
+                    <span>دفع زيادة (تبديل)</span>
+                    <span>
+                      +
+                      {money(
+                        returns.reduce((t, r) => t + Number(r.extra_charge), 0),
+                      )}
+                    </span>
+                  </div>
+                )}
+                {refunded > 0 && (
+                  <>
+                    <div className="flex justify-between text-[#8e1f0b]">
+                      <span>رجّعنا للزبون</span>
+                      <span>-{money(refunded)}</span>
+                    </div>
+                    <div className="flex justify-between border-t border-black/5 pt-2 font-semibold">
+                      <span>الصافي</span>
+                      <span>
+                        {money(
+                          Number(o.total) +
+                            returns.reduce(
+                              (t, r) => t + Number(r.extra_charge),
+                              0,
+                            ) -
+                            refunded,
+                        )}
+                      </span>
+                    </div>
+                  </>
+                )}
               </div>
               <PaidButton id={o.id} />
             </Card>
+
+            {returns.length > 0 && (
+              <Card title="↩ المرتجعات والتبديل">
+                <ul className="divide-y divide-black/5 text-[13px]">
+                  {returns.map((r) => (
+                    <li key={r.id} className="space-y-1 py-2.5">
+                      <div className="flex justify-between">
+                        <b>{r.kind === "exchange" ? "تبديل" : "استرجاع"}</b>
+                        <span className="text-muted">
+                          {fmt.format(new Date(r.created_at))}
+                        </span>
+                      </div>
+                      {r.items.length > 0 && (
+                        <div>
+                          <span className="text-muted">رجع: </span>
+                          {r.items
+                            .map(
+                              (i) =>
+                                `${i.title}${i.variantTitle ? ` (${i.variantTitle})` : ""} × ${i.qty}`,
+                            )
+                            .join("، ")}
+                          {r.restocked ? (
+                            <span className="text-muted"> · رجع للمخزون</span>
+                          ) : (
+                            <span className="text-muted">
+                              {" "}
+                              · ما رجع للمخزون
+                            </span>
+                          )}
+                        </div>
+                      )}
+                      {r.new_items.length > 0 && (
+                        <div>
+                          <span className="text-muted">أخد بدالها: </span>
+                          {r.new_items
+                            .map(
+                              (i) =>
+                                `${i.title}${i.variantTitle ? ` (${i.variantTitle})` : ""} × ${i.qty}`,
+                            )
+                            .join("، ")}
+                        </div>
+                      )}
+                      <div className="flex flex-wrap gap-x-4">
+                        {Number(r.refund_amount) > 0 && (
+                          <span className="text-[#8e1f0b]">
+                            رجّعنا {money(Number(r.refund_amount))}
+                          </span>
+                        )}
+                        {Number(r.extra_charge) > 0 && (
+                          <span>دفع زيادة {money(Number(r.extra_charge))}</span>
+                        )}
+                        {r.method && (
+                          <span className="text-muted">{r.method}</span>
+                        )}
+                      </div>
+                      {r.reason && (
+                        <div className="text-muted">السبب: {r.reason}</div>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            )}
 
             <Card title="السجل">
               <form action={addComment} className="mb-4 flex gap-2">
@@ -195,6 +322,39 @@ export default async function OrderPage({
           </div>
 
           <div className="space-y-4">
+            {o.gift && (
+              <Card title="🎁 هدية">
+                <div className="space-y-1 text-[13px]">
+                  <div>
+                    <span className="text-muted">المستلم: </span>
+                    <b>{o.gift.to_name}</b>
+                  </div>
+                  {o.gift.to_phone && (
+                    <div>
+                      <span className="text-muted">رقمه: </span>
+                      <a
+                        href={`tel:${o.gift.to_phone}`}
+                        dir="ltr"
+                        className="text-[#005bd3] hover:underline"
+                      >
+                        {o.gift.to_phone}
+                      </a>
+                    </div>
+                  )}
+                  {o.gift.message && (
+                    <div className="mt-2 rounded-lg bg-[#fff8e6] p-2">
+                      <div className="text-[11px] text-muted">رسالة الكرت</div>
+                      <p className="whitespace-pre-line">{o.gift.message}</p>
+                    </div>
+                  )}
+                  {o.gift.hide_prices && (
+                    <p className="mt-2 font-semibold text-[#8a6116]">
+                      ⚠️ لا تحط فاتورة أو أسعار مع الهدية
+                    </p>
+                  )}
+                </div>
+              </Card>
+            )}
             {o.notes && (
               <Card title="ملاحظات الزبون">
                 <p className="whitespace-pre-line text-[13px]">{o.notes}</p>
@@ -237,7 +397,9 @@ export default async function OrderPage({
                   </a>
                 </div>
                 {o.fulfillment === "pickup" ? (
-                  <div className="pt-3 font-semibold">🏪 استلام من {o.branch || "المحل"}</div>
+                  <div className="pt-3 font-semibold">
+                    🏪 استلام من {o.branch || "المحل"}
+                  </div>
                 ) : (
                   <>
                     <div className="pt-3 font-semibold">🚚 عنوان التوصيل</div>

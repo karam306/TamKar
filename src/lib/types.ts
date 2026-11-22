@@ -3,15 +3,40 @@ export type Currency = "USD" | "SYP";
 
 export type Section = (
   | { type: "announcement"; text: string }
-  | { type: "hero"; title: string; subtitle?: string; image?: string; buttonText?: string }
+  | {
+      type: "hero";
+      title: string;
+      subtitle?: string;
+      image?: string;
+      buttonText?: string;
+    }
   | { type: "categories"; title?: string }
   | { type: "featured_products"; title?: string; limit?: number }
   | { type: "image_text"; title: string; text: string; image?: string }
-  | { type: "testimonials"; title?: string; items: { name: string; text: string }[] }
+  | {
+      type: "testimonials";
+      title?: string;
+      items: { name: string; text: string }[];
+    }
   | { type: "whatsapp_cta"; title: string; text?: string }
-  | { type: "collection_products"; title?: string; collectionId?: string; limit?: number }
-  | { type: "image_banner"; image?: string; title?: string; text?: string; buttonText?: string; link?: string }
-  | { type: "features"; items: { icon: string; title: string; text?: string }[] }
+  | {
+      type: "collection_products";
+      title?: string;
+      collectionId?: string;
+      limit?: number;
+    }
+  | {
+      type: "image_banner";
+      image?: string;
+      title?: string;
+      text?: string;
+      buttonText?: string;
+      link?: string;
+    }
+  | {
+      type: "features";
+      items: { icon: string; title: string; text?: string }[];
+    }
   | { type: "faq"; title?: string; items: { q: string; a: string }[] }
   | { type: "rich_text"; title?: string; text: string }
 ) & { hidden?: boolean };
@@ -45,13 +70,31 @@ export type Store = {
 export type MenuLink = { label: string; href: string };
 export type StoreMenus = { header?: MenuLink[]; footer?: MenuLink[] };
 export type StoreSeo = { title?: string; description?: string; image?: string };
-export type StoreSocial = { instagram?: string; facebook?: string; tiktok?: string; telegram?: string };
+export type StoreSocial = {
+  instagram?: string;
+  facebook?: string;
+  tiktok?: string;
+  telegram?: string;
+};
 
-export type StorePage = { id: string; store_id: string; title: string; handle: string; body: string; published: boolean; created_at?: string };
+export type StorePage = {
+  id: string;
+  store_id: string;
+  title: string;
+  handle: string;
+  body: string;
+  published: boolean;
+  created_at?: string;
+};
 
 export type Fulfillment = "pickup" | "delivery";
 
-export type Branch = { id: string; name: string; note?: string | null; whatsapp: string };
+export type Branch = {
+  id: string;
+  name: string;
+  note?: string | null;
+  whatsapp: string;
+};
 
 export type ShippingSettings = {
   /** Delivery is optional. When off, customers pick up from the shop. */
@@ -65,6 +108,8 @@ export type ShippingSettings = {
   rates?: { city: string; fee: number }[];
   /** How customers can pay. Kept here so it is readable on the storefront. */
   payments?: PaymentSettings;
+  /** Customers can send a delivery order as a gift to someone else. */
+  gift?: boolean;
 };
 
 /** Syrian e-wallets a customer can pay with by manual transfer. */
@@ -86,6 +131,29 @@ export type PaymentSettings = {
 /** "cod" or one of the wallets. */
 export type PaymentMethod = "cod" | WalletId;
 
+/** A return, refund or exchange on an order (update 011). */
+export type OrderReturn = {
+  id: string;
+  order_id: string;
+  kind: "refund" | "exchange";
+  items: OrderLine[];
+  new_items: OrderLine[];
+  restocked: boolean;
+  refund_amount: number;
+  extra_charge: number;
+  method: string | null;
+  reason: string | null;
+  created_at: string;
+};
+
+/** "Send as a gift": who receives it and the card message. Delivery orders only. */
+export type GiftInfo = {
+  to_name: string;
+  to_phone: string | null;
+  message: string | null;
+  hide_prices: boolean;
+};
+
 export type Discount = {
   id: string;
   store_id: string;
@@ -103,7 +171,14 @@ export type Discount = {
   created_at: string;
 };
 
-export type Pricing = { subtotal: number; discount: number; shipping: number; total: number; code: string | null; free_shipping?: boolean };
+export type Pricing = {
+  subtotal: number;
+  discount: number;
+  shipping: number;
+  total: number;
+  code: string | null;
+  free_shipping?: boolean;
+};
 
 export type Product = {
   id: string;
@@ -170,6 +245,7 @@ export type OrderInput = {
   method?: Fulfillment;
   branch?: string;
   payment?: PaymentMethod;
+  gift?: GiftInfo | null;
   items: CartItem[];
 };
 
@@ -183,7 +259,8 @@ export type OrderLine = {
   image?: string | null;
 };
 
-export type OrderStatus = "new" | "confirmed" | "shipped" | "delivered" | "cancelled";
+export type OrderStatus =
+  "new" | "confirmed" | "shipped" | "delivered" | "cancelled";
 
 export type Order = {
   id: string;
@@ -197,7 +274,9 @@ export type Order = {
   items: OrderLine[];
   total: number;
   status: OrderStatus;
-  payment_status?: "pending" | "paid";
+  payment_status?: "pending" | "paid" | "partially_refunded" | "refunded";
+  /** Money given back to the customer through returns (update 011). */
+  refunded?: number | null;
   customer_id?: string | null;
   source?: "online" | "manual";
   merchant_note?: string | null;
@@ -210,10 +289,17 @@ export type Order = {
   share_token?: string | null;
   /** How the customer said they will pay. Missing on older orders (cash). */
   payment_method?: PaymentMethod | null;
+  gift?: GiftInfo | null;
   created_at: string;
 };
 
-export type QuoteLine = { title: string; variantTitle?: string | null; price: number; qty: number; productId?: string | null };
+export type QuoteLine = {
+  title: string;
+  variantTitle?: string | null;
+  price: number;
+  qty: number;
+  productId?: string | null;
+};
 
 export type Quote = {
   id: string;

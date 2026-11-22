@@ -8,7 +8,13 @@ import { isOpen } from "@/lib/subscription";
 import { storeWallets } from "@/lib/wallets";
 import { notifyNewOrder } from "@/lib/telegram";
 import { platformOrigin } from "@/lib/site-origin";
-import type { CartItem, Fulfillment, OrderInput, Pricing, WalletId } from "@/lib/types";
+import type {
+  CartItem,
+  Fulfillment,
+  OrderInput,
+  Pricing,
+  WalletId,
+} from "@/lib/types";
 
 export type PlaceOrderResult =
   | {
@@ -19,17 +25,35 @@ export type PlaceOrderResult =
       whatsappUrl: string;
       items: { productId: string; qty: number; price: number }[];
       /** Set when the customer chose to pay by e-wallet transfer: what to show them. */
-      wallet?: { id: WalletId; account: string; holder: string | null; qr: string | null } | null;
+      wallet?: {
+        id: WalletId;
+        account: string;
+        holder: string | null;
+        qr: string | null;
+      } | null;
     }
   | { ok: false; error: string };
 
-export async function placeOrder(site: string, input: OrderInput): Promise<PlaceOrderResult> {
+export async function placeOrder(
+  site: string,
+  input: OrderInput,
+): Promise<PlaceOrderResult> {
   const store = await getStore(site);
   if (!store) return { ok: false, error: "المتجر غير موجود" };
   if (!isOpen(store)) return { ok: false, error: "المتجر متوقف مؤقتاً" };
   const result = await createOrder(
     store,
-    { name: input.customerName, phone: input.phone, city: input.city, address: input.address, notes: input.notes, method: input.method, branch: input.branch, payment: input.payment },
+    {
+      name: input.customerName,
+      phone: input.phone,
+      city: input.city,
+      address: input.address,
+      notes: input.notes,
+      method: input.method,
+      branch: input.branch,
+      payment: input.payment,
+      gift: input.gift ?? null,
+    },
     input.items,
     "online",
     input.discountCode,
@@ -48,10 +72,24 @@ export async function placeOrder(site: string, input: OrderInput): Promise<Place
     number: o.number,
     total: o.total,
     whatsappUrl: whatsappOrderLink(store, o),
-    items: o.items.map((i) => ({ productId: i.productId, qty: i.qty, price: i.price })),
+    items: o.items.map((i) => ({
+      productId: i.productId,
+      qty: i.qty,
+      price: i.price,
+    })),
     wallet: (() => {
-      const w = o.payment_method === "cod" ? null : storeWallets(store).find((x) => x.id === o.payment_method);
-      return w ? { id: w.id, account: w.account, holder: w.holder ?? null, qr: w.qr ?? null } : null;
+      const w =
+        o.payment_method === "cod"
+          ? null
+          : storeWallets(store).find((x) => x.id === o.payment_method);
+      return w
+        ? {
+            id: w.id,
+            account: w.account,
+            holder: w.holder ?? null,
+            qr: w.qr ?? null,
+          }
+        : null;
     })(),
   };
 }
@@ -67,10 +105,16 @@ export type CartLine = {
 };
 
 /** Current price and details for what is in the cart. */
-export async function getCartLines(site: string, items: CartItem[]): Promise<CartLine[]> {
+export async function getCartLines(
+  site: string,
+  items: CartItem[],
+): Promise<CartLine[]> {
   const store = await getStore(site);
   if (!store || !Array.isArray(items)) return [];
-  const products = await getProductsByIds(store.id, items.map((i) => String(i.productId)));
+  const products = await getProductsByIds(
+    store.id,
+    items.map((i) => String(i.productId)),
+  );
   return items.flatMap((i) => {
     const p = products.find((x) => x.id === i.productId);
     if (!p) return [];
@@ -91,10 +135,26 @@ export async function getCartLines(site: string, items: CartItem[]): Promise<Car
 }
 
 /** Subtotal, discount, delivery fee and total for the cart page. */
-export async function quoteCart(site: string, items: CartItem[], city: string, code?: string, method: Fulfillment = "pickup"): Promise<Pricing | { error: string }> {
+export async function quoteCart(
+  site: string,
+  items: CartItem[],
+  city: string,
+  code?: string,
+  method: Fulfillment = "pickup",
+): Promise<Pricing | { error: string }> {
   const store = await getStore(site);
   if (!store) return { error: "المتجر غير موجود" };
   const lines = await getCartLines(site, items);
-  const subtotal = lines.reduce((s, l) => s + l.price * (items.find((i) => i.productId === l.productId && (i.variantId ?? "") === (l.variantId ?? ""))?.qty ?? 0), 0);
+  const subtotal = lines.reduce(
+    (s, l) =>
+      s +
+      l.price *
+        (items.find(
+          (i) =>
+            i.productId === l.productId &&
+            (i.variantId ?? "") === (l.variantId ?? ""),
+        )?.qty ?? 0),
+    0,
+  );
   return quote(store, Math.round(subtotal * 100) / 100, city, code, method);
 }

@@ -7,7 +7,11 @@ import { CartView } from "./cart-view";
 
 export const metadata: Metadata = { title: "السلة", robots: { index: false } };
 
-export default async function CartPage({ params }: { params: Promise<{ site: string }> }) {
+export default async function CartPage({
+  params,
+}: {
+  params: Promise<{ site: string }>;
+}) {
   const { site } = await params;
   const store = await getStore(site);
   if (!store) notFound();
@@ -17,10 +21,19 @@ export default async function CartPage({ params }: { params: Promise<{ site: str
       defaultCity={store.city ?? ""}
       cities={(store.shipping?.rates ?? []).map((r) => r.city)}
       delivery={Boolean(store.shipping?.delivery)}
+      gift={Boolean(store.shipping?.delivery && store.shipping?.gift)}
       pickupNote={store.shipping?.pickup_note ?? ""}
       storeCity={store.city ?? ""}
       payments={paymentChoices(store)}
-      branches={isPro(store) ? (store.shipping?.branches ?? []).map((b) => ({ id: b.id, name: b.name, note: b.note ?? "" })) : []}
+      branches={
+        isPro(store)
+          ? (store.shipping?.branches ?? []).map((b) => ({
+              id: b.id,
+              name: b.name,
+              note: b.note ?? "",
+            }))
+          : []
+      }
     />
   );
 }
