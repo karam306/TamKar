@@ -9,7 +9,7 @@ import { normalizeWhatsapp } from "@/lib/templates";
 import { storeUrl } from "@/lib/urls";
 import { saveMerchantInfo, setPaidUntil, setStoreStatus } from "@/app/admin/actions";
 import { loadStores } from "@/app/admin/data";
-import { PaymentForm, ResetPassword } from "./forms";
+import { PaymentForm, PlanSwitcher, ResetPassword } from "./forms";
 
 const PLANS = PLAN_LABELS;
 
@@ -52,11 +52,11 @@ export default async function AdminStorePage({ params }: { params: Promise<{ id:
           </div>
 
           <Card title="الاشتراك">
-            <div className="mb-4 grid gap-1 text-[13px] sm:grid-cols-3">
-              <div>
-                <span className="text-muted">الباقة: </span>
-                {PLANS[s.plan] ?? s.plan}
-              </div>
+            <div className="mb-2 text-[13px] font-semibold">الباقة</div>
+            <div className="mb-4">
+              <PlanSwitcher id={s.id} plan={s.plan} />
+            </div>
+            <div className="mb-4 grid gap-1 text-[13px] sm:grid-cols-2">
               <div>
                 <span className="text-muted">لغاية: </span>
                 {s.paid_until ?? "بدون تاريخ"}
@@ -65,7 +65,7 @@ export default async function AdminStorePage({ params }: { params: Promise<{ id:
             </div>
             <PaymentForm id={s.id} currency={s.currency} />
             <details className="mt-4 text-[13px]">
-              <summary className="cursor-pointer text-muted">تعديل التاريخ أو الباقة يدوياً</summary>
+              <summary className="cursor-pointer text-muted">تعديل تاريخ الاشتراك يدوياً</summary>
               <form action={setPaidUntil} className="mt-2 flex flex-wrap items-end gap-2">
                 <input type="hidden" name="id" value={s.id} />
                 <input type="date" name="paid_until" defaultValue={s.paid_until ?? ""} className="input !w-44" />

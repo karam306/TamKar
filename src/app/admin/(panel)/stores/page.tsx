@@ -2,6 +2,7 @@ import Link from "next/link";
 import { PageHeader } from "@/components/admin-ui";
 import { businessLabel } from "@/lib/business-types";
 import { formatPrice } from "@/lib/format";
+import { PLAN_LABELS } from "@/lib/plans";
 import { daysLeft, SUB_LABELS, subState, type SubState } from "@/lib/subscription";
 import { loadStores } from "@/app/admin/data";
 
@@ -77,6 +78,9 @@ export default async function AdminStores({ searchParams }: { searchParams: Prom
                     <td className="hidden p-2 text-muted md:table-cell">{businessLabel(s.business_type)}</td>
                     <td className="p-2">
                       <span className={`badge ${SUB_LABELS[st].className}`}>{SUB_LABELS[st].label}</span>
+                      {s.plan !== "trial" && (
+                        <span className={`badge mr-1 ${s.plan === "pro" ? "!bg-[#0b2b26] !text-white" : ""}`}>{PLAN_LABELS[s.plan] ?? s.plan}</span>
+                      )}
                     </td>
                     <td className="hidden whitespace-nowrap p-2 text-muted sm:table-cell">
                       {s.paid_until ?? "بدون تاريخ"}

@@ -115,6 +115,25 @@ export async function recordPayment(_: { error?: string; ok?: string } | undefin
   return { ok: `✓ انسجلت الدفعة. الاشتراك فعّال لغاية ${until}` };
 }
 
+/** One-click plan change from the store page. Keeps the paid-until date as it is. */
+export async function setPlan(_: { error?: string; ok?: string } | undefined, form: FormData) {
+  await requirePlatformAdmin();
+  const id = str(form, "id", 40);
+  const plan = str(form, "plan", 20);
+  if (!["trial", "basic", "pro"].includes(plan)) return { error: "باقة غير معروفة" };
+  const admin = supabaseAdmin();
+  const { data, error } = await admin.from("stores").update({ plan }).eq("id", id).select("plan").maybeSingle();
+  if (error || !data) {
+    console.error("setPlan failed", error);
+    return { error: `ما قدرنا نغيّر الباقة${error?.message ? ` (${error.message.slice(0, 80)})` : ""}` };
+  }
+  if (data.plan !== plan) return { error: "قاعدة البيانات رفضت التغيير. تأكد إن SUPABASE_SECRET_KEY بـ Vercel هو المفتاح السري (secret)" };
+  revalidatePath(`/admin/stores/${id}`);
+  revalidatePath("/admin/stores");
+  refresh();
+  return { ok: "✓ تغيّرت الباقة" };
+}
+
 export async function setPaidUntil(form: FormData) {
   await requirePlatformAdmin();
   const id = str(form, "id", 40);

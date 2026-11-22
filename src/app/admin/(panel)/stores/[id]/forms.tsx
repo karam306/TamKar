@@ -1,8 +1,51 @@
 "use client";
 
-import { useActionState } from "react";
 import { FormMessage, SubmitButton } from "@/components/form-ui";
-import { recordPayment, resetPassword } from "@/app/admin/actions";
+import { useActionState, useOptimistic, useTransition } from "react";
+import { recordPayment, resetPassword, setPlan } from "@/app/admin/actions";
+
+const PLAN_CHOICES = [
+  { id: "basic", label: "أساسي", hint: "$15 · لغاية 100 منتج" },
+  { id: "pro", label: "احترافي", hint: "$29 · كل الميزات" },
+  { id: "trial", label: "تجريبي", hint: "كل الميزات مؤقتاً" },
+];
+
+/** Big, obvious plan buttons. The chosen one changes instantly. */
+export function PlanSwitcher({ id, plan }: { id: string; plan: string }) {
+  const [state, action] = useActionState(setPlan, undefined);
+  const [shown, setShown] = useOptimistic(plan);
+  const [pending, start] = useTransition();
+  return (
+    <div className="space-y-2">
+      <div className="grid grid-cols-3 gap-2">
+        {PLAN_CHOICES.map((p) => {
+          const on = shown === p.id;
+          return (
+            <button
+              key={p.id}
+              type="button"
+              disabled={pending || on}
+              onClick={() =>
+                start(() => {
+                  setShown(p.id);
+                  const f = new FormData();
+                  f.set("id", id);
+                  f.set("plan", p.id);
+                  action(f);
+                })
+              }
+              className={`rounded-lg border-2 p-3 text-center transition ${on ? "border-[#0b2b26] bg-[#0b2b26] text-white" : "border-black/10 bg-white hover:border-[#0b2b26]"}`}
+            >
+              <div className="text-[15px] font-bold">{p.label}</div>
+              <div className={`text-[11px] ${on ? "opacity-80" : "text-muted"}`}>{p.hint}</div>
+            </button>
+          );
+        })}
+      </div>
+      <FormMessage state={state} />
+    </div>
+  );
+}
 
 export function PaymentForm({ id, currency }: { id: string; currency: string }) {
   const [state, action] = useActionState(recordPayment, undefined);
