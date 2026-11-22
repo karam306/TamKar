@@ -5,10 +5,20 @@ import { eventContext, sendPurchaseEvent } from "@/lib/meta";
 import { createOrder, getProductsByIds, getStore, quote } from "@/lib/data";
 import { whatsappOrderLink } from "@/lib/format";
 import { isOpen } from "@/lib/subscription";
-import type { CartItem, Fulfillment, OrderInput, Pricing } from "@/lib/types";
+import { storeWallets } from "@/lib/wallets";
+import type { CartItem, Fulfillment, OrderInput, Pricing, WalletId } from "@/lib/types";
 
 export type PlaceOrderResult =
-  | { ok: true; id: string; number: number; total: number; whatsappUrl: string; items: { productId: string; qty: number; price: number }[] }
+  | {
+      ok: true;
+      id: string;
+      number: number;
+      total: number;
+      whatsappUrl: string;
+      items: { productId: string; qty: number; price: number }[];
+      /** Set when the customer chose to pay by e-wallet transfer: what to show them. */
+      wallet?: { id: WalletId; account: string; holder: string | null; qr: string | null } | null;
+    }
   | { ok: false; error: string };
 
 export async function placeOrder(site: string, input: OrderInput): Promise<PlaceOrderResult> {
@@ -17,7 +27,7 @@ export async function placeOrder(site: string, input: OrderInput): Promise<Place
   if (!isOpen(store)) return { ok: false, error: "المتجر متوقف مؤقتاً" };
   const result = await createOrder(
     store,
-    { name: input.customerName, phone: input.phone, city: input.city, address: input.address, notes: input.notes, method: input.method, branch: input.branch },
+    { name: input.customerName, phone: input.phone, city: input.city, address: input.address, notes: input.notes, method: input.method, branch: input.branch, payment: input.payment },
     input.items,
     "online",
     input.discountCode,
@@ -33,6 +43,10 @@ export async function placeOrder(site: string, input: OrderInput): Promise<Place
     total: o.total,
     whatsappUrl: whatsappOrderLink(store, o),
     items: o.items.map((i) => ({ productId: i.productId, qty: i.qty, price: i.price })),
+    wallet: (() => {
+      const w = o.payment_method === "cod" ? null : storeWallets(store).find((x) => x.id === o.payment_method);
+      return w ? { id: w.id, account: w.account, holder: w.holder ?? null, qr: w.qr ?? null } : null;
+    })(),
   };
 }
 

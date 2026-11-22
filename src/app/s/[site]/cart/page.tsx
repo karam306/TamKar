@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getStore } from "@/lib/data";
 import { isPro } from "@/lib/plans";
+import { paymentChoices } from "@/lib/wallets";
 import { CartView } from "./cart-view";
 
 export const metadata: Metadata = { title: "السلة", robots: { index: false } };
@@ -18,6 +19,7 @@ export default async function CartPage({ params }: { params: Promise<{ site: str
       delivery={Boolean(store.shipping?.delivery)}
       pickupNote={store.shipping?.pickup_note ?? ""}
       storeCity={store.city ?? ""}
+      payments={paymentChoices(store)}
       branches={isPro(store) ? (store.shipping?.branches ?? []).map((b) => ({ id: b.id, name: b.name, note: b.note ?? "" })) : []}
     />
   );

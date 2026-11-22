@@ -3,6 +3,7 @@ import { ProGate } from "@/components/pro-gate";
 import { isPro, PLAN_LABELS } from "@/lib/plans";
 import { requireOwner } from "@/lib/auth";
 import { SettingsForm } from "./form";
+import { storeWallets, WALLETS } from "@/lib/wallets";
 
 export default async function SettingsPage() {
   const { store, user } = await requireOwner();
@@ -16,6 +17,16 @@ export default async function SettingsPage() {
           <span className="flex-1">
             <b className="block text-sm">الاستلام والتوصيل</b>
             <span className="text-[13px] text-muted">{store.shipping?.delivery ? "استلام من المحل + توصيل" : "استلام من المحل بس"}</span>
+          </span>
+          <span className="text-muted">←</span>
+        </Link>
+        <Link href="/dashboard/settings/payments" className="card flex items-center gap-3 p-4 hover:shadow-md">
+          <span className="text-2xl">💳</span>
+          <span className="flex-1">
+            <b className="block text-sm">طرق الدفع</b>
+            <span className="text-[13px] text-muted">
+              {storeWallets(store).length ? `كاش + ${storeWallets(store).map((w) => WALLETS[w.id].short).join("، ")}` : "كاش عند الاستلام. ضيف شام كاش أو سيرياتل كاش"}
+            </span>
           </span>
           <span className="text-muted">←</span>
         </Link>

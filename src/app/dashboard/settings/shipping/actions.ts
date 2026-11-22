@@ -54,6 +54,7 @@ export async function saveShipping(_: FormState, form: FormData): Promise<FormSt
         free_over: freeOver,
         rates: clean,
         branches,
+        payments: store.shipping?.payments ?? undefined,
       },
     })
     .eq("id", store.id);

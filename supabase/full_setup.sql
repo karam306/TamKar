@@ -969,3 +969,12 @@ create policy "staff manages quotes" on public.quotes
   for all to authenticated
   using (exists (select 1 from public.store_staff st where st.store_id = quotes.store_id and st.user_id = auth.uid()))
   with check (exists (select 1 from public.store_staff st where st.store_id = quotes.store_id and st.user_id = auth.uid()));
+
+-- ───────────── 009 ─────────────
+-- Nama update 009: pay by e-wallet transfer (Sham Cash, Syriatel Cash, MTN Cash).
+-- Run once in Supabase: SQL Editor > New query > Run. Safe to run again.
+-- Wallet details live in stores.shipping -> payments (no change needed there).
+
+alter table public.orders
+  add column if not exists payment_method text not null default 'cod'
+  check (payment_method in ('cod', 'sham_cash', 'syriatel_cash', 'mtn_cash'));

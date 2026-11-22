@@ -61,7 +61,7 @@ export default async function OrderPage({
           title={`#${o.number}`}
           badges={
             <>
-              <LivePaymentBadge />
+              <LivePaymentBadge method={o.payment_method} />
               <LiveStatusBadge />
             </>
           }
@@ -124,7 +124,7 @@ export default async function OrderPage({
               <NextStepButton id={o.id} />
             </Card>
 
-            <Card title={<LivePaymentBadge />}>
+            <Card title={<LivePaymentBadge method={o.payment_method} />}>
               <div className="space-y-1.5 text-[13px]">
                 <div className="flex justify-between">
                   <span>المجموع الفرعي</span>

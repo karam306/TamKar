@@ -1,4 +1,5 @@
 import type { Order, OrderStatus } from "@/lib/types";
+import { WALLETS } from "@/lib/wallets";
 
 export const ORDER_STATUSES: { id: OrderStatus; label: string; className: string }[] = [
   { id: "new", label: "جديد", className: "bg-[#ffd6a4] text-[#5e4200]" },
@@ -33,10 +34,9 @@ export function StatusBadge({ status, pickup }: { status: Order["status"]; picku
   return <span className={`badge ${s.className}`}>● {statusLabel(s.id, pickup)}</span>;
 }
 
-export function PaymentBadge({ status }: { status?: Order["payment_status"] }) {
-  return status === "paid" ? (
-    <span className="badge bg-[#e3e3e3] text-[#303030]">● مدفوع</span>
-  ) : (
-    <span className="badge bg-[#ffeb78] text-[#4f4700]">● الدفع عند الاستلام</span>
-  );
+export function PaymentBadge({ status, method }: { status?: Order["payment_status"]; method?: Order["payment_method"] }) {
+  const wallet = method && method !== "cod" ? WALLETS[method]?.short : null;
+  if (status === "paid") return <span className="badge bg-[#e3e3e3] text-[#303030]">● مدفوع{wallet ? ` (${wallet})` : ""}</span>;
+  if (wallet) return <span className="badge bg-[#d5ebff] text-[#003a5a]">● بانتظار تحويل {wallet}</span>;
+  return <span className="badge bg-[#ffeb78] text-[#4f4700]">● الدفع عند الاستلام</span>;
 }

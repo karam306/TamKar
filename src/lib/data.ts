@@ -5,7 +5,8 @@ import { findVariant, hasVariants } from "./product-utils";
 import { hasSupabase, supabaseAdmin, supabasePublic } from "./supabase";
 import { templateMenus, templatePages } from "./business-templates";
 import { isPro } from "./plans";
-import type { CartItem, Collection, Order, OrderLine, Pricing, Product, Store, StorePage, Fulfillment, Branch } from "./types";
+import { paymentChoices } from "./wallets";
+import type { CartItem, Collection, Order, OrderLine, Pricing, Product, Store, StorePage, Fulfillment, Branch, PaymentMethod } from "./types";
 
 export const isDemoStore = (storeId: string) => storeId.startsWith("s-");
 
@@ -118,7 +119,7 @@ export const getCategories = cache(async (storeId: string): Promise<string[]> =>
 const clean = (v: unknown, max: number) =>
   typeof v === "string" ? v.replace(/[\u0000-\u001f]/g, " ").trim().slice(0, max) : "";
 
-export type CustomerInput = { name: string; phone: string; city: string; address: string; notes?: string; method?: Fulfillment; branch?: string };
+export type CustomerInput = { name: string; phone: string; city: string; address: string; notes?: string; method?: Fulfillment; branch?: string; payment?: PaymentMethod };
 
 export type CreateOrderResult =
   | {
@@ -131,11 +132,12 @@ export type CreateOrderResult =
         fulfillment: Fulfillment;
         /** Pickup branch, when the store has more than one. */
         branch?: Branch | null;
+        payment_method: PaymentMethod;
       };
     }
   | { ok: false; error: string };
 
-export function validateCustomer(input: CustomerInput): { ok: true; value: Required<Omit<CustomerInput, "branch">> } | { ok: false; error: string } {
+export function validateCustomer(input: CustomerInput): { ok: true; value: Required<Omit<CustomerInput, "branch" | "payment">> } | { ok: false; error: string } {
   const method: Fulfillment = input.method === "delivery" ? "delivery" : "pickup";
   const name = clean(input.name, 80);
   const phone = clean(input.phone, 20).replace(/[^\d+]/g, "");
@@ -229,6 +231,8 @@ export async function createOrder(
     .map((i) => ({ productId: String(i.productId), variantId: i.variantId ? String(i.variantId) : undefined, qty: Math.floor(Number(i.qty)) }))
     .filter((i) => Number.isFinite(i.qty) && i.qty >= 1 && i.qty <= 999);
   if (clean.length === 0) return { ok: false, error: "السلة فاضية" };
+  const choices = paymentChoices(store);
+  const payment: PaymentMethod = customer.payment && choices.includes(customer.payment) ? customer.payment : choices[0];
 
   if (!hasSupabase || isDemoStore(store.id)) {
     // Demo stores: nothing is saved.
@@ -258,6 +262,7 @@ export async function createOrder(
         discount_code: null,
         fulfillment: v.method,
         branch,
+        payment_method: payment,
         customer_name: v.name,
         phone: v.phone,
         city: v.city,
@@ -280,7 +285,13 @@ export async function createOrder(
     console.error("createOrder", error?.message);
     return { ok: false, error: orderError(error?.message ?? "") };
   }
-  if (branch) await supabaseAdmin().from("orders").update({ branch: branch.name }).eq("id", (data as { id: string }).id);
+  const orderId = (data as { id: string }).id;
+  if (branch) await supabaseAdmin().from("orders").update({ branch: branch.name }).eq("id", orderId);
+  if (payment !== "cod") {
+    // Needs update 009 in Supabase; the order is saved either way.
+    const { error: payError } = await supabaseAdmin().from("orders").update({ payment_method: payment }).eq("id", orderId);
+    if (payError) console.error("payment_method not saved (run 009_payments.sql)", payError.message);
+  }
   const r = data as { id: string; number: number; total: number; subtotal: number; discount: number; shipping: number; discount_code: string | null; items: OrderLine[] };
   return {
     ok: true,
@@ -295,6 +306,7 @@ export async function createOrder(
       discount_code: r.discount_code,
       fulfillment: v.method,
       branch,
+      payment_method: payment,
       customer_name: v.name,
       phone: v.phone,
       city: v.city,

@@ -63,7 +63,28 @@ export type ShippingSettings = {
   default_fee?: number | null;
   free_over?: number | null;
   rates?: { city: string; fee: number }[];
+  /** How customers can pay. Kept here so it is readable on the storefront. */
+  payments?: PaymentSettings;
 };
+
+/** Syrian e-wallets a customer can pay with by manual transfer. */
+export type WalletId = "sham_cash" | "syriatel_cash" | "mtn_cash";
+export type Wallet = {
+  id: WalletId;
+  /** Sham Cash wallet code (32 characters) or the Syriatel / MTN Cash phone number. */
+  account: string;
+  /** Account holder name, so the customer can check it before sending. */
+  holder?: string | null;
+  /** Picture of the merchant's receive QR code (from the wallet app). */
+  qr?: string | null;
+};
+export type PaymentSettings = {
+  /** Cash on delivery / pay at pickup. On unless the merchant turns it off. */
+  cod?: boolean;
+  wallets?: Wallet[];
+};
+/** "cod" or one of the wallets. */
+export type PaymentMethod = "cod" | WalletId;
 
 export type Discount = {
   id: string;
@@ -148,6 +169,7 @@ export type OrderInput = {
   discountCode?: string;
   method?: Fulfillment;
   branch?: string;
+  payment?: PaymentMethod;
   items: CartItem[];
 };
 
@@ -186,6 +208,8 @@ export type Order = {
   fulfillment?: Fulfillment;
   branch?: string | null;
   share_token?: string | null;
+  /** How the customer said they will pay. Missing on older orders (cash). */
+  payment_method?: PaymentMethod | null;
   created_at: string;
 };
 

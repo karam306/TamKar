@@ -1,4 +1,5 @@
-import type { Currency, OrderLine, Store } from "./types";
+import type { Currency, OrderLine, PaymentMethod, Store } from "./types";
+import { WALLETS } from "./wallets";
 
 export function formatPrice(amount: number, currency: Currency): string {
   if (currency === "SYP") {
@@ -24,8 +25,10 @@ export function whatsappOrderLink(
     discount?: number;
     shipping?: number;
     discount_code?: string | null;
+    payment_method?: PaymentMethod | null;
   },
 ): string {
+  const wallet = order.payment_method && order.payment_method !== "cod" ? WALLETS[order.payment_method] : null;
   const lines = [
     `طلب جديد رقم #${order.number} من متجر ${store.name}`,
     "",
@@ -38,7 +41,7 @@ export function whatsappOrderLink(
         ? `التوصيل: ${order.shipping ? formatPrice(order.shipping, store.currency) : "مجاني"}`
         : "",
     `المجموع: ${formatPrice(order.total, store.currency)}`,
-    "الدفع: عند الاستلام",
+    wallet ? `الدفع: ${wallet.name}. رح أبعتلكم صورة إيصال التحويل` : "الدفع: عند الاستلام",
     "",
     `الاسم: ${order.customer_name}`,
     `الهاتف: ${order.phone}`,

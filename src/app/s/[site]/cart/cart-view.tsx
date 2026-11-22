@@ -6,8 +6,10 @@ import { StoreLink } from "@/components/store-ui";
 import { formatPrice } from "@/lib/format";
 import { contentId } from "@/lib/product-utils";
 import { track } from "@/components/tracking";
-import type { Fulfillment, Pricing } from "@/lib/types";
-import { getCartLines, placeOrder, quoteCart, type CartLine } from "./actions";
+import type { Fulfillment, PaymentMethod, Pricing } from "@/lib/types";
+import { WALLETS } from "@/lib/wallets";
+import { getCartLines, placeOrder, quoteCart, type CartLine, type PlaceOrderResult } from "./actions";
+import { WalletPay } from "./wallet-pay";
 
 const keyOf = (productId: string, variantId?: string) =>
   `${productId}|${variantId ?? ""}`;
@@ -20,6 +22,7 @@ export function CartView({
   pickupNote,
   storeCity,
   branches,
+  payments,
 }: {
   site: string;
   defaultCity: string;
@@ -28,7 +31,9 @@ export function CartView({
   pickupNote: string;
   storeCity: string;
   branches: { id: string; name: string; note: string }[];
+  payments: PaymentMethod[];
 }) {
+  const [payment, setPayment] = useState<PaymentMethod>(payments[0] ?? "cod");
   const [branch, setBranch] = useState("");
   // Pickup from the shop is the default; delivery only when the shop offers it.
   const [method, setMethod] = useState<Fulfillment>("pickup");
@@ -37,7 +42,9 @@ export function CartView({
   const [error, setError] = useState("");
   const [done, setDone] = useState<{
     number: number;
+    total: number;
     whatsappUrl: string;
+    wallet: Extract<PlaceOrderResult, { ok: true }>["wallet"];
   } | null>(null);
   const [details, setDetails] = useState<Record<string, CartLine> | null>(null);
   const [city, setCity] = useState(
@@ -107,6 +114,10 @@ export function CartView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [site, qtyKey, city, code, ready, method]);
 
+  if (done?.wallet) {
+    return <WalletPay number={done.number} total={done.total} currency={currency} whatsappUrl={done.whatsappUrl} wallet={done.wallet} />;
+  }
+
   if (done) {
     return (
       <div className="mx-auto max-w-lg px-4 py-16 text-center">
@@ -164,6 +175,7 @@ export function CartView({
         discountCode: code || undefined,
         method,
         branch: method === "pickup" && branch ? branch : undefined,
+        payment,
         items: lines.map((l) => ({
           productId: l.productId,
           variantId: l.variantId,
@@ -181,7 +193,8 @@ export function CartView({
         })),
       );
       clear();
-      setDone({ number: res.number, whatsappUrl: res.whatsappUrl });
+      setDone({ number: res.number, total: res.total, whatsappUrl: res.whatsappUrl, wallet: res.wallet ?? null });
+      window.scrollTo({ top: 0 });
     });
   }
 
@@ -406,12 +419,29 @@ export function CartView({
               </span>
             </div>
           </div>
-          <p className="text-sm text-muted">
-            💵{" "}
-            {method === "pickup"
-              ? "الدفع بالمحل عند الاستلام"
-              : "الدفع عند الاستلام"}
-          </p>
+          {payments.length > 1 ? (
+            <div className="space-y-2">
+              <div className="text-sm font-semibold">طريقة الدفع</div>
+              {payments.map((p) => (
+                <label
+                  key={p}
+                  className={`flex cursor-pointer items-center gap-2 rounded-theme border-2 bg-white p-3 text-sm ${payment === p ? "border-primary font-semibold" : "border-transparent"}`}
+                >
+                  <input type="radio" name="payment_pick" checked={payment === p} onChange={() => setPayment(p)} />
+                  <span className="text-lg">{p === "cod" ? "💵" : WALLETS[p].icon}</span>
+                  <span>
+                    {p === "cod" ? (method === "pickup" ? "كاش بالمحل عند الاستلام" : "كاش عند الاستلام") : `ادفع هلق عبر ${WALLETS[p].name}`}
+                  </span>
+                </label>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-muted">
+              {payment === "cod"
+                ? `💵 ${method === "pickup" ? "الدفع بالمحل عند الاستلام" : "الدفع عند الاستلام"}`
+                : `${WALLETS[payment].icon} الدفع بتحويل ${WALLETS[payment].name}، بنعطيك التفاصيل بعد تأكيد الطلب`}
+            </p>
+          )}
           {error && (
             <p className="rounded-theme bg-red-50 p-3 text-sm text-red-700">
               {error}

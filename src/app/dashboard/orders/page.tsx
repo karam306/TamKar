@@ -160,7 +160,7 @@ export default async function OrdersPage({
                       {formatPrice(Number(o.total), store.currency)}
                     </td>
                     <td className="hidden p-2 md:table-cell">
-                      <PaymentBadge status={o.payment_status} />
+                      <PaymentBadge status={o.payment_status} method={o.payment_method} />
                     </td>
                     <td className="p-2">
                       <StatusBadge status={o.status} pickup={o.fulfillment === "pickup"} />

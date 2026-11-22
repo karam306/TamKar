@@ -23,7 +23,7 @@ export function LiveStatusBadge() {
   const { live, pickup } = useLive();
   return <StatusBadge status={live.status} pickup={pickup} />;
 }
-export const LivePaymentBadge = () => <PaymentBadge status={useLive().live.payment} />;
+export const LivePaymentBadge = ({ method }: { method?: Order["payment_method"] }) => <PaymentBadge status={useLive().live.payment} method={method} />;
 
 export function NextStepButton({ id }: { id: string }) {
   const { live, set, pickup } = useLive();
