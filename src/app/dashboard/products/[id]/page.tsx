@@ -31,7 +31,7 @@ export default async function EditProductPage({
     compare_at_price:
       data.compare_at_price == null ? null : Number(data.compare_at_price),
   };
-  const { categories, collections, optionPresets, specPresets } =
+  const { categories, collections, optionPresets, specPresets, placeholders } =
     await formData(m);
 
   return (
@@ -67,7 +67,7 @@ export default async function EditProductPage({
       />
       {created && (
         <p className="card mb-4 border-r-4 border-[#29845a] p-3 text-[13px]">
-          ✓ أُأضف المنتج
+          ✓ أُضيف المنتج
         </p>
       )}
       <ProductForm
@@ -77,6 +77,7 @@ export default async function EditProductPage({
         collections={collections}
         optionPresets={optionPresets}
         specPresets={specPresets}
+        placeholders={placeholders}
       />
       <details className="card mt-6 p-4 text-[13px]">
         <summary className="cursor-pointer font-semibold text-red-700">

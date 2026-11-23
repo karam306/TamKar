@@ -14,7 +14,7 @@ export default async function NewProductPage() {
         <ProGate feature="إضافة أكثر من 100 منتج" />
       </div>
     );
-  const { categories, collections, optionPresets, specPresets } =
+  const { categories, collections, optionPresets, specPresets, placeholders } =
     await formData(m);
   return (
     <div>
@@ -25,6 +25,7 @@ export default async function NewProductPage() {
         collections={collections}
         optionPresets={optionPresets}
         specPresets={specPresets}
+        placeholders={placeholders}
       />
     </div>
   );

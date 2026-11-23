@@ -12,6 +12,7 @@ type Template = {
   options: string[]; // option names suggested in the product editor
   specs: string[]; // spec rows suggested in the product editor
   productTypes: string[];
+  placeholders: { title: string; description: string; type: string }; // grey hints in the product editor
   features: { icon: string; title: string; text: string }[];
   faq: { q: string; a: string }[];
   extraPage?: { title: string; handle: string; body: string };
@@ -30,6 +31,7 @@ export const TEMPLATES: Record<BusinessType, Template> = {
     options: ["المقاس", "اللون"],
     specs: ["الخامة", "طريقة الغسيل", "القصة"],
     productTypes: ["فساتين", "بلايز", "بناطيل", "جاكيتات", "أحذية", "أطفال"],
+    placeholders: { title: "مثلاً: قميص قطني رجالي بأكمام طويلة", description: "الخامة، والمقاسات المتوفرة، وطريقة الغسيل...", type: "مثلاً: بلايز" },
     features: [{ icon: "🏪", title: "اطلب واستلم", text: "جهّز طلبك عبر الإنترنت واستلمه من المحل" }, COD, { icon: "🔁", title: "تبديل المقاس", text: "خلال 3 أيام من الاستلام" }, WA],
     faq: [
       { q: "ماذا لو لم يناسبني المقاس؟", a: "يمكنك استبداله خلال 3 أيام من الاستلام، بشرط أن تكون القطعة بحالتها الأصلية." },
@@ -51,6 +53,7 @@ export const TEMPLATES: Record<BusinessType, Template> = {
     options: ["اللون", "الخامة", "المقاس"],
     specs: ["الخامة", "الطلاء", "الطول", "الوزن"],
     productTypes: ["أساور", "قلادات", "حلق", "خواتم", "ساعات", "شنط"],
+    placeholders: { title: "مثلاً: سوار فضة عيار 925 بتصميم ناعم", description: "الخامة، والطول، ونوع الطلاء، ومناسبته للهدايا...", type: "مثلاً: أساور" },
     features: [{ icon: "🎁", title: "تغليف هدية مجاني", text: "مع كل طلب" }, COD, { icon: "✨", title: "خامات مضمونة", text: "لا تتغير مع الوقت" }, WA],
     faq: [
       { q: "هل يتوفر تغليف هدايا؟", a: "نعم، تصل جميع الطلبات بتغليف هدايا مجاني." },
@@ -66,6 +69,7 @@ export const TEMPLATES: Record<BusinessType, Template> = {
     options: ["السعة", "اللون", "الحالة"],
     specs: ["الشاشة", "المعالج", "الذاكرة", "الكاميرا", "البطارية", "الكفالة"],
     productTypes: ["هواتف", "سماعات", "شواحن", "أغطية", "ساعات ذكية", "أجهزة لوحية"],
+    placeholders: { title: "مثلاً: سامسونج Galaxy A55 بسعة 256 غيغابايت", description: "حالة الجهاز، ومحتويات العلبة، ومدة الكفالة...", type: "مثلاً: هواتف" },
     features: [{ icon: "🛡️", title: "كفالة", text: "على كل الأجهزة" }, { icon: "✅", title: "أصلي 100%", text: "مع العلبة الأصلية" }, COD, WA],
     faq: [
       { q: "هل الأجهزة جديدة أم مستعملة؟", a: "الحالة مذكورة لكل جهاز. الجديد بعلبته الأصلية، والمستعمل مفحوص." },
@@ -83,6 +87,7 @@ export const TEMPLATES: Record<BusinessType, Template> = {
     options: ["المعالج", "الذاكرة", "التخزين"],
     specs: ["المعالج", "الذاكرة", "التخزين", "البطاقة الرسومية", "الشاشة", "نظام التشغيل", "الكفالة"],
     productTypes: ["حواسيب محمولة", "معالجات", "بطاقات رسومية", "ذواكر RAM", "أقراص SSD", "شاشات", "إكسسوارات"],
+    placeholders: { title: "مثلاً: حاسوب محمول Lenovo بمعالج Core i5 وذاكرة 16 غيغابايت", description: "المعالج، والذاكرة، والتخزين، وحالة الجهاز، ومدة الكفالة...", type: "مثلاً: حواسيب محمولة" },
     features: [{ icon: "🛠️", title: "فحص قبل التسليم", text: "يُختبر كل جهاز" }, { icon: "🛡️", title: "كفالة", text: "على القطع والأجهزة" }, COD, WA],
     faq: [
       { q: "هل يمكنكم تجميع جهاز لي؟", a: "بالتأكيد، أرسل إلينا ميزانيتك واستخدامك عبر واتساب وسنقترح عليك." },
@@ -99,6 +104,7 @@ export const TEMPLATES: Record<BusinessType, Template> = {
     options: ["الحجم", "الوزن", "النكهة"],
     specs: ["المكونات", "الوزن", "مدة الصلاحية", "طريقة الحفظ"],
     productTypes: ["وجبات", "حلويات", "معجنات", "مشروبات", "علب ضيافة"],
+    placeholders: { title: "مثلاً: معمول بالتمر، علبة 1 كغ", description: "المكونات، والوزن أو عدد القطع، ومدة الصلاحية، وطريقة الحفظ...", type: "مثلاً: حلويات" },
     features: [{ icon: "🔥", title: "طازج كل يوم", text: "يُحضَّر يومياً" }, { icon: "🏪", title: "جاهز في اليوم نفسه", text: "اطلب واستلم من المحل" }, COD, WA],
     faq: [
       { q: "متى يصل الطلب؟", a: "في اليوم نفسه إذا طلبت قبل الساعة 2 ظهراً." },
@@ -114,6 +120,7 @@ export const TEMPLATES: Record<BusinessType, Template> = {
     options: ["الحجم", "اللون", "الرائحة"],
     specs: ["الحجم", "نوع البشرة", "المكونات", "بلد المنشأ"],
     productTypes: ["عطور", "مكياج", "عناية بالبشرة", "عناية بالشعر", "هدايا"],
+    placeholders: { title: "مثلاً: عطر عود للرجال، 100 مل", description: "الحجم، والرائحة، ونوع البشرة المناسب، وبلد المنشأ...", type: "مثلاً: عطور" },
     features: [{ icon: "✅", title: "أصلي 100%", text: "من مصادر موثوقة" }, { icon: "🎁", title: "تغليف هدية", text: "عند الطلب" }, COD, WA],
     faq: [
       { q: "هل المنتجات أصلية؟", a: "نعم، جميع منتجاتنا أصلية ومن مصادر موثوقة." },
@@ -129,6 +136,7 @@ export const TEMPLATES: Record<BusinessType, Template> = {
     options: ["اللون", "الحجم", "العدد"],
     specs: ["الخامة", "الأبعاد", "عدد القطع", "بلد المنشأ"],
     productTypes: ["صحون", "قدور", "كؤوس", "أدوات مطبخ", "تخزين", "ديكور"],
+    placeholders: { title: "مثلاً: طقم صحون سيراميك 18 قطعة", description: "المقاسات، والخامة، وطريقة الاستخدام...", type: "مثلاً: صحون" },
     features: [{ icon: "🏪", title: "اطلب واستلم", text: "جهّز طلبك عبر الإنترنت واستلمه من المحل" }, { icon: "✅", title: "جودة مضمونة", text: "منتجات مختارة" }, COD, WA],
     faq: [
       { q: "ماذا لو وصلت قطعة مكسورة؟", a: "صوّرها وأرسلها إلينا عبر واتساب، وسنستبدلها." },
@@ -144,6 +152,7 @@ export const TEMPLATES: Record<BusinessType, Template> = {
     options: ["اللون", "الحجم", "المقاس"],
     specs: ["الخامة", "الأبعاد", "الوزن"],
     productTypes: [],
+    placeholders: { title: "مثلاً: حقيبة ظهر مقاومة للماء", description: "ما يميّز المنتج، ومقاساته، وطريقة استخدامه...", type: "مثلاً: حقائب" },
     features: [{ icon: "🏪", title: "اطلب واستلم", text: "جهّز طلبك عبر الإنترنت واستلمه من المحل" }, COD, { icon: "✅", title: "جودة مضمونة", text: "منتجات مختارة" }, WA],
     faq: [
       { q: "كيف أدفع؟", a: "نقداً عند استلام الطلب." },

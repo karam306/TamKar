@@ -3,7 +3,7 @@ import type { Merchant } from "@/lib/auth";
 import { templateFor } from "@/lib/business-templates";
 import type { Collection } from "@/lib/types";
 
-export async function formData({ store, db }: Merchant): Promise<{ categories: string[]; collections: Collection[]; optionPresets: string[]; specPresets: string[] }> {
+export async function formData({ store, db }: Merchant): Promise<{ categories: string[]; collections: Collection[]; optionPresets: string[]; specPresets: string[]; placeholders: { title: string; description: string; type: string } }> {
   const t = templateFor((store as { business_type?: string }).business_type);
   const [cats, cols] = await Promise.all([
     db.from("products").select("category").eq("store_id", store.id).not("category", "is", null).limit(5000),
@@ -13,6 +13,7 @@ export async function formData({ store, db }: Merchant): Promise<{ categories: s
     categories: [...new Set([...(cats.data ?? []).map((r) => r.category as string), ...t.productTypes])],
     optionPresets: t.options,
     specPresets: t.specs,
+    placeholders: t.placeholders,
     collections: (cols.data ?? []) as Collection[],
   };
 }

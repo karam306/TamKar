@@ -16,6 +16,7 @@ export function ProductForm({
   collections,
   optionPresets,
   specPresets,
+  placeholders,
 }: {
   product?: Product;
   currency: string;
@@ -23,6 +24,7 @@ export function ProductForm({
   collections: Collection[];
   optionPresets: string[];
   specPresets: string[];
+  placeholders: { title: string; description: string; type: string };
 }) {
   const [state, action] = useActionState(saveProduct, undefined);
   const [withVariants, setWithVariants] = useState((product?.options?.length ?? 0) > 0);
@@ -36,10 +38,10 @@ export function ProductForm({
       <div className="space-y-4">
         <section className="card space-y-3 p-4">
           <Field label="العنوان">
-            <input name="title" required defaultValue={product?.title} maxLength={200} className="input" placeholder="مثلاً: طقم صحون سيراميك 18 قطعة" />
+            <input name="title" required defaultValue={product?.title} maxLength={200} className="input" placeholder={placeholders.title} />
           </Field>
           <Field label="الوصف">
-            <textarea name="description" rows={6} defaultValue={product?.description ?? ""} className="input" placeholder="المقاسات، والخامة، وطريقة الاستخدام..." />
+            <textarea name="description" rows={6} defaultValue={product?.description ?? ""} className="input" placeholder={placeholders.description} />
           </Field>
           <ImageUploader name="images" initial={product?.images ?? []} upload={uploadImage} max={10} label="الصور" />
         </section>
@@ -103,7 +105,7 @@ export function ProductForm({
         <section className="card space-y-3 p-4">
           <h2 className="text-sm font-semibold">التنظيم</h2>
           <Field label="نوع المنتج" hint="يظهر كعامل تصفية في صفحة المنتجات">
-            <input name="category" list="cats" defaultValue={product?.category ?? ""} className="input" placeholder="مثلاً: صحون" />
+            <input name="category" list="cats" defaultValue={product?.category ?? ""} className="input" placeholder={placeholders.type} />
             <datalist id="cats">
               {categories.map((c) => (
                 <option key={c} value={c} />
