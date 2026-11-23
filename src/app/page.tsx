@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BRAND, BRAND_AR } from "@/lib/brand";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { demoStores } from "@/lib/demo-data";
 
 /**
@@ -38,7 +39,7 @@ const faqs = [
 
 export default function PlatformHome() {
   return (
-    <div className="nama font-sans">
+    <div data-ui className="nama font-sans">
       <style>{CSS}</style>
 
       <header className="nama-wrap flex h-16 items-center justify-between">
@@ -56,6 +57,7 @@ export default function PlatformHome() {
           <a href="#pricing" className="hidden px-3 py-2 hover:underline sm:inline">
             الأسعار
           </a>
+          <ThemeToggle compact />
           <Link href="/login" className="px-3 py-2 hover:underline">
             دخول
           </Link>
@@ -325,6 +327,18 @@ const CSS = `
 .nama-typing i{width:6px;height:6px;border-radius:50%;background:#999;animation:nama-dot 1s infinite}
 .nama-typing i:nth-child(2){animation-delay:.15s}.nama-typing i:nth-child(3){animation-delay:.3s}
 .nama-tag{position:absolute;top:5.5rem;left:-1.25rem;background:var(--pist);color:var(--ink);font-weight:600;font-size:.85rem;padding:.45rem .9rem;border-radius:999px;box-shadow:0 10px 25px -12px rgba(22,36,26,.5);opacity:0;animation:nama-in .4s 2.1s forwards}
+html[data-mode=dark] .nama{--bg:#0e1510;--mute:#a7b49f;--pist-soft:#26331f;color:#e8efe1}
+html[data-mode=dark] .nama-band{background:#142019}
+html[data-mode=dark] .nama-dark{background:#08100a;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),inset 0 -1px 0 rgba(255,255,255,.06)}
+html[data-mode=dark] .nama-btn-ghost{box-shadow:inset 0 0 0 2px #e8efe1;color:#e8efe1}
+html[data-mode=dark] .nama-step{color:#e8efe1}
+html[data-mode=dark] .nama-phone{border-color:#2b3a2f;box-shadow:0 30px 60px -25px rgba(0,0,0,.7)}
+html[data-mode=dark] .nama .bg-white{background:#17221a}
+html[data-mode=dark] .nama .bg-\\[var\\(--ink\\)\\]{background:#08100a;box-shadow:0 0 0 1px rgba(195,217,127,.35)}
+html[data-mode=dark] .nama .nama-phone .bg-white,html[data-mode=dark] .nama .nama-typing{background:#fff}
+html[data-mode=dark] .nama .text-black\\/40{color:rgba(0,0,0,.4)}
+html[data-mode=dark] .nama .nama-tag{color:#16241A}
+html[data-mode=dark] .nama .nama-btn-pist{color:#16241A}
 @keyframes nama-in{to{opacity:1;transform:none}}
 @keyframes nama-out{to{opacity:0;height:0;padding:0;margin:0}}
 @keyframes nama-dot{50%{transform:translateY(-3px);opacity:.5}}

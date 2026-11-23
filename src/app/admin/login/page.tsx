@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { adminSessionInfo } from "@/lib/platform-admin";
 import { BRAND } from "@/lib/brand";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { switchToAdmin } from "./actions";
 import { AdminLoginForm } from "./form";
 
@@ -13,7 +14,10 @@ export default async function AdminLoginPage() {
   if (isAdmin) redirect("/admin");
 
   return (
-    <div data-theme="admin" className="flex min-h-screen flex-col items-center justify-center bg-[#0b2b26] px-4 py-10 font-sans">
+    <div data-theme="admin" data-ui className="relative flex min-h-screen flex-col items-center justify-center bg-[#0b2b26] px-4 py-10 font-sans">
+      <div className="absolute left-4 top-4">
+        <ThemeToggle onDark />
+      </div>
       <div className="mb-6 text-center text-white">
         <div className="brand-display text-3xl">{BRAND}</div>
         <div className="mt-1 text-sm opacity-75">لوحة المنصة</div>

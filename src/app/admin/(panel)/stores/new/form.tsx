@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useActionState, useState, useSyncExternalStore } from "react";
-import { Field, FormMessage, SubmitButton } from "@/components/form-ui";
+import { Field, SaveRow } from "@/components/form-ui";
 import { BUSINESS_TYPES } from "@/lib/business-types";
 import { createMerchant } from "@/app/admin/actions";
 
@@ -123,11 +123,11 @@ export function NewMerchantForm({ salesmen = [] }: { salesmen?: { id: string; na
             </select>
           </section>
         )}
-        <FormMessage state={state?.error ? { error: state.error } : undefined} />
-        <SubmitButton className="w-full" pendingText="جارٍ الإنشاء...">
-          إنشاء المتجر والحساب
-        </SubmitButton>
       </div>
+
+      <SaveRow state={state?.error ? { error: state.error } : undefined} pendingText="جارٍ الإنشاء...">
+        إنشاء المتجر والحساب
+      </SaveRow>
     </form>
   );
 }

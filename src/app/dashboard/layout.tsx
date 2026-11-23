@@ -8,6 +8,7 @@ import { daysLeft, subState } from "@/lib/subscription";
 import { storeUrl } from "@/lib/urls";
 import { MobileMenu, SideNav } from "./nav";
 import { BRAND } from "@/lib/brand";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export const metadata: Metadata = {
   title: "لوحة التحكم",
@@ -26,6 +27,7 @@ export default async function DashboardLayout({
     return (
       <div
         data-theme="admin"
+        data-ui
         className="mx-auto max-w-lg p-10 text-center font-sans"
       >
         <h1 className="mb-3 text-2xl">لوحة التحكم غير مفعّلة بعد</h1>
@@ -42,6 +44,7 @@ export default async function DashboardLayout({
   return (
     <div
       data-theme="admin"
+      data-ui
       className="flex min-h-screen flex-col bg-[#1a1a1a] font-sans text-text"
     >
       {/* Top bar */}
@@ -67,6 +70,8 @@ export default async function DashboardLayout({
             className="w-full rounded-lg border border-white/10 bg-[#303030] px-3 py-1.5 text-sm text-white placeholder:text-white/50 focus:border-white/40 focus:outline-none"
           />
         </form>
+        <div className="flex items-center gap-2">
+        <ThemeToggle onDark />
         <details className="relative">
           <summary className="flex cursor-pointer list-none items-center gap-2 rounded-lg px-2 py-1 hover:bg-white/10">
             <span className="hidden text-sm sm:inline">{store.name}</span>
@@ -112,6 +117,7 @@ export default async function DashboardLayout({
             </form>
           </div>
         </details>
+        </div>
       </header>
 
       <div className="flex min-h-0 flex-1 overflow-hidden lg:rounded-t-xl">

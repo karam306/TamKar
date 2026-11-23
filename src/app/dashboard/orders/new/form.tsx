@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useState } from "react";
-import { Field, FormMessage, SubmitButton } from "@/components/form-ui";
+import { Field, SaveRow } from "@/components/form-ui";
 import { formatPrice } from "@/lib/format";
 import type { Currency, Product } from "@/lib/types";
 import { createManualOrder } from "../actions";
@@ -307,11 +307,11 @@ export function ManualOrderForm({
             دفع الزبون مسبقاً
           </label>
         </section>
-        <FormMessage state={state} />
-        <SubmitButton className="w-full" pendingText="جارٍ الإنشاء...">
-          إنشاء الطلب
-        </SubmitButton>
       </div>
+
+      <SaveRow state={state} pendingText="جارٍ الإنشاء...">
+        إنشاء الطلب
+      </SaveRow>
     </form>
   );
 }

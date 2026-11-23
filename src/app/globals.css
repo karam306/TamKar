@@ -159,3 +159,104 @@ h1, h2, h3 {
 .hl-butter { --hl: #fbe28c; }
 .hl-pist { --hl: #dceaa4; }
 .hl-dark { --hl: #4a6b3a; }
+
+/* ------------------------------------------------------------------
+   Dark mode for the platform pages (homepage, login, dashboard, admin).
+   Turned on by <html data-mode="dark"> (ThemeToggle + script in layout).
+   Only containers marked data-ui change; stores, invoices and quotes
+   always keep their own light colors.
+   ------------------------------------------------------------------ */
+[data-theme="classic"], [data-theme="bold"], [data-theme="soft"] { color-scheme: light; }
+html[data-mode="dark"] { color-scheme: dark; background: #111312; }
+html[data-mode="dark"] [data-ui] {
+  color-scheme: dark;
+  --primary: #e7ebe9;
+  --bg: #111312;
+  --surface: #232725;
+  --text: #e7ebe9;
+  --muted: #9ba3a0;
+  --dk-page: #111312;
+  --dk-side: #181b1a;
+  --dk-card: #1c201e;
+  --dk-raised: #262b29;
+  --dk-line: rgba(255, 255, 255, 0.09);
+  --dk-line-strong: rgba(255, 255, 255, 0.18);
+  color: var(--text);
+}
+/* Surfaces */
+html[data-mode="dark"] [data-ui] .card,
+html[data-mode="dark"] [data-ui] .bg-white { background: var(--dk-card); }
+html[data-mode="dark"] [data-ui] .card { box-shadow: 0 0 0 1px var(--dk-line); }
+html[data-mode="dark"] [data-ui] .bg-\[\#f1f1f1\] { background: var(--dk-page); }
+html[data-mode="dark"] [data-ui] .bg-\[\#ebebeb\] { background: var(--dk-side); }
+html[data-mode="dark"] [data-ui] .bg-\[\#f7f7f7\],
+html[data-mode="dark"] [data-ui] .hover\:bg-\[\#f7f7f7\]:hover,
+html[data-mode="dark"] [data-ui] .hover\:bg-surface:hover { background: var(--dk-raised); }
+html[data-mode="dark"] [data-ui] .bg-\[\#1a1a1a\] { background: #0b0d0c; }
+html[data-mode="dark"] [data-ui] .bg-\[\#e3e3e3\] { background: #343a37; color: #d4d9d6; }
+html[data-mode="dark"] [data-ui] .bg-black\/5,
+html[data-mode="dark"] [data-ui] .hover\:bg-black\/5:hover { background: rgba(255, 255, 255, 0.07); }
+html[data-mode="dark"] [data-ui] .bg-\[\#303030\] { background: #e7ebe9; color: #111312; }
+html[data-mode="dark"] [data-ui] header .bg-\[\#303030\] { background: #232725; color: #fff; }
+html[data-mode="dark"] [data-ui] .file\:bg-\[\#303030\]::file-selector-button { background: #e7ebe9; color: #111312; }
+/* Lines */
+html[data-mode="dark"] [data-ui] .border-black\/5,
+html[data-mode="dark"] [data-ui] .border-black\/10,
+html[data-mode="dark"] [data-ui] .divide-black\/5 > *,
+html[data-mode="dark"] [data-ui] .divide-black\/10 > * { border-color: var(--dk-line); }
+html[data-mode="dark"] [data-ui] .border-black\/15,
+html[data-mode="dark"] [data-ui] .border-black\/20,
+html[data-mode="dark"] [data-ui] .border-black\/40 { border-color: var(--dk-line-strong); }
+html[data-mode="dark"] [data-ui] .ring-black\/5,
+html[data-mode="dark"] [data-ui] .ring-black\/10,
+html[data-mode="dark"] [data-ui] .ring-black\/20 { --tw-ring-color: var(--dk-line-strong); }
+html[data-mode="dark"] [data-ui] [class*="shadow-[0_0_0_1px_rgba(0,0,0"] { box-shadow: 0 0 0 1px var(--dk-line); }
+/* Text */
+html[data-mode="dark"] [data-ui] .text-\[\#303030\],
+html[data-mode="dark"] [data-ui] .text-black { color: var(--text); }
+html[data-mode="dark"] [data-ui] .text-\[\#4a4a4a\] { color: #c9cfcc; }
+html[data-mode="dark"] [data-ui] .text-\[\#616161\] { color: var(--muted); }
+html[data-mode="dark"] [data-ui] .text-black\/40 { color: rgba(255, 255, 255, 0.45); }
+html[data-mode="dark"] [data-ui] .text-\[\#005bd3\],
+html[data-mode="dark"] [data-ui] .text-\[\#1a0dab\] { color: #7cb3ff; }
+html[data-mode="dark"] [data-ui] .text-\[\#16241A\] { color: #e7ebe9; }
+html[data-mode="dark"] [data-ui] .text-\[\#8e1f0b\],
+html[data-mode="dark"] [data-ui] .text-red-700 { color: #ff9585; }
+html[data-mode="dark"] [data-ui] .text-green-700,
+html[data-mode="dark"] [data-ui] .text-green-800 { color: #7fdca6; }
+html[data-mode="dark"] [data-ui] .text-amber-700,
+html[data-mode="dark"] [data-ui] .text-amber-900 { color: #f3c96d; }
+/* Colored badges and notes: deep backgrounds, light text */
+html[data-mode="dark"] [data-ui] .bg-\[\#affebf\] { background: #123d2a; color: #8be8b4; }
+html[data-mode="dark"] [data-ui] .text-\[\#014b40\] { color: #8be8b4; }
+html[data-mode="dark"] [data-ui] .bg-\[\#fff4d6\],
+html[data-mode="dark"] [data-ui] .bg-\[\#fff8e6\],
+html[data-mode="dark"] [data-ui] .bg-\[\#fff4e5\],
+html[data-mode="dark"] [data-ui] .bg-amber-50 { background: #3a2f12; }
+html[data-mode="dark"] [data-ui] .bg-\[\#ffd6a4\] { background: #47300f; }
+html[data-mode="dark"] [data-ui] .text-\[\#5e4200\],
+html[data-mode="dark"] [data-ui] .text-\[\#8a6116\] { color: #f5cf7d; }
+html[data-mode="dark"] [data-ui] main .bg-\[\#ffeb78\] { background: #463d0c; }
+html[data-mode="dark"] [data-ui] main .text-\[\#4f4700\] { color: #fbe58a; }
+html[data-mode="dark"] [data-ui] .bg-\[\#e0f0ff\],
+html[data-mode="dark"] [data-ui] .bg-\[\#d5ebff\] { background: #12304a; }
+html[data-mode="dark"] [data-ui] .text-\[\#00527c\],
+html[data-mode="dark"] [data-ui] .text-\[\#003a5a\] { color: #9fd2ff; }
+html[data-mode="dark"] [data-ui] .bg-\[\#f4f0ff\],
+html[data-mode="dark"] [data-ui] .bg-\[\#eae4ff\] { background: #2a2147; }
+html[data-mode="dark"] [data-ui] .text-\[\#5700d1\] { color: #c8b3ff; }
+html[data-mode="dark"] [data-ui] .bg-red-50 { background: #3b1518; }
+html[data-mode="dark"] [data-ui] .bg-green-50 { background: #10301f; }
+/* Buttons and fields */
+html[data-mode="dark"] [data-ui] .btn { color: #111312; }
+html[data-mode="dark"] [data-ui][data-theme="admin"] .btn { box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.25); }
+html[data-mode="dark"] [data-ui] .btn-outline { background: transparent; color: var(--text); border-color: var(--dk-line-strong); }
+html[data-mode="dark"] [data-ui][data-theme="admin"] .btn-outline { background: var(--dk-raised); box-shadow: 0 0 0 1px var(--dk-line-strong); }
+html[data-mode="dark"] [data-ui] .input { background: #151816; border-color: var(--dk-line-strong); color: var(--text); }
+html[data-mode="dark"] [data-ui] .input:focus { border-color: #8be8b4; }
+html[data-mode="dark"] [data-ui] .input::placeholder { color: #6f7774; }
+/* Highlighter: deeper bars so light text stays readable */
+html[data-mode="dark"] [data-ui] .hl-apricot { --hl: #6e4320; }
+html[data-mode="dark"] [data-ui] .hl-mint { --hl: #1d5a3c; }
+html[data-mode="dark"] [data-ui] .hl-pist { --hl: #4b5a1b; }
+html[data-mode="dark"] [data-ui] .hl-butter { --hl: #5e4c10; }

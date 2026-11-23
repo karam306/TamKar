@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useActionState, useState } from "react";
-import { Field, FormMessage, SubmitButton } from "@/components/form-ui";
+import { Field, SaveRow } from "@/components/form-ui";
 import { ImageUploader } from "@/components/image-uploader";
 import type { Collection, Product } from "@/lib/types";
 import { saveProduct, uploadImage } from "./actions";
@@ -130,11 +130,9 @@ export function ProductForm({
           </div>
         </section>
 
-        <div className="sticky bottom-3 space-y-2">
-          <FormMessage state={state} />
-          <SubmitButton className="w-full">حفظ</SubmitButton>
-        </div>
       </div>
+
+      <SaveRow state={state}>حفظ المنتج</SaveRow>
     </form>
   );
 }

@@ -29,3 +29,20 @@ export function Field({ label, hint, children }: { label: string; hint?: React.R
     </label>
   );
 }
+
+/**
+ * Save row at the very end of a two-column form: spans both columns on a laptop,
+ * so the button comes after the last field instead of sitting high in the side column.
+ */
+export function SaveRow({ state, children, pendingText }: { state?: FormState; children: React.ReactNode; pendingText?: string }) {
+  return (
+    <div className="space-y-3 border-t border-black/10 pt-4 lg:col-span-2">
+      <FormMessage state={state} />
+      <div className="flex justify-end">
+        <SubmitButton className="w-full lg:w-auto lg:min-w-48" pendingText={pendingText}>
+          {children}
+        </SubmitButton>
+      </div>
+    </div>
+  );
+}

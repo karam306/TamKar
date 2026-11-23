@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { Field, FormMessage, SubmitButton } from "@/components/form-ui";
+import { Field, SaveRow } from "@/components/form-ui";
 import type { Discount } from "@/lib/types";
 import { saveDiscount } from "./actions";
 
@@ -84,9 +84,9 @@ export function DiscountForm({ discount, currency }: { discount?: Discount; curr
           </select>
           {discount && <p className="text-xs text-muted">استُخدم {discount.used_count} مرة</p>}
         </section>
-        <FormMessage state={state} />
-        <SubmitButton className="w-full">حفظ الخصم</SubmitButton>
       </div>
+
+      <SaveRow state={state}>حفظ الخصم</SaveRow>
     </form>
   );
 }

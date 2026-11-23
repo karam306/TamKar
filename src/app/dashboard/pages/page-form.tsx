@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { Field, FormMessage, SubmitButton } from "@/components/form-ui";
+import { Field, SaveRow } from "@/components/form-ui";
 import type { StorePage } from "@/lib/types";
 import { savePage } from "./actions";
 
@@ -31,9 +31,9 @@ export function PageForm({ page }: { page?: StorePage }) {
             <input name="handle" dir="ltr" className="input" value={handle} onChange={(e) => setHandle(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))} />
           </Field>
         </section>
-        <FormMessage state={state} />
-        <SubmitButton className="w-full">حفظ</SubmitButton>
       </div>
+
+      <SaveRow state={state}>حفظ</SaveRow>
     </form>
   );
 }

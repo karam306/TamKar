@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { Field, FormMessage, SubmitButton } from "@/components/form-ui";
+import { Field, SaveRow } from "@/components/form-ui";
 import { ImageUploader } from "@/components/image-uploader";
 import type { Collection } from "@/lib/types";
 import { uploadImage } from "../products/actions";
@@ -38,9 +38,9 @@ export function CollectionForm({ collection, children }: { collection?: Collecti
             />
           </Field>
         </section>
-        <FormMessage state={state} />
-        <SubmitButton className="w-full">حفظ</SubmitButton>
       </div>
+
+      <SaveRow state={state}>حفظ</SaveRow>
     </form>
   );
 }
