@@ -258,7 +258,7 @@ export default function SignupPage() {
     if (index > 0) setStep(steps[index - 1]);
   }
 
-  const link = root ? `${d.slug || "mystore"}.${root}` : `tam-kar.vercel.app/s/${d.slug || "mystore"}`;
+  const link = root ? `${d.slug || "mystore"}.${root}` : `kunstores.com/s/${d.slug || "mystore"}`;
   const progress = Math.round((index / (steps.length - 1)) * 100);
 
   return (
@@ -518,7 +518,7 @@ export default function SignupPage() {
         )}
 
         {step === "heard_from" && (
-          <Screen title="كيف عرفت بنمى؟" sub="يساعدنا ذلك على الوصول إلى تجار مثلك.">
+          <Screen title="كيف عرفت بمنصة كُن؟" sub="يساعدنا ذلك على الوصول إلى تجار مثلك.">
             <div className="grid grid-cols-2 gap-2">
               {HEARD.map((h) => (
                 <Choice key={h.id} selected={d.heard_from === h.id} onClick={() => choose({ heard_from: h.id })}>

@@ -11,7 +11,7 @@ export function ForgotForm({ support }: { support: string | null }) {
   const state = done ?? asked;
   const email = state?.email ?? "";
   const help = support
-    ? `https://wa.me/${support}?text=${encodeURIComponent(`مرحباً، نسيت كلمة المرور لحسابي على نمى${email ? ` (${email})` : ""}`)}`
+    ? `https://wa.me/${support}?text=${encodeURIComponent(`مرحباً، نسيت كلمة المرور لحسابي على منصة كُن${email ? ` (${email})` : ""}`)}`
     : null;
 
   if (state?.step !== "code") {

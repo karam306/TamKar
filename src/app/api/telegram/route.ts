@@ -24,7 +24,7 @@ export async function POST(req: Request) {
   if (start) {
     const { data } = await admin.from("store_admin").select("store_id, stores(name)").eq("telegram_token", start[1].toLowerCase()).maybeSingle();
     if (!data) {
-      await sendTelegram(chat, "انتهت صلاحية هذا الرابط أو استُخدم من قبل. عُد إلى لوحة متجرك على نمى: الإعدادات، ثم إشعارات تيليغرام، واضغط «ربط» مرة أخرى.");
+      await sendTelegram(chat, "انتهت صلاحية هذا الرابط أو استُخدم من قبل. عُد إلى لوحة متجرك على منصة كُن: الإعدادات، ثم إشعارات تيليغرام، واضغط «ربط» مرة أخرى.");
     } else {
       await admin.from("store_admin").update({ telegram_chat_id: chat, telegram_token: null }).eq("store_id", data.store_id);
       const name = (data as unknown as { stores?: { name?: string } }).stores?.name ?? "متجرك";
@@ -39,6 +39,6 @@ export async function POST(req: Request) {
     return Response.json({ ok: true });
   }
 
-  await sendTelegram(chat, "أهلاً بك. هذا بوت إشعارات نمى.\nلربط متجرك: افتح لوحة المتجر، ثم الإعدادات، ثم إشعارات تيليغرام، واضغط «ربط».");
+  await sendTelegram(chat, "أهلاً بك. هذا بوت إشعارات منصة كُن.\nلربط متجرك: افتح لوحة المتجر، ثم الإعدادات، ثم إشعارات تيليغرام، واضغط «ربط».");
   return Response.json({ ok: true });
 }

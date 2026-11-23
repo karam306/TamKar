@@ -1,9 +1,10 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { PLATFORM_DOMAIN } from "@/lib/brand";
 
 /**
  * Routes every request to the right store based on the address:
- *   tamkar.com / www.tamkar.com / *.vercel.app  -> platform pages and dashboard (stores at /s/<slug>)
+ *   kunstores.com / www.kunstores.com / *.vercel.app  -> platform pages and dashboard (stores at /s/<slug>)
  *   ahmad.tamkar.com                            -> store "ahmad"
  *   ahmadstore.com (custom domain)              -> store with that verified domain
  */
@@ -21,6 +22,8 @@ export async function proxy(request: NextRequest) {
   const isPlatform =
     host === ROOT ||
     host === `www.${ROOT}` ||
+    host === PLATFORM_DOMAIN ||
+    host === `www.${PLATFORM_DOMAIN}` ||
     host.endsWith(".vercel.app") ||
     host.startsWith("127.0.0.1") ||
     host === "";

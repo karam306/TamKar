@@ -77,7 +77,7 @@ export function defaultSections(storeName: string): Section[] {
 
 export const RESERVED_SLUGS = [
   "www", "app", "admin", "api", "dashboard", "mail", "help", "support", "blog", "s",
-  "login", "signup", "tamkar", "demo", "lamar", "halawet", "test", "shop", "store",
+  "login", "signup", "tamkar", "kun", "kunstores", "demo", "lamar", "halawet", "test", "shop", "store",
 ];
 
 /** Turns a local Syrian number (09xxxxxxxx) or +963... into 963xxxxxxxxx. */

@@ -7,7 +7,7 @@
 @import "@fontsource/cairo/arabic-900.css";
 @import "@fontsource/tajawal/400.css";
 @import "@fontsource/tajawal/700.css";
-/* Nama brand: Rakkas for Arabic display, Fraunces Black Italic for Latin (Nama, prices). */
+/* Kun brand: Rakkas for Arabic display, Fraunces Black Italic for Latin (Kun, prices). */
 @import "@fontsource/rakkas/arabic-400.css";
 @import "@fontsource/fraunces/latin-900-italic.css";
 
@@ -137,7 +137,7 @@ h1, h2, h3 {
 }
 .input:focus { border-color: var(--primary); }
 
-/* Nama brand highlighter: a pastel marker bar under display text. */
+/* Kun brand highlighter: a pastel marker bar under display text. */
 .brand-display {
   font-family: "Fraunces", "Rakkas", system-ui, sans-serif;
   font-style: italic;

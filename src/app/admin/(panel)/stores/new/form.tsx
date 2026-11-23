@@ -16,7 +16,7 @@ export function NewMerchantForm({ salesmen = [] }: { salesmen?: { id: string; na
 
   if (state?.created) {
     const c = state.created;
-    const msg = `أهلاً بك في نمى.\nمتجرك "${c.name}" جاهز.\n\nرابط متجرك: ${origin}/s/${c.slug}\nلوحة التحكم: ${origin}/login\nالبريد الإلكتروني: ${c.email}\nكلمة المرور: ${c.password}\n\nيمكنك تغيير كلمة المرور بعد أول تسجيل دخول.`;
+    const msg = `أهلاً بك في منصة كُن.\nمتجرك "${c.name}" جاهز.\n\nرابط متجرك: ${origin}/s/${c.slug}\nلوحة التحكم: ${origin}/login\nالبريد الإلكتروني: ${c.email}\nكلمة المرور: ${c.password}\n\nيمكنك تغيير كلمة المرور بعد أول تسجيل دخول.`;
     return (
       <div className="card max-w-xl space-y-4 p-5">
         <h2 className="text-lg font-semibold">✓ أُنشئ المتجر</h2>

@@ -22,7 +22,7 @@ export function AddSalesmanForm() {
 /** The salesman's personal signup link: stores that sign up through it are counted for him. */
 export function CopyRef({ link, phone }: { link: string; phone: string | null }) {
   const [copied, setCopied] = useState(false);
-  const text = `هذا رابطك الخاص لتسجيل المتاجر على نمى. يُحتسب لك كل متجر يسجّل من خلاله:\n${link}`;
+  const text = `هذا رابطك الخاص لتسجيل المتاجر على منصة كُن. يُحتسب لك كل متجر يسجّل من خلاله:\n${link}`;
   return (
     <div className="flex flex-wrap items-center gap-2 rounded-lg bg-[#f7f7f7] p-2 text-[13px]">
       <span className="min-w-0 flex-1 truncate font-mono" dir="ltr">

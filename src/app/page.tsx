@@ -3,7 +3,7 @@ import { BRAND, BRAND_AR } from "@/lib/brand";
 import { demoStores } from "@/lib/demo-data";
 
 /**
- * Nama's public homepage. Audience: shop owners in Syria, mostly on phones.
+ * Kun's public homepage. Audience: shop owners in Syria, mostly on phones.
  * One job: get them to open a store (or ask us to build it for them).
  * Look: olive and pistachio, Rakkas / Fraunces Black Italic headlines with a pastel
  * highlighter bar under them (the brand mark), and one moving moment,
@@ -11,7 +11,7 @@ import { demoStores } from "@/lib/demo-data";
  */
 
 const SUPPORT = process.env.PLATFORM_SUPPORT_WHATSAPP;
-const helpLink = SUPPORT ? `https://wa.me/${SUPPORT}?text=${encodeURIComponent("مرحباً، أرغب في مساعدتكم لإنشاء متجر على نمى")}` : "/signup";
+const helpLink = SUPPORT ? `https://wa.me/${SUPPORT}?text=${encodeURIComponent("مرحباً، أرغب في مساعدتكم لإنشاء متجر على منصة كُن")}` : "/signup";
 
 const steps = [
   { title: "أنشئ متجرك", text: "أجب عن بضعة أسئلة: اسم المحل، ونوع نشاطك، ورقم واتساب. يُجهَّز متجرك بقالب يناسب نشاطك." },
@@ -74,7 +74,7 @@ export default function PlatformHome() {
             <span className="hl hl-pist">وطلباتك تصلك عبر واتساب.</span>
           </h1>
           <p className="mb-8 max-w-xl text-lg leading-9 text-[var(--mute)]">
-            تتيح لك {BRAND_AR} إنشاء متجر إلكتروني عربي لمحلك خلال دقائق. يتصفح الزبون منتجاتك ويطلب من هاتفه، ويصلك الطلب منظّماً، ثم يستلمه من محلك ويدفع.
+            تتيح لك منصة {BRAND_AR} إنشاء متجر إلكتروني عربي لمحلك خلال دقائق. يتصفح الزبون منتجاتك ويطلب من هاتفه، ويصلك الطلب منظّماً، ثم يستلمه من محلك ويدفع.
           </p>
           <div className="flex flex-wrap gap-3">
             <Link href="/signup" className="nama-btn text-lg">
