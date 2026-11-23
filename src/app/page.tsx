@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BRAND, BRAND_AR } from "@/lib/brand";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { storeUrl } from "@/lib/urls";
 import { demoStores } from "@/lib/demo-data";
 
 /**
@@ -178,7 +179,7 @@ export default function PlatformHome() {
           <p className="mb-8 text-lg text-[var(--mute)]">متاجر تجريبية على المنصة. افتح أياً منها وجرّب تقديم طلب.</p>
           <div className="grid gap-4 sm:grid-cols-3">
             {demoStores.map((s) => (
-              <Link key={s.slug} href={`/s/${s.slug}`} className="group block overflow-hidden rounded-2xl bg-white ring-1 ring-black/5">
+              <Link key={s.slug} href={storeUrl(s.slug)} className="group block overflow-hidden rounded-2xl bg-white ring-1 ring-black/5">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={(s.sections.find((x) => x.type === "hero") as { image?: string } | undefined)?.image} alt="" className="aspect-[2/1] w-full object-cover" />
                 <div className="p-5">

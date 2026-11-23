@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { BUSINESS_TYPES } from "@/lib/business-types";
 import { slugify } from "@/lib/slugify";
+import { ROOT_DOMAIN } from "@/lib/brand";
 import { checkSlug, signup } from "../actions";
 
 /**
@@ -11,7 +12,7 @@ import { checkSlug, signup } from "../actions";
  * (except the password) so a refresh doesn't lose them.
  */
 
-const root = process.env.NEXT_PUBLIC_ROOT_DOMAIN;
+const root = ROOT_DOMAIN;
 const SAVE_KEY = "tk_signup";
 
 const TYPE_ICONS: Record<string, string> = {
@@ -258,7 +259,7 @@ export default function SignupPage() {
     if (index > 0) setStep(steps[index - 1]);
   }
 
-  const link = root ? `${d.slug || "mystore"}.${root}` : `kunstores.com/s/${d.slug || "mystore"}`;
+  const link = `${d.slug || "mystore"}.${root.startsWith("localhost") ? "kunstores.com" : root}`;
   const progress = Math.round((index / (steps.length - 1)) * 100);
 
   return (

@@ -1,14 +1,14 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { PLATFORM_DOMAIN } from "@/lib/brand";
+import { PLATFORM_DOMAIN, ROOT_DOMAIN } from "@/lib/brand";
 
 /**
  * Routes every request to the right store based on the address:
  *   kunstores.com / www.kunstores.com / *.vercel.app  -> platform pages and dashboard (stores at /s/<slug>)
- *   ahmad.tamkar.com                            -> store "ahmad"
+ *   ahmad.kunstores.com                         -> store "ahmad"
  *   ahmadstore.com (custom domain)              -> store with that verified domain
  */
-const ROOT = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || "localhost:3000").toLowerCase();
+const ROOT = ROOT_DOMAIN;
 const SB_URL = (process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "")
   .trim()
   .replace(/\/+$/, "")
@@ -29,6 +29,12 @@ export async function proxy(request: NextRequest) {
     host === "";
 
   if (isPlatform) {
+    // Old store links (kunstores.com/s/ahmad) move to the store's own address (ahmad.kunstores.com).
+    // The design preview inside the dashboard keeps using /s/<slug> in an iframe.
+    const old = pathname.match(/^\/s\/([a-z0-9-]{2,40})(\/.*)?$/);
+    if (old && (host === ROOT || host === `www.${ROOT}`) && !ROOT.startsWith("localhost") && request.headers.get("sec-fetch-dest") !== "iframe") {
+      return NextResponse.redirect(`https://${old[1]}.${ROOT}${old[2] || "/"}${search}`, 308);
+    }
     if (pathname.startsWith("/dashboard") || pathname.startsWith("/admin") || pathname === "/login" || pathname === "/signup") {
       return refreshSession(request);
     }

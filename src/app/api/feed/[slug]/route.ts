@@ -1,3 +1,4 @@
+import { ROOT_DOMAIN } from "@/lib/brand";
 import { getCollections, getStore, isDemoStore } from "@/lib/data";
 import { demoProducts } from "@/lib/demo-data";
 import { hasSupabase, supabasePublic } from "@/lib/supabase";
@@ -27,8 +28,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ slug: st
   if (!store || !isPro(store)) return new Response("Not found", { status: 404 });
 
   const origin = new URL(req.url).origin;
-  const root = process.env.NEXT_PUBLIC_ROOT_DOMAIN;
-  const storeBase = root && !root.startsWith("localhost") ? `https://${store.slug}.${root}` : `${origin}/s/${store.slug}`;
+  const root = ROOT_DOMAIN;
+  const storeBase = !root.startsWith("localhost") ? `https://${store.slug}.${root}` : `${origin}/s/${store.slug}`;
   const img = (u?: string) => (!u ? "" : u.startsWith("http") ? u : `${origin}${u}${u.startsWith("/api/media/") ? "?f=jpg" : ""}`);
 
   let products: Product[] = [];
