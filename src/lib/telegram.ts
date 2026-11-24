@@ -1,5 +1,6 @@
 import "server-only";
 import { createHash } from "node:crypto";
+import { unstable_cache } from "next/cache";
 import { supabaseAdmin } from "./supabase";
 import { formatPrice, giftLines } from "./format";
 import type {
@@ -59,20 +60,60 @@ export async function tg<T = unknown>(
   }
 }
 
-let username: string | null = null;
+type GetMe = { ok: boolean; result?: { username: string }; description?: string; parameters?: { retry_after?: number } };
+
+/** Ask Telegram who the bot is (not cached). */
+async function getMe(): Promise<GetMe> {
+  if (!TOKEN) return { ok: false, description: "TELEGRAM_BOT_TOKEN missing" };
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${TOKEN}/getMe`, { cache: "no-store", signal: AbortSignal.timeout(8000) });
+    return (await res.json()) as GetMe;
+  } catch (e) {
+    const err = e as Error & { cause?: { code?: string } };
+    return { ok: false, description: `network: ${[err.message, err.cause?.code].filter(Boolean).join(" / ")}` };
+  }
+}
+
+/** Last refusal, so the admin card can explain it without asking Telegram a second time. */
+let lastFailure: GetMe | null = null;
+
+/**
+ * The bot's name hardly ever changes, so it is asked once and kept for a day, shared by all
+ * servers. Asking on every page view got the platform rate-limited ("Too Many Requests").
+ * A failed answer throws, so it is never kept.
+ */
+const cachedBotName = unstable_cache(
+  async (tokenId: string) => {
+    void tokenId; // part of the cache key: a new token asks again
+    const r = await getMe();
+    if (!r.ok || !r.result) {
+      lastFailure = r;
+      throw new Error(r.description ?? "getMe failed");
+    }
+    return r.result.username;
+  },
+  ["telegram-bot-name"],
+  { revalidate: 86400 },
+);
+
 export async function botUsername(): Promise<string | null> {
-  if (username) return username;
-  const r = await tg<{ username: string }>("getMe", {});
-  username = r.ok && r.result ? r.result.username : null;
-  return username;
+  if (!TOKEN) return null;
+  try {
+    lastFailure = null;
+    return await cachedBotName(TOKEN.split(":")[0]);
+  } catch {
+    return null;
+  }
 }
 
 /** Why Telegram refused the token, in words the owner can act on. */
 export async function botProblem(): Promise<string | null> {
   if (!TOKEN) return null;
   if (!/^\d{6,}:[A-Za-z0-9_-]{30,}$/.test(TOKEN)) return "شكل الرمز غير صحيح. يجب أن يكون مثل 7123456789:AAH... بالكامل، دون أي إضافات.";
-  const r = await tg("getMe", {});
+  const r = lastFailure ?? (await getMe());
   if (r.ok) return null;
+  if (/too many requests/i.test(r.description ?? ""))
+    return `الرمز صحيح، لكن تيليغرام طلب الانتظار ${r.parameters?.retry_after ?? 60} ثانية. حدّث الصفحة بعد دقيقة.`;
   if (r.description?.startsWith("network")) return `تعذّر الاتصال بخوادم تيليغرام من الموقع. التفاصيل التقنية: ${r.description.replace(/^network:\s*/, "")}`;
   if (/unauthorized|not found/i.test(r.description ?? "")) return "رفض تيليغرام الرمز (Unauthorized). الرمز غير صحيح أو أُلغي. اطلب رمزاً جديداً من BotFather.";
   return `رفض تيليغرام الرمز (${r.description ?? "سبب غير معروف"}).`;
