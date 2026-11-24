@@ -23,7 +23,6 @@ import { RevealObserver, StickyCta } from "@/components/home/home-motion";
 const SUPPORT = process.env.PLATFORM_SUPPORT_WHATSAPP;
 const helpLink = SUPPORT ? `https://wa.me/${SUPPORT}?text=${encodeURIComponent("مرحباً، أرغب في مساعدتكم لإنشاء متجر على منصة كُن")}` : "/signup";
 
-const kinds = ["حلويات", "ملابس وأحذية", "عطور", "أدوات منزلية", "هواتف وإكسسوارات", "مجوهرات", "مطاعم", "ألعاب أطفال", "قرطاسية", "حواسيب", "هدايا", "أعشاب وبهارات"];
 
 const steps = [
   { title: "أنشئ متجرك", text: "أجب عن بضعة أسئلة: اسم المحل، ونوع نشاطك، ورقم واتساب. يُجهَّز متجرك بقالب يناسب نشاطك.", time: "5 دقائق" },
@@ -129,19 +128,6 @@ export default function PlatformHome() {
         </div>
       </section>
 
-      {/* Marquee of shop types */}
-      <section className="kun-marquee border-y border-black/10 py-5" aria-label="أنواع المحلات">
-        <div className="kun-track">
-          {[...kinds, ...kinds].map((k, i) => (
-            <span key={i} className="kun-tick" aria-hidden={i >= kinds.length}>
-              {k}
-              <span className="kun-star" aria-hidden>
-                ✦
-              </span>
-            </span>
-          ))}
-        </div>
-      </section>
 
       {/* 2. The problem, measured */}
       <section className="nama-wrap py-20">
@@ -507,11 +493,6 @@ const CSS = `
 .kun-cap-bar{position:absolute;bottom:0;right:0;left:0;height:3px;background:var(--leaf);transform:scaleX(0);transform-origin:right;animation:kun-bar 14s calc(var(--i) * 3.5s) infinite both}
 @media (max-width:640px){.kun-cap{padding:.75rem}.kun-cap .text-sm{display:none}}
 
-/* Marquee */
-.kun-marquee{overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
-.kun-track{display:flex;width:max-content;animation:kun-marq 45s linear infinite}
-.kun-tick{display:inline-flex;align-items:center;gap:1.6rem;padding-inline-end:1.6rem;font-family:"Rakkas",serif;font-size:1.6rem;white-space:nowrap}
-.kun-star{color:var(--leaf);font-size:1rem}
 
 /* Section labels */
 .kun-kicker{font-size:.85rem;font-weight:700;color:var(--leaf);margin-bottom:.6rem;letter-spacing:.01em}
@@ -631,7 +612,6 @@ html[data-mode=dark] [data-ui] :is(.kun-phone,.kun-preview) .border-black\\/5{bo
 @keyframes kun-pop{0%{opacity:0;transform:translateY(10px) scale(.9)}4%{opacity:1;transform:none}17%{opacity:1;transform:none}20%,100%{opacity:0;transform:translateY(-6px)}}
 @keyframes kun-cap{0%{opacity:.45;background:transparent}2%,23%{opacity:1;background:var(--card)}25.5%,100%{opacity:.45;background:transparent}}
 @keyframes kun-bar{0%{transform:scaleX(0);opacity:1}24%{transform:scaleX(1);opacity:1}25.5%,100%{transform:scaleX(1);opacity:0}}
-@keyframes kun-marq{to{transform:translateX(50%)}}
 @keyframes kun-drift{to{transform:translate(10rem,6rem)}}
 
 @media (prefers-reduced-motion:reduce){

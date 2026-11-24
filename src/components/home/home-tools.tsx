@@ -227,8 +227,9 @@ const QUESTIONS = ["كم السعر؟", "هل يتوفر مقاس أكبر؟", "
 export function TimeCalculator() {
   const [n, setN] = useState(20);
   const id = useId();
-  // Assumption shown to the visitor: about 2 minutes per reply, 30 days a month.
-  const hours = Math.round((n * 2 * 30) / 60);
+  // Assumption shown to the visitor: about 3 minutes per reply (read, check, answer), 26 working days a month.
+  const perDay = n * 3;
+  const hours = Math.round((perDay * 26) / 60);
   const days = Math.round((hours / 8) * 10) / 10;
 
   return (
@@ -266,12 +267,14 @@ export function TimeCalculator() {
             </span>
             <span className="text-2xl font-semibold">ساعة شهرياً</span>
           </div>
-          <div className="text-[var(--mute)]">أي ما يعادل {days.toLocaleString("en-US")} أيام عمل كاملة.</div>
+          <div className="text-[var(--mute)]">
+            أي نحو {perDay} دقيقة كل يوم، وما يعادل {days.toLocaleString("en-US")} أيام عمل كاملة في الشهر.
+          </div>
           <p className="mt-4 border-t border-black/10 pt-4 leading-8">
             في متجرك على <b>كُن</b> يرى الزبون السعر والمقاسات والألوان ومكان المحل قبل أن يسأل، ويصلك منه طلب جاهز بدل عشر رسائل.
           </p>
         </div>
-        <p className="mt-3 text-xs text-[var(--mute)]">تقدير تقريبي، بافتراض دقيقتين لكل رد.</p>
+        <p className="mt-3 text-xs text-[var(--mute)]">تقدير تقريبي، بافتراض ثلاث دقائق لكل رد (قراءة الرسالة والتحقق والإجابة) و26 يوم عمل في الشهر.</p>
       </div>
     </div>
   );
