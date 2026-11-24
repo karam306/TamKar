@@ -45,10 +45,8 @@ export default function PlatformHome() {
       <style>{CSS}</style>
 
       <header className="nama-wrap flex h-16 items-center justify-between">
-        <Link href="/" className="flex items-center gap-4" aria-label={`${BRAND_FULL_AR} ${BRAND_FULL}`}>
-          <KunLogo lang="ar" className="text-[2.1rem]" />
-          <span className="hidden h-7 w-px bg-black/15 sm:block" aria-hidden />
-          <KunLogo lang="en" className="hidden text-[1.9rem] sm:inline-flex" />
+        <Link href="/" className="flex items-center" aria-label={BRAND_FULL_AR}>
+          <KunLogo lang="ar" className="text-[2.3rem]" />
         </Link>
         <nav className="flex items-center gap-1 text-sm">
           <a href="#how" className="hidden px-3 py-2 hover:underline sm:inline">
