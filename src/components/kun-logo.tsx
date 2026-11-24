@@ -1,13 +1,15 @@
 import { BRAND_FULL, BRAND_FULL_AR } from "@/lib/brand";
+import { LOGO } from "./kun-logo-data";
 
 /**
- * The Kun Stores wordmark (approved 2026-11-24).
- * Arabic: "كُن" in Rakkas + "ستورز" in Alexandria Bold on the highlighter.
- * English: "kun" in Abril Fatface (tight letters) with the Arabic damma over the "u",
- *          + "stores" in Alexandria Bold on the highlighter.
- * Size it with a text-* class: everything scales from the font size.
+ * The Kun Stores logo, drawn from the outlined brand-kit shapes (no web fonts needed).
+ * Arabic: "كن" in Rakkas with the brand damma + "ستورز" (Alexandria Bold) on the highlighter.
+ * English: "kun" in Abril Fatface with the brand damma on the k + "stores" on the highlighter.
+ * The brand damma is the same mark as the favicon.
+ * Size it with a text-* class: the name is drawn 1em tall-ish, like text.
  * `onDark` switches to the dark-background colors (damma mint, bar olive).
  * `short` drops the second word (small spaces like the dashboard bar).
+ * Never show the Arabic and English logos side by side.
  */
 export function KunLogo({
   lang = "ar",
@@ -20,35 +22,20 @@ export function KunLogo({
   short?: boolean;
   className?: string;
 }) {
-  const cls = `kun-logo ${onDark ? "kun-on-dark" : ""} ${className}`;
-  if (lang === "en") {
-    return (
-      <span className={cls} dir="ltr" role="img" aria-label={short ? "Kun" : BRAND_FULL}>
-        <span className="kun-en" aria-hidden>
-          k
-          <span className="kun-u">
-            u<span className="kun-damma">و</span>
-          </span>
-          n
-        </span>
-        {!short && (
-          <span className="kun-stores" aria-hidden>
-            stores
-          </span>
-        )}
-      </span>
-    );
-  }
+  const art = LOGO[`${lang}${short ? "-short" : ""}`];
+  const [x, y, w, h] = art.viewBox;
+  const label = lang === "ar" ? (short ? "كُن" : BRAND_FULL_AR) : short ? "Kun" : BRAND_FULL;
   return (
-    <span className={cls} dir="rtl" role="img" aria-label={short ? "كُن" : BRAND_FULL_AR}>
-      <span className="kun-ar" aria-hidden>
-        كُن
-      </span>
-      {!short && (
-        <span className="kun-stores" aria-hidden>
-          ستورز
-        </span>
-      )}
-    </span>
+    <svg
+      className={`kun-logo ${onDark ? "kun-on-dark" : ""} ${className}`}
+      viewBox={`${x} ${y} ${w} ${h}`}
+      style={{ height: `${h / 200}em`, width: "auto" }}
+      role="img"
+      aria-label={label}
+    >
+      {art.bar && <rect x={art.bar[0]} y={art.bar[1]} width={art.bar[2]} height={art.bar[3]} className="kun-bar" />}
+      <path d={art.ink} fill="currentColor" />
+      <path d={art.damma} className="kun-damma" />
+    </svg>
   );
 }
