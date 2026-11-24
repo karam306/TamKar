@@ -1,5 +1,6 @@
 import "server-only";
 import { createHash } from "node:crypto";
+import https from "node:https";
 import { unstable_cache } from "next/cache";
 import { supabaseAdmin } from "./supabase";
 import { formatPrice, giftLines } from "./format";
@@ -32,29 +33,49 @@ export const telegramReady = () => Boolean(TOKEN);
 export const webhookSecret = () =>
   createHash("sha256").update(`nama-tg:${TOKEN}`).digest("hex").slice(0, 48);
 
-export async function tg<T = unknown>(
-  method: string,
-  body: Record<string, unknown>,
-): Promise<{ ok: boolean; result?: T; description?: string }> {
+/**
+ * POST/GET to Telegram over IPv4 only. Vercel servers have no IPv6 route out, and Node's
+ * fetch sometimes tries Telegram's IPv6 address first and hangs until it times out.
+ */
+function telegramCall(method: string, body?: Record<string, unknown>, timeoutMs = 10000): Promise<{ status: number; text: string }> {
+  return new Promise((resolve, reject) => {
+    const payload = body ? JSON.stringify(body) : undefined;
+    const req = https.request(
+      {
+        hostname: "api.telegram.org",
+        path: `/bot${TOKEN}/${method}`,
+        method: payload ? "POST" : "GET",
+        family: 4,
+        headers: payload ? { "content-type": "application/json", "content-length": Buffer.byteLength(payload) } : {},
+        timeout: timeoutMs,
+      },
+      (res) => {
+        let text = "";
+        res.setEncoding("utf8");
+        res.on("data", (c) => (text += c));
+        res.on("end", () => resolve({ status: res.statusCode ?? 0, text }));
+      },
+    );
+    req.on("timeout", () => req.destroy(new Error(`timeout after ${timeoutMs / 1000}s`)));
+    req.on("error", reject);
+    if (payload) req.write(payload);
+    req.end();
+  });
+}
+
+export async function tg<T = unknown>(method: string, body: Record<string, unknown>): Promise<{ ok: boolean; result?: T; description?: string }> {
   if (!TOKEN) return { ok: false, description: "TELEGRAM_BOT_TOKEN missing" };
   try {
-    const res = await fetch(`https://api.telegram.org/bot${TOKEN}/${method}`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(body),
-      cache: "no-store",
-      signal: AbortSignal.timeout(8000),
-    });
-    const text = await res.text();
+    const { status, text } = await telegramCall(method, body);
     try {
       return JSON.parse(text);
     } catch {
-      console.error("telegram non-JSON", method, res.status, text.slice(0, 200));
-      return { ok: false, description: `network: HTTP ${res.status} ${text.slice(0, 80)}` };
+      console.error("telegram non-JSON", method, status, text.slice(0, 200));
+      return { ok: false, description: `network: HTTP ${status} ${text.slice(0, 80)}` };
     }
   } catch (e) {
-    const err = e as Error & { cause?: { code?: string; message?: string } };
-    const detail = [err.name, err.message, err.cause?.code, err.cause?.message].filter(Boolean).join(" / ");
+    const err = e as Error & { code?: string };
+    const detail = [err.message, err.code].filter(Boolean).join(" / ");
     console.error("telegram", method, detail);
     return { ok: false, description: `network: ${detail}` };
   }
@@ -63,16 +84,7 @@ export async function tg<T = unknown>(
 type GetMe = { ok: boolean; result?: { username: string }; description?: string; parameters?: { retry_after?: number } };
 
 /** Ask Telegram who the bot is (not cached). */
-async function getMe(): Promise<GetMe> {
-  if (!TOKEN) return { ok: false, description: "TELEGRAM_BOT_TOKEN missing" };
-  try {
-    const res = await fetch(`https://api.telegram.org/bot${TOKEN}/getMe`, { cache: "no-store", signal: AbortSignal.timeout(8000) });
-    return (await res.json()) as GetMe;
-  } catch (e) {
-    const err = e as Error & { cause?: { code?: string } };
-    return { ok: false, description: `network: ${[err.message, err.cause?.code].filter(Boolean).join(" / ")}` };
-  }
-}
+const getMe = () => tg<{ username: string }>("getMe", {}) as Promise<GetMe>;
 
 /** Last refusal, so the admin card can explain it without asking Telegram a second time. */
 let lastFailure: GetMe | null = null;
