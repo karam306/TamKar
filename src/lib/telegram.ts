@@ -44,10 +44,18 @@ export async function tg<T = unknown>(
       cache: "no-store",
       signal: AbortSignal.timeout(8000),
     });
-    return await res.json();
+    const text = await res.text();
+    try {
+      return JSON.parse(text);
+    } catch {
+      console.error("telegram non-JSON", method, res.status, text.slice(0, 200));
+      return { ok: false, description: `network: HTTP ${res.status} ${text.slice(0, 80)}` };
+    }
   } catch (e) {
-    console.error("telegram", method, e instanceof Error ? e.message : e);
-    return { ok: false, description: "network" };
+    const err = e as Error & { cause?: { code?: string; message?: string } };
+    const detail = [err.name, err.message, err.cause?.code, err.cause?.message].filter(Boolean).join(" / ");
+    console.error("telegram", method, detail);
+    return { ok: false, description: `network: ${detail}` };
   }
 }
 
@@ -65,7 +73,7 @@ export async function botProblem(): Promise<string | null> {
   if (!/^\d{6,}:[A-Za-z0-9_-]{30,}$/.test(TOKEN)) return "شكل الرمز غير صحيح. يجب أن يكون مثل 7123456789:AAH... بالكامل، دون أي إضافات.";
   const r = await tg("getMe", {});
   if (r.ok) return null;
-  if (r.description === "network") return "تعذّر الاتصال بخوادم تيليغرام من الموقع. حاول بعد دقائق.";
+  if (r.description?.startsWith("network")) return `تعذّر الاتصال بخوادم تيليغرام من الموقع. التفاصيل التقنية: ${r.description.replace(/^network:\s*/, "")}`;
   if (/unauthorized|not found/i.test(r.description ?? "")) return "رفض تيليغرام الرمز (Unauthorized). الرمز غير صحيح أو أُلغي. اطلب رمزاً جديداً من BotFather.";
   return `رفض تيليغرام الرمز (${r.description ?? "سبب غير معروف"}).`;
 }
