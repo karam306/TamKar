@@ -3,7 +3,7 @@ import { Card, PageHeader } from "@/components/admin-ui";
 import { formatPrice } from "@/lib/format";
 import { daysLeft, SUB_LABELS, subState } from "@/lib/subscription";
 import { loadStores } from "@/app/admin/data";
-import { botUsername, telegramReady } from "@/lib/telegram";
+import { botProblem, botUsername, telegramReady } from "@/lib/telegram";
 import { TelegramCard } from "./telegram-card";
 
 export default async function AdminHome() {
@@ -22,6 +22,7 @@ export default async function AdminHome() {
 
   const helpWanted = stores.filter((s) => s.note?.startsWith("🙋"));
 
+  const tgBot = telegramReady() ? await botUsername() : null;
   return (
     <div className="space-y-4">
       <PageHeader
@@ -44,7 +45,13 @@ export default async function AdminHome() {
         <Tile label="مبيعات بالليرة (30 يوم)" value={formatPrice(syp, "SYP")} />
       </div>
 
-      <TelegramCard ready={telegramReady()} bot={telegramReady() ? await botUsername() : null} connected={stores.filter((s) => s.telegram).length} total={stores.length} />
+      <TelegramCard
+        ready={telegramReady()}
+        bot={tgBot}
+        problem={telegramReady() && !tgBot ? await botProblem() : null}
+        connected={stores.filter((s) => s.telegram).length}
+        total={stores.length}
+      />
 
       {helpWanted.length > 0 && (
         <Card title={`🙋 طلبوا المساعدة في التجهيز والإعلانات (${helpWanted.length})`}>

@@ -15,7 +15,16 @@ import { paymentLabel } from "./wallets";
  * One Telegram bot for the whole platform. Karam creates it with BotFather and puts its
  * token in Vercel as TELEGRAM_BOT_TOKEN. Each merchant connects their own chat to it.
  */
-const TOKEN = process.env.TELEGRAM_BOT_TOKEN?.trim() || "";
+/**
+ * The token as pasted can carry extras (quotes, spaces, "bot" prefix, "TELEGRAM_BOT_TOKEN=",
+ * or the whole BotFather message). Keep only the real token: digits, a colon, then the key.
+ */
+function cleanToken(raw?: string): string {
+  const v = (raw ?? "").trim();
+  const m = v.match(/\d{6,}:[A-Za-z0-9_-]{30,}/);
+  return m ? m[0] : v.replace(/^["']|["']$/g, "");
+}
+const TOKEN = cleanToken(process.env.TELEGRAM_BOT_TOKEN);
 export const telegramReady = () => Boolean(TOKEN);
 
 /** Secret Telegram sends back with every update, so nobody else can post to our webhook. */
@@ -48,6 +57,17 @@ export async function botUsername(): Promise<string | null> {
   const r = await tg<{ username: string }>("getMe", {});
   username = r.ok && r.result ? r.result.username : null;
   return username;
+}
+
+/** Why Telegram refused the token, in words the owner can act on. */
+export async function botProblem(): Promise<string | null> {
+  if (!TOKEN) return null;
+  if (!/^\d{6,}:[A-Za-z0-9_-]{30,}$/.test(TOKEN)) return "شكل الرمز غير صحيح. يجب أن يكون مثل 7123456789:AAH... بالكامل، دون أي إضافات.";
+  const r = await tg("getMe", {});
+  if (r.ok) return null;
+  if (r.description === "network") return "تعذّر الاتصال بخوادم تيليغرام من الموقع. حاول بعد دقائق.";
+  if (/unauthorized|not found/i.test(r.description ?? "")) return "رفض تيليغرام الرمز (Unauthorized). الرمز غير صحيح أو أُلغي. اطلب رمزاً جديداً من BotFather.";
+  return `رفض تيليغرام الرمز (${r.description ?? "سبب غير معروف"}).`;
 }
 
 export const sendTelegram = (

@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { activateTelegram } from "@/app/admin/platform-actions";
 
 /** Bot status and the one-time "activate" button. */
-export function TelegramCard({ ready, bot, connected, total }: { ready: boolean; bot: string | null; connected: number; total: number }) {
+export function TelegramCard({ ready, bot, problem, connected, total }: { ready: boolean; bot: string | null; problem?: string | null; connected: number; total: number }) {
   const [msg, setMsg] = useState<{ ok?: string; error?: string } | undefined>();
   const [pending, start] = useTransition();
   return (
@@ -13,7 +13,10 @@ export function TelegramCard({ ready, bot, connected, total }: { ready: boolean;
       {!ready ? (
         <p className="text-muted">غير مُعَدّ. يجب إضافة TELEGRAM_BOT_TOKEN في Vercel (Settings، ثم Environment Variables) ثم تنفيذ Redeploy.</p>
       ) : !bot ? (
-        <p className="text-red-700">يوجد رمز لكن تيليغرام لم يقبله. تأكد من نسخه كاملاً من BotFather.</p>
+        <div className="space-y-1">
+          <p className="text-red-700">يوجد رمز لكن تيليغرام لم يقبله.</p>
+          {problem && <p className="text-red-700">السبب: {problem}</p>}
+        </div>
       ) : (
         <>
           <p>
