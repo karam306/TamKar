@@ -148,6 +148,14 @@ export default function SignupPage() {
     // A salesman's personal link: signup?ref=CODE
     const ref = new URLSearchParams(window.location.search).get("ref")?.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12);
     if (ref) restored = { ...restored, ref, heard_from: "salesman", ref_link: "1" };
+    // Answers carried over from the homepage store preview: signup?store=NAME&type=ID&color=HEX
+    const qs = new URLSearchParams(window.location.search);
+    const qStore = qs.get("store")?.trim().slice(0, 40);
+    const qType = qs.get("type");
+    const qColor = qs.get("color")?.toLowerCase();
+    if (qStore) restored = { ...restored, store_name: qStore, slug: restored.slug || slugify(qStore) };
+    if (qType && BUSINESS_TYPES.some((b) => b.id === qType)) restored = { ...restored, business_type: qType };
+    if (qColor && COLORS.includes(qColor)) restored = { ...restored, color: qColor };
     let savedStep: StepId | null = null;
     try {
       const st = JSON.parse(localStorage.getItem(SAVE_KEY) ?? "null")?.step;
