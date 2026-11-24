@@ -59,7 +59,7 @@ export default function PlatformHome() {
           <Link href="/login" className="px-3 py-2 hover:underline">
             دخول
           </Link>
-          <Link href="/signup" className="nama-btn !px-4 !py-2 text-sm">
+          <Link href="/signup" className="nama-btn whitespace-nowrap !px-4 !py-2 text-sm">
             أنشئ متجرك
           </Link>
         </nav>
@@ -69,9 +69,9 @@ export default function PlatformHome() {
       <section className="nama-wrap grid items-center gap-10 pb-16 pt-8 lg:grid-cols-[1.15fr_1fr] lg:pt-16">
         <div>
           <h1 className="brand-display mb-6 text-[clamp(2.5rem,6.4vw,4.2rem)] leading-[1.45]">
-            <span className="hl hl-apricot">متجرك على الإنترنت،</span>
+            <span className="hl hl-apricot">كُن حيث يبحث زبائنك.</span>
             <br />
-            <span className="hl hl-pist">وطلباتك تصلك عبر واتساب.</span>
+            <span className="hl hl-pist">متجرك. جاهز خلال دقائق.</span>
           </h1>
           <p className="mb-8 max-w-xl text-lg leading-9 text-[var(--mute)]">
             تتيح لك منصة {BRAND_AR} إنشاء متجر إلكتروني عربي لمحلك خلال دقائق. يتصفح الزبون منتجاتك ويطلب من هاتفه، ويصلك الطلب منظّماً، ثم يستلمه من محلك ويدفع.
@@ -205,7 +205,7 @@ export default function PlatformHome() {
       </section>
 
       <section className="nama-wrap pb-20 text-center">
-        <h2 className="brand-display mb-8 text-4xl leading-[1.5] sm:text-6xl"><span className="hl hl-apricot">دع تجارتك تنمو.</span></h2>
+        <h2 className="brand-display mb-8 text-4xl leading-[1.5] sm:text-6xl"><span className="hl hl-apricot">كُن حيث يبحث زبائنك.</span></h2>
         <Link href="/signup" className="nama-btn text-lg">
           ابدأ مجاناً
         </Link>
