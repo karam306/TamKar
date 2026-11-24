@@ -10,7 +10,7 @@ import { whatsappLink } from "@/lib/format";
 import { isOpen } from "@/lib/subscription";
 import type { MenuLink, StoreSocial } from "@/lib/types";
 import { isPro } from "@/lib/plans";
-import { BRAND, BRAND_AR } from "@/lib/brand";
+import { BRAND_FULL_AR } from "@/lib/brand";
 
 type Props = { children: React.ReactNode; params: Promise<{ site: string }> };
 
@@ -54,7 +54,6 @@ export default async function StoreLayout({ children, params }: Props) {
   const onOwnHost = (await headers()).get("x-store-host") === "1";
   const base = onOwnHost ? "" : `/s/${store.slug}`;
   const style = store.primary_color ? ({ "--primary": store.primary_color } as React.CSSProperties) : undefined;
-  const platform = BRAND_AR;
   const header: MenuLink[] = store.menus?.header?.length ? store.menus.header : [{ label: "المنتجات", href: "/products" }];
   const footer: MenuLink[] = store.menus?.footer ?? [];
   const social = SOCIAL.filter((s) => store.social?.[s.key]);
@@ -129,7 +128,7 @@ export default async function StoreLayout({ children, params }: Props) {
               </a>
             </div>
           </div>
-          {!isPro(store) && <div className="pb-6 text-center text-xs text-muted">متجر مبني على منصة {platform} ({BRAND})</div>}
+          {!isPro(store) && <div className="pb-6 text-center text-xs text-muted">متجر مبني على منصة {BRAND_FULL_AR}</div>}
         </footer>
       </StoreProvider>
     </div>

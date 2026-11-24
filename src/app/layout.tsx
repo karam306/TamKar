@@ -1,9 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { BRAND } from "@/lib/brand";
+import { BRAND_FULL } from "@/lib/brand";
 
 export const metadata: Metadata = {
-  title: BRAND,
+  title: BRAND_FULL,
   description: "أنشئ متجرك الإلكتروني خلال دقائق",
 };
 

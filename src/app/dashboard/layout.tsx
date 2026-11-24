@@ -7,7 +7,7 @@ import { hasSupabase } from "@/lib/supabase";
 import { daysLeft, subState } from "@/lib/subscription";
 import { storeUrl } from "@/lib/urls";
 import { MobileMenu, SideNav } from "./nav";
-import { BRAND } from "@/lib/brand";
+import { KunLogo } from "@/components/kun-logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 export const metadata: Metadata = {
@@ -15,8 +15,6 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 export const dynamic = "force-dynamic";
-
-const platform = BRAND;
 
 export default async function DashboardLayout({
   children,
@@ -56,8 +54,8 @@ export default async function DashboardLayout({
             staff={staff}
             perms={perms}
           />
-          <Link href="/dashboard" className="brand-display text-xl">
-            {platform}
+          <Link href="/dashboard" className="text-[1.6rem]" aria-label="لوحة التحكم">
+            <KunLogo lang="en" onDark />
           </Link>
         </div>
         <form

@@ -3,13 +3,11 @@ import Link from "next/link";
 import { adminLogout } from "@/app/admin/login/actions";
 import { requirePlatformAdmin } from "@/lib/platform-admin";
 import { AdminNav } from "./nav";
-import { BRAND } from "@/lib/brand";
+import { KunLogo } from "@/components/kun-logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 export const metadata: Metadata = { title: "لوحة المنصة", robots: { index: false } };
 export const dynamic = "force-dynamic";
-
-const platform = BRAND;
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const { email } = await requirePlatformAdmin();
@@ -17,8 +15,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <div data-theme="admin" data-ui className="flex min-h-screen flex-col bg-[#0b2b26] font-sans text-text">
       <header className="flex h-14 items-center justify-between gap-3 px-4 text-white">
         <div className="flex items-center gap-3">
-          <Link href="/admin" className="text-lg brand-display">
-            {platform}
+          <Link href="/admin" className="text-[1.6rem]" aria-label="لوحة المنصة">
+            <KunLogo lang="en" onDark />
           </Link>
           <span className="rounded-md bg-white/15 px-2 py-0.5 text-xs">لوحة المنصة</span>
         </div>

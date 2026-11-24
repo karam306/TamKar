@@ -1,6 +1,9 @@
 /** The platform's name, in one place. */
 export const BRAND = "Kun";
 export const BRAND_AR = "كُن";
+/** Full name as written in the logo. */
+export const BRAND_FULL = "Kun Stores";
+export const BRAND_FULL_AR = "كُن ستورز";
 /** The platform's own web address. Each store lives at https://<slug>.kunstores.com */
 export const PLATFORM_DOMAIN = "kunstores.com";
 

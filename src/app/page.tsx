@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { BRAND, BRAND_AR } from "@/lib/brand";
+import { BRAND_AR, BRAND_FULL, BRAND_FULL_AR } from "@/lib/brand";
+import { KunLogo } from "@/components/kun-logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { storeUrl } from "@/lib/urls";
 import { demoStores } from "@/lib/demo-data";
@@ -44,12 +45,10 @@ export default function PlatformHome() {
       <style>{CSS}</style>
 
       <header className="nama-wrap flex h-16 items-center justify-between">
-        <Link href="/" className="flex items-center gap-2" aria-label={`${BRAND_AR} ${BRAND}`}>
-          <Sprout />
-          <span className="brand-display text-[1.7rem] leading-none">{BRAND_AR}</span>
-          <span className="brand-display hl hl-apricot text-lg leading-none" dir="ltr">
-            {BRAND}
-          </span>
+        <Link href="/" className="flex items-center gap-4" aria-label={`${BRAND_FULL_AR} ${BRAND_FULL}`}>
+          <KunLogo lang="ar" className="text-[2.1rem]" />
+          <span className="hidden h-7 w-px bg-black/15 sm:block" aria-hidden />
+          <KunLogo lang="en" className="hidden text-[1.9rem] sm:inline-flex" />
         </Link>
         <nav className="flex items-center gap-1 text-sm">
           <a href="#how" className="hidden px-3 py-2 hover:underline sm:inline">
@@ -217,7 +216,7 @@ export default function PlatformHome() {
       <footer className="border-t border-black/10 py-8">
         <div className="nama-wrap flex flex-wrap items-center justify-between gap-3 text-sm text-[var(--mute)]">
           <span>
-            © {new Date().getFullYear()} {BRAND_AR} {BRAND}
+            © {new Date().getFullYear()} {BRAND_FULL_AR} · {BRAND_FULL}
           </span>
           <span className="flex gap-4">
             <Link href="/login" className="hover:underline">
@@ -298,15 +297,6 @@ function Phone() {
   );
 }
 
-function Sprout() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden>
-      <path d="M16 29V15" stroke="var(--leaf)" strokeWidth="2.6" strokeLinecap="round" />
-      <path d="M16 17C16 10 11 6 4 6c0 7 5 11 12 11Z" fill="var(--leaf)" />
-      <path d="M16 14c0-6 4.5-10 11-10 0 6-4.5 10-11 10Z" fill="var(--pist)" />
-    </svg>
-  );
-}
 
 const CSS = `
 .nama{--bg:#F5F8EF;--ink:#16241A;--leaf:#2D6A38;--pist:#C3D97F;--pist-soft:#E6EFC6;--mute:#56644F;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans Arabic",system-ui,sans-serif}

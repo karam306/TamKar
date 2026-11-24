@@ -1,8 +1,7 @@
 import Link from "next/link";
-import { BRAND } from "@/lib/brand";
+import { BRAND_FULL_AR } from "@/lib/brand";
+import { KunLogo } from "@/components/kun-logo";
 import { ThemeToggle } from "@/components/theme-toggle";
-
-const platform = BRAND;
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -10,8 +9,8 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <div className="absolute left-4 top-4">
         <ThemeToggle />
       </div>
-      <Link href="/" className="brand-display mb-8 text-4xl text-[#16241A]">
-        <span className="hl hl-apricot">{platform}</span>
+      <Link href="/" className="mb-8 text-5xl text-[#16241A]" aria-label={BRAND_FULL_AR}>
+        <KunLogo lang="ar" />
       </Link>
       <div className="w-full max-w-md rounded-theme bg-white p-6 shadow-sm sm:p-8">{children}</div>
     </div>

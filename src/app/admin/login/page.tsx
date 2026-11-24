@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { adminSessionInfo } from "@/lib/platform-admin";
-import { BRAND } from "@/lib/brand";
+import { KunLogo } from "@/components/kun-logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { switchToAdmin } from "./actions";
 import { AdminLoginForm } from "./form";
@@ -19,7 +19,7 @@ export default async function AdminLoginPage() {
         <ThemeToggle onDark />
       </div>
       <div className="mb-6 text-center text-white">
-        <div className="brand-display text-3xl">{BRAND}</div>
+        <div className="text-[2.6rem]"><KunLogo lang="en" onDark /></div>
         <div className="mt-1 text-sm opacity-75">لوحة المنصة</div>
       </div>
       <div className="w-full max-w-sm rounded-xl bg-white p-6 shadow-lg sm:p-8">
