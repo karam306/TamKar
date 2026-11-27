@@ -48,15 +48,25 @@ export default async function MarketingPage() {
       <PageHeader title="إعلانات فيسبوك وإنستغرام" back="/dashboard/settings/advanced" />
       <p className="text-[13px] text-muted">اختر إحدى طريقتين لربط متجرك بإعلانات Meta.</p>
 
-      {!missing && (
-        <Card title="الطريقة الأولى: يتولى فريق كُن الربط (الأسهل)">
+      <Card title="الطريقة الأولى: يتولى فريق كُن الربط (الأسهل)">
           <div className="space-y-3 text-[13px]">
             <ul className="list-inside list-disc space-y-1">
               <li>دون أي خطوات تقنية من جهتك.</li>
               <li>نجهّز لك التتبع وكتالوج المنتجات، وتُحدَّث المنتجات في الإعلانات فور تعديلها.</li>
               <li>كل ما عليك: الموافقة على طلب وصول واحد لصفحتك. الصفحة تبقى ملكك، ويمكنك إلغاء الوصول متى شئت.</li>
             </ul>
-            {meta?.status === "requested" ? (
+            {missing ? (
+              ask(`مرحباً، أرغب في أن يتولى فريق كُن ربط متجري (${store.name}) بإعلانات فيسبوك وإنستغرام`) && (
+                <a
+                  href={ask(`مرحباً، أرغب في أن يتولى فريق كُن ربط متجري (${store.name}) بإعلانات فيسبوك وإنستغرام`)!}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn inline-block"
+                >
+                  اطلب الربط عبر واتساب
+                </a>
+              )
+            ) : meta?.status === "requested" ? (
               <div className="space-y-2 rounded-lg bg-[#fff8e6] p-3">
                 <p>✓ وصل طلبك إلى فريق كُن، وسنتواصل معك عبر واتساب لإكمال الربط.</p>
                 <CancelRequest />
@@ -66,9 +76,8 @@ export default async function MarketingPage() {
             )}
           </div>
         </Card>
-      )}
 
-      <Card title={missing ? "ربط Meta" : "الطريقة الثانية: اربط حسابك بنفسك"}>
+      <Card title="الطريقة الثانية: اربط حسابك بنفسك">
         {!isPro(store) ? (
           <ProGate feature="الربط اليدوي بحسابك على Meta" compact />
         ) : (
