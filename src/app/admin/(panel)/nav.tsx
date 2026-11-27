@@ -9,6 +9,7 @@ const ITEMS = [
   { href: "/admin/stores/new", label: "+ متجر جديد" },
   { href: "/admin/salesmen", label: "المندوبون" },
   { href: "/admin/meta", label: "ربط Meta" },
+  { href: "/admin/claude", label: "ربط Claude" },
   { href: "/admin/test-data", label: "متاجر تجريبية" },
 ];
 
