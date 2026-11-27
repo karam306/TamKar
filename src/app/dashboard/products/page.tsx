@@ -91,7 +91,7 @@ export default async function ProductsPage({
       {!sp.q && !sp.status && products.length === 0 ? (
         <EmptyState
           title="كل متجر جميل بدأ بمنتج واحد."
-          text="أضف منتجك الأول، أو استورد جميع منتجاتك دفعة واحدة من ملف Excel."
+          text="أضف منتجك الأول، أو صوّر قائمة أسعارك ليضيف كُن منتجاتك دفعة واحدة."
           action={
             <div className="flex gap-2">
               <Link href="/dashboard/products/new" className="btn">
@@ -101,7 +101,7 @@ export default async function ProductsPage({
                 href="/dashboard/products/import"
                 className="btn btn-outline"
               >
-                استيراد
+                ✨ من صورة قائمة الأسعار
               </Link>
             </div>
           }

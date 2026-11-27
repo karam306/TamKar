@@ -2,6 +2,7 @@ import { PageHeader } from "@/components/admin-ui";
 import { ProGate } from "@/components/pro-gate";
 import { isPro } from "@/lib/plans";
 import { requireOwner } from "@/lib/auth";
+import { AiListImport } from "./ai-list-import";
 import { ImportForm } from "./import-form";
 
 export default async function ImportPage() {
@@ -10,6 +11,10 @@ export default async function ImportPage() {
     return (
       <div className="space-y-4">
         <PageHeader title="استيراد وتصدير المنتجات" back="/dashboard/products" />
+      <section className="card space-y-3 p-4">
+        <h2 className="text-sm font-semibold">✨ استيراد من صورة قائمة الأسعار</h2>
+        <AiListImport unit={store.currency === "SYP" ? "ل.س" : "$"} />
+      </section>
         <ProGate feature="الاستيراد والتصدير من Excel" />
       </div>
     );
@@ -17,6 +22,10 @@ export default async function ImportPage() {
   return (
     <div className="space-y-4">
       <PageHeader title="استيراد وتصدير المنتجات" back="/dashboard/products" />
+      <section className="card space-y-3 p-4">
+        <h2 className="text-sm font-semibold">✨ استيراد من صورة قائمة الأسعار</h2>
+        <AiListImport unit={store.currency === "SYP" ? "ل.س" : "$"} />
+      </section>
 
       <section className="card space-y-3 p-4">
         <h2 className="text-sm font-semibold">استيراد من Excel</h2>

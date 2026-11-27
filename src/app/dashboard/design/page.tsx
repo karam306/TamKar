@@ -3,9 +3,11 @@ import { BUSINESS_TYPES } from "@/lib/business-types";
 import type { Collection } from "@/lib/types";
 import { applyTemplate } from "./actions";
 import { storeUrl } from "@/lib/urls";
+import { AiStoreWriter } from "./ai-store-writer";
 import { DesignEditor } from "./editor";
 
-export default async function DesignPage() {
+export default async function DesignPage({ searchParams }: { searchParams: Promise<{ ai?: string }> }) {
+  const { ai } = await searchParams;
   const { store, db } = await requireAccess("design");
   const { data: cols } = await db
     .from("collections")
@@ -14,6 +16,7 @@ export default async function DesignPage() {
     .order("title");
   return (
     <>
+      <AiStoreWriter open={ai === "1"} />
       <details className="card mb-4 p-4 text-[13px]">
         <summary className="cursor-pointer font-semibold">
           ابدأ من قالب جاهز حسب نوع النشاط
@@ -43,6 +46,7 @@ export default async function DesignPage() {
         </form>
       </details>
       <DesignEditor
+        key={`${store.primary_color}-${JSON.stringify(store.sections ?? []).length}`}
         collections={(cols ?? []) as Pick<Collection, "id" | "title">[]}
         previewUrl={`/s/${store.slug}`}
         publicUrl={storeUrl(store.slug)}

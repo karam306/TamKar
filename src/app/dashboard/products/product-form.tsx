@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useState } from "react";
+import { useActionState, useRef, useState } from "react";
 import { Field, SaveRow } from "@/components/form-ui";
 import { ImageUploader } from "@/components/image-uploader";
 import type { Collection, Product } from "@/lib/types";
 import { saveProduct, uploadImage } from "./actions";
+import { AiWriter } from "./ai-writer";
 import { OffersEditor } from "./offers-editor";
 import { SpecsEditor } from "./specs-editor";
 import { VariantEditor } from "./variant-editor";
@@ -31,9 +32,15 @@ export function ProductForm({
   const [withVariants, setWithVariants] = useState((product?.options?.length ?? 0) > 0);
   const [price, setPrice] = useState(product?.price != null ? String(product.price) : "");
   const unit = currency === "SYP" ? "ل.س" : "$";
+  const formRef = useRef<HTMLFormElement>(null);
+  const [specs, setSpecs] = useState({ key: 0, rows: product?.specs ?? [] });
+  const set = (name: string, value: string) => {
+    const el = formRef.current?.elements.namedItem(name) as HTMLInputElement | HTMLTextAreaElement | null;
+    if (el && value) el.value = value;
+  };
 
   return (
-    <form action={action} className="grid items-start gap-4 lg:grid-cols-[1fr_300px]">
+    <form ref={formRef} action={action} className="grid items-start gap-4 lg:grid-cols-[1fr_300px]">
       <input type="hidden" name="id" value={product?.id ?? ""} />
 
       <div className="space-y-4">
@@ -45,6 +52,16 @@ export function ProductForm({
             <textarea name="description" rows={6} defaultValue={product?.description ?? ""} className="input" placeholder={placeholders.description} />
           </Field>
           <ImageUploader name="images" initial={product?.images ?? []} upload={uploadImage} max={10} label="الصور" />
+          <AiWriter
+            getForm={() => formRef.current}
+            categories={categories}
+            onResult={(p) => {
+              set("title", p.title);
+              set("description", p.description);
+              set("category", p.category);
+              if (p.specs.length) setSpecs((s) => ({ key: s.key + 1, rows: p.specs }));
+            }}
+          />
         </section>
 
         {!withVariants && (
@@ -76,7 +93,7 @@ export function ProductForm({
 
         <OffersEditor initial={product?.qty_prices ?? []} />
 
-        <SpecsEditor initial={product?.specs ?? []} presets={specPresets} />
+        <SpecsEditor key={specs.key} initial={specs.rows} presets={specPresets} />
 
         <section className="card space-y-3 p-4">
           <div className="flex items-center justify-between">

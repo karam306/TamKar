@@ -91,7 +91,7 @@ export async function importProducts(_: ImportResult, form: FormData): Promise<I
 
   refresh();
   return {
-    ok: `✓ أُأضف ${added} منتج${updated ? ` وحُدِّث ${updated}` : ""}`,
+    ok: `✓ أُضيف ${added} منتج${updated ? ` وحُدِّث ${updated}` : ""}`,
     problems: problems.slice(0, 50),
   };
 }
