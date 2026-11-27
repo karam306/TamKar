@@ -146,8 +146,20 @@ export async function drawStory(p: StoryProduct, s: StoryStore, link: string): P
   ctx.fillText("اطلب الآن", W / 2, btn.y + 85);
   ctx.direction = "ltr";
   ctx.fillStyle = "#4b5148";
-  ctx.font = `600 40px ${FONT}`;
-  ctx.fillText(link.replace(/^https?:\/\//, ""), W / 2, H - 95);
+  // The full product link is long (it ends with the product id). Shrink it to fit;
+  // if it still does not fit, show the store address, which customers can type.
+  let shown = link.replace(/^https?:\/\//, "");
+  let size = 40;
+  ctx.font = `600 ${size}px ${FONT}`;
+  while (ctx.measureText(shown).width > W - 120 && size > 28) {
+    size -= 2;
+    ctx.font = `600 ${size}px ${FONT}`;
+  }
+  if (ctx.measureText(shown).width > W - 120) {
+    shown = shown.split("/")[0];
+    ctx.font = `600 40px ${FONT}`;
+  }
+  ctx.fillText(shown, W / 2, H - 95);
 
   const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, "image/png"));
   return new File([blob!], "status.png", { type: "image/png" });
@@ -178,17 +190,20 @@ export function StoryButton({
     }
   }
 
+  // Phones can send the image straight to WhatsApp; every device can save it.
+  const canShare =
+    typeof navigator !== "undefined" &&
+    Boolean(preview && navigator.canShare?.({ files: [preview.file] }));
+
   async function share() {
     if (!preview) return;
-    const data = { files: [preview.file], text: `${product.title}\n${link}` };
-    if (navigator.canShare?.(data)) {
-      try {
-        await navigator.share(data);
-        return;
-      } catch {
-        return;
-      }
-    }
+    try {
+      await navigator.share({ files: [preview.file], text: `${product.title}\n${link}` });
+    } catch {}
+  }
+
+  function download() {
+    if (!preview) return;
     const a = document.createElement("a");
     a.href = preview.url;
     a.download = `${product.title.slice(0, 40)}.png`;
@@ -209,12 +224,19 @@ export function StoryButton({
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={preview.url} alt="" className="w-full rounded-lg border border-black/10" />
             <p className="text-[13px] text-muted">
-              من الهاتف: اضغط مشاركة واختر واتساب، ثم «حالتي». من الحاسوب: تُحفظ الصورة في التنزيلات.
+              {canShare
+                ? "اضغط «مشاركة» واختر واتساب ثم «حالتي»، أو احفظ الصورة على جهازك."
+                : "احفظ الصورة، ثم انشرها على حالة واتساب أو إنستغرام."}
             </p>
-            <div className="flex gap-2">
-              <button type="button" className="btn flex-1" onClick={share}>
-                مشاركة أو تنزيل
+            <div className="flex flex-wrap gap-2">
+              <button type="button" className="btn flex-1" onClick={download}>
+                حفظ الصورة
               </button>
+              {canShare && (
+                <button type="button" className="btn btn-outline flex-1" onClick={share}>
+                  مشاركة
+                </button>
+              )}
               <button type="button" className="btn btn-outline" onClick={() => setPreview(null)}>
                 إغلاق
               </button>
