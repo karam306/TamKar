@@ -5,7 +5,7 @@ import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { StoreMobileMenu } from "@/components/store-menu";
 import { StoreProvider } from "@/components/store-context";
-import { CartButton, StoreLink } from "@/components/store-ui";
+import { CartButton, MobileBar, StoreLink } from "@/components/store-ui";
 import { StoreTracking } from "@/components/tracking";
 import { getStore } from "@/lib/data";
 import { liveFx } from "@/lib/fx";
@@ -89,7 +89,8 @@ export default async function StoreLayout({ children, params }: Props) {
           </div>
         </header>
 
-        <main className="flex-1">{children}</main>
+        <main className="flex-1 pb-16 md:pb-0">{children}</main>
+        <MobileBar />
 
         <footer className="mt-16 border-t border-black/5 bg-surface">
           <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 text-sm sm:grid-cols-3">
