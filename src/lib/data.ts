@@ -1,4 +1,5 @@
 import "server-only";
+import { searchProducts } from "./search";
 import { cache } from "react";
 import { demoCollections, demoProducts, demoStores } from "./demo-data";
 import { findVariant, hasVariants } from "./product-utils";
@@ -89,7 +90,7 @@ export async function listProducts(
     if (f.collectionId)
       list = list.filter((p) => p.collection_ids?.includes(f.collectionId!));
     if (f.category) list = list.filter((p) => p.category === f.category);
-    if (f.q) list = list.filter((p) => p.title.includes(f.q!));
+    if (f.q) list = searchProducts(list, f.q);
     return {
       items: list.slice((page - 1) * perPage, page * perPage),
       total: list.length,
@@ -102,7 +103,22 @@ export async function listProducts(
     .eq("active", true);
   if (f.collectionId) q = q.contains("collection_ids", [f.collectionId]);
   if (f.category) q = q.eq("category", f.category);
-  if (f.q) q = q.ilike("title", `%${f.q.replace(/[%_,()]/g, "")}%`);
+  if (f.q) {
+    // Smart search: load the store's products and rank them here, so spelling
+    // differences, typos and synonyms still find the product (see lib/search.ts).
+    const all: Product[] = [];
+    for (let from = 0; from < 5000; from += 1000) {
+      const { data, error } = await q.order("created_at", { ascending: false }).range(from, from + 999);
+      if (error) {
+        console.error("listProducts search", error.message);
+        return { items: [], total: 0 };
+      }
+      all.push(...((data as Product[]) ?? []));
+      if (!data || data.length < 1000) break;
+    }
+    const found = searchProducts(all, f.q);
+    return { items: found.slice((page - 1) * perPage, page * perPage).map(num), total: found.length };
+  }
   const { data, count, error } = await q
     .order("created_at", { ascending: false })
     .range((page - 1) * perPage, page * perPage - 1);

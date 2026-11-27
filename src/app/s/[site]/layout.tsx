@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { storePixel } from "@/lib/meta-managed";
+import { StoreSearch } from "@/components/store-search";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { StoreMobileMenu } from "@/components/store-menu";
@@ -80,6 +81,7 @@ export default async function StoreLayout({ children, params }: Props) {
               {header.map((l) => (
                 <MenuItem key={l.href + l.label} link={l} className="hidden rounded-theme px-3 py-2 hover:bg-surface md:block" />
               ))}
+              <StoreSearch />
               <CartButton />
             </nav>
           </div>
