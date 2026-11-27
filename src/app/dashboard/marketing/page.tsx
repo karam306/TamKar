@@ -10,10 +10,18 @@ import { getStoreMeta, isManagedActive } from "@/lib/meta-managed";
 const SUPPORT = process.env.PLATFORM_SUPPORT_WHATSAPP;
 
 // Two ways to connect Meta (Facebook and Instagram ads):
-//   1. The Kun team connects it from the Kun business account (any plan, part of the ads service).
-//   2. The merchant pastes their own pixel and adds the catalog link themselves (Pro plan).
+//   1. The Kun team connects it from the Kun business account.
+//   2. The merchant pastes their own pixel and adds the catalog link themselves.
+// Both are on the Pro plan only.
 export default async function MarketingPage() {
   const { store } = await requireOwner();
+  if (!isPro(store))
+    return (
+      <div className="space-y-4">
+        <PageHeader title="إعلانات فيسبوك وإنستغرام" back="/dashboard/settings/advanced" />
+        <ProGate feature="ربط إعلانات فيسبوك وإنستغرام" />
+      </div>
+    );
   const s = store as typeof store & { meta_pixel_id?: string | null; meta_capi_token?: string | null };
   const { row: meta, missing } = await getStoreMeta(store.id);
   const managed = isManagedActive(meta);
@@ -78,10 +86,7 @@ export default async function MarketingPage() {
         </Card>
 
       <Card title="الطريقة الثانية: اربط حسابك بنفسك">
-        {!isPro(store) ? (
-          <ProGate feature="الربط اليدوي بحسابك على Meta" compact />
-        ) : (
-          <div className="space-y-6">
+        <div className="space-y-6">
             <div>
               <div className="mb-1 text-[13px] font-semibold">1. البيكسل و Conversions API</div>
               <p className="mb-3 text-[13px] text-muted">
@@ -110,7 +115,6 @@ export default async function MarketingPage() {
               </div>
             </div>
           </div>
-        )}
       </Card>
     </div>
   );

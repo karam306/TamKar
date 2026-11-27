@@ -28,6 +28,7 @@ export async function saveMeta(_: FormState, form: FormData): Promise<FormState>
 /** Option 1: the merchant asks the Kun team to connect Meta for them. */
 export async function requestMetaHelp(_: FormState, form: FormData): Promise<FormState> {
   const { store } = await requireOwner();
+  if (!isPro(store)) return { error: "ربط Meta متاح في الباقة الاحترافية" };
   const page = String(form.get("page_url") ?? "").trim().slice(0, 300);
   try {
     await requestManaged(store.id, page);

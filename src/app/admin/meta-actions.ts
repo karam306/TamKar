@@ -5,13 +5,14 @@ import type { FormState } from "@/components/form-ui";
 import { activateManaged, getStoreMeta, stopManaged, syncCatalog, testConnection } from "@/lib/meta-managed";
 import { requirePlatformAdmin } from "@/lib/platform-admin";
 import { supabaseAdmin } from "@/lib/supabase";
+import { isPro } from "@/lib/plans";
 
 async function storeFrom(form: FormData) {
   await requirePlatformAdmin();
   const id = String(form.get("id") ?? "");
   if (!/^[0-9a-f-]{36}$/.test(id)) return null;
-  const { data } = await supabaseAdmin().from("stores").select("id, slug, name").eq("id", id).maybeSingle();
-  return data as { id: string; slug: string; name: string } | null;
+  const { data } = await supabaseAdmin().from("stores").select("id, slug, name, plan, paid_until").eq("id", id).maybeSingle();
+  return data as { id: string; slug: string; name: string; plan: string | null; paid_until: string | null } | null;
 }
 
 function done(id: string, r: { ok: string } | { error: string }): FormState {
@@ -24,6 +25,7 @@ function done(id: string, r: { ok: string } | { error: string }): FormState {
 export async function metaActivate(_: FormState, form: FormData): Promise<FormState> {
   const s = await storeFrom(form);
   if (!s) return { error: "المتجر غير موجود" };
+  if (!isPro(s)) return { error: "ربط Meta متاح في الباقة الاحترافية فقط. حوّل المتجر إلى الاحترافية أولاً" };
   return done(s.id, await activateManaged(s));
 }
 

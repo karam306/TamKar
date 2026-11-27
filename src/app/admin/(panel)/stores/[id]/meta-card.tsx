@@ -23,6 +23,7 @@ export function MetaCard({
   configured,
   missing,
   ownPixel,
+  pro,
 }: {
   id: string;
   storeName: string;
@@ -31,6 +32,7 @@ export function MetaCard({
   configured: boolean;
   missing: boolean;
   ownPixel: string | null;
+  pro: boolean;
 }) {
   const [aState, activate] = useActionState(metaActivate, undefined);
   const [sState, stop] = useActionState(metaStop, undefined);
@@ -68,6 +70,10 @@ export function MetaCard({
 
       {status === "requested" && meta?.requested_at && (
         <div className="rounded-lg bg-[#fff8e6] p-3">طلب التاجر أن يتولى فريق كُن ربط Meta بتاريخ {date(meta.requested_at)}.</div>
+      )}
+
+      {!pro && (
+        <div className="rounded-lg bg-[#f4f0ff] p-3">ربط Meta متاح في الباقة الاحترافية فقط. حوّل المتجر إلى الاحترافية أو التجريبية لتفعيله.</div>
       )}
 
       {!configured && (
@@ -111,7 +117,7 @@ export function MetaCard({
         </div>
       )}
 
-      {configured && !active && (
+      {configured && pro && !active && (
         <form action={activate} className="space-y-2">
           <input type="hidden" name="id" value={id} />
           <p className="text-muted">

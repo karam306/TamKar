@@ -9,11 +9,13 @@ export default async function AdvancedSettingsPage() {
   const { store } = await requireOwner();
   const s = store as typeof store & { meta_pixel_id?: string | null };
   const { row: meta } = await getStoreMeta(store.id);
-  const metaStatus = isManagedActive(meta)
+  const metaStatus = !isPro(store)
+    ? "🔒 احترافي"
+    : isManagedActive(meta)
     ? "✓ عبر فريق كُن"
     : meta?.status === "requested"
       ? "طلبك قيد التنفيذ"
-      : s.meta_pixel_id && isPro(store)
+      : s.meta_pixel_id
         ? "✓ مربوط"
         : null;
   const items = [

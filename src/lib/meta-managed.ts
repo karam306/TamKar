@@ -74,9 +74,10 @@ export async function storePixel(store: {
   try {
     const { row } = await getStoreMeta(store.id);
     const cfg = metaConfig();
+    if (!isPro(store as Parameters<typeof isPro>[0])) return null; // Meta is a Pro feature, both options
     if (isManagedActive(row) && cfg) return { pixel: row!.pixel_id!, token: cfg.token };
   } catch {}
-  if (store.meta_pixel_id && isPro(store as Parameters<typeof isPro>[0])) return { pixel: store.meta_pixel_id, token: store.meta_capi_token ?? null };
+  if (store.meta_pixel_id) return { pixel: store.meta_pixel_id, token: store.meta_capi_token ?? null };
   return null;
 }
 

@@ -5,10 +5,21 @@ import { requireOwner } from "@/lib/auth";
 import { SettingsForm } from "./form";
 import { storeWallets, WALLETS } from "@/lib/wallets";
 import { storeChat } from "@/lib/telegram";
+import { storeUrl } from "@/lib/urls";
 
 export default async function SettingsPage() {
   const { store, user } = await requireOwner();
   const tgChat = await storeChat(store.id);
+  const support = process.env.PLATFORM_SUPPORT_WHATSAPP;
+  const domain = store.custom_domain_verified ? store.custom_domain : null;
+  const address = domain ?? storeUrl(store.slug).replace(/^https?:\/\//, "");
+  const domainLink = support
+    ? `https://wa.me/${support}?text=${encodeURIComponent(
+        domain
+          ? `مرحباً، لدي سؤال عن نطاق متجري (${store.name}): ${domain}`
+          : `مرحباً، أرغب في شراء نطاق خاص لمتجري (${store.name})، بدلاً من العنوان الحالي ${address}`,
+      )}`
+    : null;
   const paid = store.paid_until ? new Date(store.paid_until).toLocaleDateString("en-GB") : null;
   return (
     <div className="space-y-6">
@@ -58,6 +69,24 @@ export default async function SettingsPage() {
           </span>
           <span className="text-muted">←</span>
         </Link>
+        {domainLink && (
+          <a href={domainLink} target="_blank" rel="noopener noreferrer" className="card flex items-center gap-3 p-4 hover:shadow-md">
+            <span className="text-2xl">🌐</span>
+            <span className="flex-1">
+              <b className="block text-sm">{domain ? "نطاق متجرك" : "اشترِ نطاقاً خاصاً لمتجرك"}</b>
+              <span className="text-[13px] text-muted">
+                {domain ? (
+                  <span dir="ltr">✓ {domain}</span>
+                ) : (
+                  <>
+                    عنوانك الحالي <span dir="ltr">{address}</span>. تواصل معنا عبر واتساب لنحجز لك نطاقاً باسم محلك ونربطه.
+                  </>
+                )}
+              </span>
+            </span>
+            <span className="text-muted">↗</span>
+          </a>
+        )}
         <Link href="/dashboard/settings/advanced" className="card flex items-center gap-3 p-4 hover:shadow-md">
           <span className="text-2xl">⚙️</span>
           <span className="flex-1">
