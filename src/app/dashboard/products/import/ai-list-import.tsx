@@ -60,43 +60,50 @@ export function AiListImport({ unit }: { unit: string }) {
           <p className="text-muted">
             وُجد {rows.length} منتجاً. تحقّق من الأسماء والأسعار ({unit})، وأزل علامة ما لا تريد إضافته.
           </p>
-          <div className="max-h-[480px] overflow-auto rounded-lg border border-black/10">
-            <table className="w-full">
-              <thead className="sticky top-0 bg-[#f7f7f7] text-start text-xs text-muted">
-                <tr>
-                  <th className="w-8 p-2" />
-                  <th className="p-2 text-start">الاسم</th>
-                  <th className="w-32 p-2 text-start">السعر</th>
-                  <th className="w-32 p-2 text-start">النوع</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((r, i) => (
-                  <tr key={i} className={`border-t border-black/5 ${r.on ? "" : "opacity-50"}`}>
-                    <td className="p-2">
-                      <input type="checkbox" className="h-4 w-4 accent-black" checked={r.on} onChange={(e) => edit(i, { on: e.target.checked })} />
-                    </td>
-                    <td className="p-1">
-                      <input className="input !py-1.5" value={r.title} onChange={(e) => edit(i, { title: e.target.value })} />
-                    </td>
-                    <td className="p-1">
-                      <input
-                        className={`input !py-1.5 ${r.on && r.price_text.trim() === "" ? "!border-red-400" : ""}`}
-                        dir="ltr"
-                        inputMode="decimal"
-                        value={r.price_text}
-                        placeholder="السعر"
-                        onChange={(e) => edit(i, { price_text: e.target.value })}
-                      />
-                    </td>
-                    <td className="p-1">
-                      <input className="input !py-1.5" value={r.category} onChange={(e) => edit(i, { category: e.target.value })} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          {/* One row per product. On phones the name gets the full width, price and type sit under it. */}
+          <ul className="max-h-[560px] divide-y divide-black/10 overflow-auto rounded-lg border border-black/10">
+            <li className="hidden gap-2 bg-[#f7f7f7] px-3 py-2 text-xs text-muted sm:grid sm:grid-cols-[20px_1fr_130px_150px]">
+              <span />
+              <span>الاسم</span>
+              <span>السعر ({unit})</span>
+              <span>النوع</span>
+            </li>
+            {rows.map((r, i) => (
+              <li
+                key={i}
+                className={`grid grid-cols-[20px_1fr_1fr] items-center gap-2 px-3 py-2.5 sm:grid-cols-[20px_1fr_130px_150px] ${r.on ? "" : "opacity-50"}`}
+              >
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 accent-black"
+                  checked={r.on}
+                  onChange={(e) => edit(i, { on: e.target.checked })}
+                  aria-label="إضافة هذا المنتج"
+                />
+                <input
+                  className="input col-span-2 !py-1.5 sm:col-span-1"
+                  value={r.title}
+                  onChange={(e) => edit(i, { title: e.target.value })}
+                  aria-label="الاسم"
+                />
+                <label className="col-start-2 flex items-center gap-1.5 sm:col-start-auto">
+                  <span className="shrink-0 text-xs text-muted sm:hidden">السعر</span>
+                  <input
+                    className={`input min-w-0 !py-1.5 ${r.on && r.price_text.trim() === "" ? "!border-red-400" : ""}`}
+                    dir="ltr"
+                    inputMode="decimal"
+                    value={r.price_text}
+                    placeholder="السعر"
+                    onChange={(e) => edit(i, { price_text: e.target.value })}
+                  />
+                </label>
+                <label className="flex items-center gap-1.5">
+                  <span className="shrink-0 text-xs text-muted sm:hidden">النوع</span>
+                  <input className="input min-w-0 !py-1.5" value={r.category} onChange={(e) => edit(i, { category: e.target.value })} />
+                </label>
+              </li>
+            ))}
+          </ul>
           <div className="flex flex-wrap items-center gap-2">
             <button type="button" className="btn" disabled={!!busy || chosen.length === 0 || bad.length > 0} onClick={add}>
               {busy === "add" ? "جارٍ الإضافة..." : `أضف ${chosen.length} منتجاً`}
