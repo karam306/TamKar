@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useRef, useState } from "react";
+import { useActionState, useCallback, useEffect, useRef, useState } from "react";
 import { Field, FormMessage, SubmitButton } from "@/components/form-ui";
 import { shrink } from "@/components/image-uploader";
 import { SECTION_LABELS, THEMES, newSection } from "@/lib/templates";
@@ -18,6 +18,19 @@ export function DesignEditor({ initial, previewUrl, publicUrl, collections }: { 
   const [sections, setSections] = useState<Section[]>(initial.sections);
   const [open, setOpen] = useState<number | null>(null);
   const defaultColor = THEMES.find((t) => t.id === theme)?.color ?? "#0f5c4d";
+
+  // Live preview: the template and colour change in the preview at once, before saving.
+  const frame = useRef<HTMLIFrameElement>(null);
+  const paint = useCallback(() => {
+    try {
+      const root = frame.current?.contentDocument?.querySelector<HTMLElement>("[data-theme]");
+      if (!root) return;
+      root.setAttribute("data-theme", theme);
+      if (color) root.style.setProperty("--primary", color);
+      else root.style.removeProperty("--primary");
+    } catch {}
+  }, [theme, color]);
+  useEffect(paint, [paint]);
 
   const update = (i: number, patch: Partial<Section>) =>
     setSections((cur) => cur.map((s, j) => (j === i ? ({ ...s, ...patch } as Section) : s)));
@@ -48,7 +61,11 @@ export function DesignEditor({ initial, previewUrl, publicUrl, collections }: { 
               <button
                 type="button"
                 key={t.id}
-                onClick={() => setTheme(t.id)}
+                onClick={() => {
+                  setTheme(t.id);
+                  // Each template comes with its own colour; the merchant can change it after.
+                  setColor("");
+                }}
                 className={`flex items-center gap-3 rounded-theme border-2 p-3 text-right ${theme === t.id ? "border-primary" : "border-black/10"}`}
               >
                 <span className="h-8 w-8 shrink-0 rounded-full" style={{ background: t.color }} />
@@ -129,12 +146,12 @@ export function DesignEditor({ initial, previewUrl, publicUrl, collections }: { 
       <div className="hidden lg:block">
         <div className="sticky top-4 overflow-hidden rounded-theme border border-black/10 bg-white">
           <div className="flex items-center justify-between border-b border-black/5 px-3 py-2 text-xs text-muted">
-            <span>معاينة (تُحدَّث بعد الحفظ)</span>
+            <span>معاينة: القالب واللون يتغيّران فوراً، والأقسام بعد الحفظ</span>
             <a href={publicUrl} target="_blank" rel="noopener noreferrer" className="text-primary">
               فتح في صفحة جديدة ↗
             </a>
           </div>
-          <iframe key={state?.ok ?? "initial"} src={previewUrl} className="h-[80vh] w-full" title="معاينة المتجر" />
+          <iframe ref={frame} onLoad={paint} key={state?.ok ?? "initial"} src={previewUrl} className="h-[80vh] w-full" title="معاينة المتجر" />
         </div>
       </div>
     </form>

@@ -67,7 +67,7 @@ function SectionHead({ title, href }: { title: string; href: string }) {
 function SectionView({ section, store, products, categories, collections, byCollection }: Data & { section: Section }) {
   switch (section.type) {
     case "announcement":
-      return <div className="bg-primary px-4 py-2 text-center text-sm text-white">{section.text}</div>;
+      return <div className="st-announce bg-primary px-4 py-2 text-center text-sm text-white">{section.text}</div>;
 
     case "hero": {
       const logo = store.logo_url ? (
@@ -92,13 +92,13 @@ function SectionView({ section, store, products, categories, collections, byColl
       // The merchant's own photo: full width, text on a soft shade so it stays readable.
       if (section.image)
         return (
-          <section className="relative overflow-hidden">
+          <section className="st-hero relative overflow-hidden">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={section.image} alt="" className="absolute inset-0 h-full w-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-l from-black/70 via-black/40 to-black/10" />
+            <div className="st-hero-shade absolute inset-0 bg-gradient-to-l from-black/70 via-black/40 to-black/10" />
             <div className="relative mx-auto flex min-h-[380px] max-w-6xl flex-col justify-center gap-4 px-4 py-16 text-white sm:min-h-[480px]">
               {logo}
-              <h1 className="max-w-xl text-4xl leading-tight sm:text-5xl">{section.title}</h1>
+              <h1 className="st-hero-title max-w-xl text-4xl leading-tight sm:text-5xl">{section.title}</h1>
               {section.subtitle && <p className="max-w-lg text-lg opacity-90">{section.subtitle}</p>}
               <div className="pt-2">{cta(true)}</div>
             </div>
@@ -107,11 +107,11 @@ function SectionView({ section, store, products, categories, collections, byColl
       // No photo: the store's own products make the picture.
       const mosaic = <ProductMosaic products={products} />;
       return (
-        <section className="bg-surface">
+        <section className="st-hero st-hero-plain bg-surface">
           <div className="mx-auto grid max-w-6xl items-center gap-8 px-4 py-10 sm:py-14 md:grid-cols-2">
             <div className="flex flex-col gap-4">
               {logo}
-              <h1 className="text-4xl leading-tight sm:text-5xl">{section.title}</h1>
+              <h1 className="st-hero-title text-4xl leading-tight sm:text-5xl">{section.title}</h1>
               {section.subtitle && <p className="max-w-lg text-lg text-muted">{section.subtitle}</p>}
               <div className="pt-2">{cta(false)}</div>
             </div>
@@ -260,7 +260,7 @@ function SectionView({ section, store, products, categories, collections, byColl
         <section className="mx-auto max-w-6xl px-4 pt-10">
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             {section.items.map((f, i) => (
-              <div key={i} className="flex items-center gap-3 rounded-theme bg-surface p-4">
+              <div key={i} className="st-tile flex items-center gap-3 rounded-theme bg-surface p-4">
                 <span className="text-2xl">{f.icon}</span>
                 <div>
                   <div className="font-semibold">{f.title}</div>

@@ -210,7 +210,7 @@ export function ProductCard({ product }: { product: Product }) {
   return (
     <div className="group flex flex-col">
       <div className="relative">
-        <Link href={href} className="block aspect-square overflow-hidden rounded-theme bg-surface">
+        <Link href={href} className="st-card-img block aspect-square overflow-hidden rounded-theme bg-surface">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={product.images[0] || "/demo/k1.svg"}

@@ -66,7 +66,7 @@ export default async function StoreLayout({ children, params }: Props) {
     <div data-theme={store.theme} style={style} className="flex min-h-screen flex-col bg-bg font-sans text-text">
       <StoreProvider info={{ slug: store.slug, base, currency: store.currency, whatsapp: store.whatsapp, name: store.name, fx: liveFx(store), loyalty: liveLoyalty(store) }}>
         <StoreTracking slug={store.slug} pixelId={(await storePixel(store))?.pixel ?? null} />
-        <header className="sticky top-0 z-20 border-b border-black/5 bg-bg/95 backdrop-blur">
+        <header className="st-header sticky top-0 z-20 border-b border-black/5 bg-bg/95 backdrop-blur">
           <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4">
             <div className="flex items-center gap-2">
               <StoreMobileMenu links={header} />
@@ -92,7 +92,7 @@ export default async function StoreLayout({ children, params }: Props) {
         <main className="flex-1 pb-16 md:pb-0">{children}</main>
         <MobileBar />
 
-        <footer className="mt-16 border-t border-black/5 bg-surface">
+        <footer className="st-footer mt-16 border-t border-black/5 bg-surface">
           <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 text-sm sm:grid-cols-3">
             <div className="space-y-2">
               <div className="text-lg font-bold text-primary">{store.name}</div>
