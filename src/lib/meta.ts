@@ -6,7 +6,7 @@ import { contentId } from "./product-utils";
 import { hasSupabase, supabaseAdmin } from "./supabase";
 import { normalizeWhatsapp } from "./templates";
 import type { OrderLine, Store } from "./types";
-import { isPro } from "./plans";
+import { storePixel } from "./meta-managed";
 
 // Meta Conversions API: sends the same events as the browser Pixel, but from our
 // server, so ad blockers and iOS privacy settings don't hide sales from Meta.
@@ -31,9 +31,11 @@ export async function eventContext(): Promise<EventContext> {
 
 async function credentials(storeId: string): Promise<{ pixel: string; token: string } | null> {
   if (!hasSupabase || isDemoStore(storeId)) return null;
-  const { data } = await supabaseAdmin().from("stores").select("meta_pixel_id, meta_capi_token, plan").eq("id", storeId).maybeSingle();
-  if (!data?.meta_pixel_id || !data?.meta_capi_token || !isPro(data)) return null;
-  return { pixel: data.meta_pixel_id as string, token: data.meta_capi_token as string };
+  const { data } = await supabaseAdmin().from("stores").select("id, meta_pixel_id, meta_capi_token, plan, paid_until").eq("id", storeId).maybeSingle();
+  if (!data) return null;
+  // Either the Kun-managed pixel (when on) or the merchant's own pixel and token.
+  const p = await storePixel(data);
+  return p?.token ? { pixel: p.pixel, token: p.token } : null;
 }
 
 async function send(storeId: string, event: Record<string, unknown>) {

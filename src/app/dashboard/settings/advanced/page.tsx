@@ -2,18 +2,27 @@ import Link from "next/link";
 import { PageHeader } from "@/components/admin-ui";
 import { requireOwner } from "@/lib/auth";
 import { isPro } from "@/lib/plans";
+import { getStoreMeta, isManagedActive } from "@/lib/meta-managed";
 
 /** Everything most merchants never need to touch, in one place. */
 export default async function AdvancedSettingsPage() {
   const { store } = await requireOwner();
   const s = store as typeof store & { meta_pixel_id?: string | null };
+  const { row: meta } = await getStoreMeta(store.id);
+  const metaStatus = isManagedActive(meta)
+    ? "✓ عبر فريق كُن"
+    : meta?.status === "requested"
+      ? "طلبك قيد التنفيذ"
+      : s.meta_pixel_id && isPro(store)
+        ? "✓ مربوط"
+        : null;
   const items = [
     {
       href: "/dashboard/marketing",
       icon: "📈",
-      title: "Meta Pixel وكتالوج المنتجات",
-      text: "لربط متجرك بإعلانات فيسبوك وإنستغرام. إذا كانت جهة أخرى تدير إعلاناتك، فهي التي تملأ هذا القسم.",
-      status: !isPro(store) ? "🔒 احترافي" : s.meta_pixel_id ? "✓ مربوط" : null,
+      title: "إعلانات فيسبوك وإنستغرام",
+      text: "اربط متجرك بإعلانات Meta: يتولى فريق كُن الربط عنك، أو تربطه بنفسك عبر البيكسل وكتالوج المنتجات.",
+      status: metaStatus,
     },
     { href: "/dashboard/seo", icon: "🔎", title: "Google ومواقع التواصل", text: "ظهور متجرك في بحث Google، وصورة المشاركة، وروابط حساباتك." },
     { href: "/dashboard/products/import", icon: "📊", title: "استيراد وتصدير Excel", text: "إضافة عدد كبير من المنتجات أو تعديلها دفعة واحدة من ملف Excel.", status: !isPro(store) ? "🔒 احترافي" : null },

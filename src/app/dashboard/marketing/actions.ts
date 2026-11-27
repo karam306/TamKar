@@ -4,6 +4,7 @@ import { refresh, revalidatePath } from "next/cache";
 import type { FormState } from "@/components/form-ui";
 import { requireOwner } from "@/lib/auth";
 import { isPro } from "@/lib/plans";
+import { cancelRequest, requestManaged } from "@/lib/meta-managed";
 
 export async function saveMeta(_: FormState, form: FormData): Promise<FormState> {
   if (!isPro((await requireOwner()).store)) return { error: "ربط Meta متاح في الباقة الاحترافية" };
@@ -22,4 +23,26 @@ export async function saveMeta(_: FormState, form: FormData): Promise<FormState>
   revalidatePath("/dashboard/marketing");
   refresh();
   return { ok: "✓ تم حفظ إعدادات Meta" };
+}
+
+/** Option 1: the merchant asks the Kun team to connect Meta for them. */
+export async function requestMetaHelp(_: FormState, form: FormData): Promise<FormState> {
+  const { store } = await requireOwner();
+  const page = String(form.get("page_url") ?? "").trim().slice(0, 300);
+  try {
+    await requestManaged(store.id, page);
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "تعذّر إرسال الطلب" };
+  }
+  revalidatePath("/dashboard/marketing");
+  refresh();
+  return { ok: "✓ وصل طلبك إلى فريق كُن، وسنتواصل معك قريباً" };
+}
+
+export async function cancelMetaHelp(): Promise<FormState> {
+  const { store } = await requireOwner();
+  await cancelRequest(store.id).catch(() => {});
+  revalidatePath("/dashboard/marketing");
+  refresh();
+  return { ok: "تم إلغاء الطلب" };
 }

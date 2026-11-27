@@ -11,6 +11,8 @@ import { saveMerchantInfo, setPaidUntil, setStoreStatus } from "@/app/admin/acti
 import { loadSalesmen, loadStores } from "@/app/admin/data";
 import { setStoreSalesman } from "@/app/admin/platform-actions";
 import { PaymentForm, PlanSwitcher, ResetPassword } from "./forms";
+import { MetaCard } from "./meta-card";
+import { getStoreMeta, metaConfig } from "@/lib/meta-managed";
 
 const PLANS = PLAN_LABELS;
 
@@ -21,6 +23,10 @@ export default async function AdminStorePage({ params }: { params: Promise<{ id:
   const s = all.find((x) => x.id === id);
   if (!s) notFound();
   const { data: payments } = await supabaseAdmin().from("subscription_payments").select("*").eq("store_id", id).order("created_at", { ascending: false });
+  const [{ row: meta, missing: metaMissing }, { data: own }] = await Promise.all([
+    getStoreMeta(id),
+    supabaseAdmin().from("stores").select("meta_pixel_id").eq("id", id).maybeSingle(),
+  ]);
   const st = subState(s);
   const left = daysLeft(s.paid_until);
   const link = storeUrl(s.slug);
@@ -81,6 +87,18 @@ export default async function AdminStorePage({ params }: { params: Promise<{ id:
                 <button className="btn btn-outline">احفظ</button>
               </form>
             </details>
+          </Card>
+
+          <Card title="إعلانات Meta (فيسبوك وإنستغرام)">
+            <MetaCard
+              id={s.id}
+              storeName={s.name}
+              merchantPhone={s.owner_phone || s.whatsapp ? normalizeWhatsapp(s.owner_phone || s.whatsapp) : null}
+              meta={meta}
+              configured={Boolean(metaConfig())}
+              missing={metaMissing}
+              ownPixel={(own?.meta_pixel_id as string | null) ?? null}
+            />
           </Card>
 
           <Card title="الدفعات">

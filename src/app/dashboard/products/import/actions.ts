@@ -1,5 +1,6 @@
 "use server";
 
+import { syncCatalogLater } from "@/lib/meta-managed";
 import { isPro } from "@/lib/plans";
 import { refresh, revalidatePath } from "next/cache";
 import { requireOwner } from "@/lib/auth";
@@ -85,6 +86,7 @@ export async function importProducts(_: ImportResult, form: FormData): Promise<I
     if (!error) updated++;
   }
 
+  syncCatalogLater(store.id);
   revalidatePath("/dashboard/products");
 
   refresh();

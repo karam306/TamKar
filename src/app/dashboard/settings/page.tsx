@@ -62,7 +62,7 @@ export default async function SettingsPage() {
           <span className="text-2xl">⚙️</span>
           <span className="flex-1">
             <b className="block text-sm">إعدادات متقدمة</b>
-            <span className="text-[13px] text-muted">Meta Pixel، Google، Excel، القوائم</span>
+            <span className="text-[13px] text-muted">إعلانات Meta، Google، Excel، القوائم</span>
           </span>
           <span className="text-muted">←</span>
         </Link>

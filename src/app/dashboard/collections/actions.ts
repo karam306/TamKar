@@ -1,5 +1,6 @@
 "use server";
 
+import { syncCatalogLater } from "@/lib/meta-managed";
 import { refresh, revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import type { FormState } from "@/components/form-ui";
@@ -50,6 +51,7 @@ export async function saveCollection(
           ? "توجد مجموعة أخرى بالرابط نفسه، يُرجى تغيير الرابط"
           : "تعذّر الحفظ، حاول مرة أخرى",
     };
+  syncCatalogLater(store.id);
   revalidatePath("/dashboard/collections");
   refresh();
   if (!id) redirect(`/dashboard/collections/${res.data.id}?created=1`);
@@ -67,6 +69,7 @@ export async function deleteCollection(form: FormData) {
     .select("image")
     .maybeSingle();
   if (data?.image) await deleteImages(store.id, [data.image as string]);
+  syncCatalogLater(store.id);
   revalidatePath("/dashboard/collections");
   refresh();
   redirect("/dashboard/collections");
@@ -99,6 +102,7 @@ export async function setCollectionProducts(form: FormData) {
       .eq("id", p.id)
       .eq("store_id", store.id);
   }
+  syncCatalogLater(store.id);
   revalidatePath(`/dashboard/collections/${id}`);
   refresh();
 }

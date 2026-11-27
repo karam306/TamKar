@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { storePixel } from "@/lib/meta-managed";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { StoreMobileMenu } from "@/components/store-menu";
@@ -61,7 +62,7 @@ export default async function StoreLayout({ children, params }: Props) {
   return (
     <div data-theme={store.theme} style={style} className="flex min-h-screen flex-col bg-bg font-sans text-text">
       <StoreProvider info={{ slug: store.slug, base, currency: store.currency, whatsapp: store.whatsapp, name: store.name }}>
-        <StoreTracking slug={store.slug} pixelId={isPro(store) ? store.meta_pixel_id : null} />
+        <StoreTracking slug={store.slug} pixelId={(await storePixel(store))?.pixel ?? null} />
         <header className="sticky top-0 z-20 border-b border-black/5 bg-bg/95 backdrop-blur">
           <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4">
             <div className="flex items-center gap-2">

@@ -1,5 +1,6 @@
 "use server";
 
+import { syncCatalogLater } from "@/lib/meta-managed";
 import { LIMIT_MSG, productRoom } from "@/lib/plan-guard";
 import { randomUUID } from "node:crypto";
 import { refresh, revalidatePath } from "next/cache";
@@ -184,6 +185,7 @@ export async function saveProduct(
       store.id,
       ((old?.images as string[]) ?? []).filter((u) => !images.includes(u)),
     );
+    syncCatalogLater(store.id);
     revalidatePath("/dashboard/products");
     refresh();
     return { ok: "✓ تم حفظ المنتج" };
@@ -195,6 +197,7 @@ export async function saveProduct(
     .select("id")
     .single();
   if (error || !data) return { error: "تعذّر الحفظ، حاول مرة أخرى" };
+  syncCatalogLater(store.id);
   revalidatePath("/dashboard/products");
   refresh();
   redirect(`/dashboard/products/${data.id}?created=1`);
@@ -211,6 +214,7 @@ export async function deleteProduct(form: FormData) {
     .select("images")
     .maybeSingle();
   if (data) await deleteImages(store.id, (data.images as string[]) ?? []);
+  syncCatalogLater(store.id);
   revalidatePath("/dashboard/products");
   refresh();
   redirect("/dashboard/products");
@@ -268,6 +272,7 @@ export async function bulkProducts(form: FormData) {
       (data ?? []).flatMap((r) => (r.images as string[]) ?? []),
     );
   }
+  syncCatalogLater(store.id);
   revalidatePath("/dashboard/products");
   refresh();
 }
