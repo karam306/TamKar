@@ -267,3 +267,13 @@ html[data-mode="dark"] [data-ui] .hl-apricot { --hl: #6e4320; }
 html[data-mode="dark"] [data-ui] .hl-mint { --hl: #1d5a3c; }
 html[data-mode="dark"] [data-ui] .hl-pist { --hl: #4b5a1b; }
 html[data-mode="dark"] [data-ui] .hl-butter { --hl: #5e4c10; }
+
+/* iPhone zooms the whole page in when a field under 16px is tapped, and stays zoomed
+   after login. 16px on phones and tablets stops that. */
+@media (max-width: 1023px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
