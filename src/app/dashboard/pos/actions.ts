@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireAccess } from "@/lib/auth";
 import { createOrder } from "@/lib/data";
 import { liveFx, money } from "@/lib/fx";
+import { awardPoints } from "@/lib/loyalty-server";
 import { supabaseAdmin } from "@/lib/supabase";
 import type { CartItem } from "@/lib/types";
 
@@ -23,6 +24,8 @@ export async function sellInStore(input: {
   name?: string;
   phone?: string;
   pay: "cash" | "sham_cash" | "syriatel_cash" | "mtn_cash" | "credit";
+  /** A discount code, e.g. one made from loyalty points. */
+  code?: string;
 }): Promise<SaleResult> {
   const { store } = await requireAccess("orders");
   const items = (Array.isArray(input.items) ? input.items : [])
@@ -46,6 +49,7 @@ export async function sellInStore(input: {
     { name: name || WALK_IN_NAME, phone: phone || WALK_IN_PHONE, city: "", address: "", notes: "", method: "pickup" },
     items,
     "manual",
+    String(input.code ?? "").trim().slice(0, 40) || undefined,
   );
   if (!res.ok) return { ok: false, error: res.error };
   const o = res.order;
@@ -60,6 +64,8 @@ export async function sellInStore(input: {
   // Separate steps: these columns come with updates 013 and 014; the sale is saved either way.
   const { error: e1 } = await db.from("orders").update({ in_store: true }).eq("id", o.id);
   if (e1) console.error("in_store not saved (run 014)", e1.message);
+  // Loyalty points for a named customer (the sale is handed over now).
+  if (phone) await awardPoints(store, { id: o.id, phone, total: o.total });
   if (credit) {
     const { error: e2 } = await db.from("orders").update({ on_credit: true }).eq("id", o.id);
     if (e2) console.error("on_credit not saved (run 013)", e2.message);
@@ -67,6 +73,7 @@ export async function sellInStore(input: {
 
   const m = money(store.currency, liveFx(store));
   const t = m.totals(o.items, o.discount, 0);
+  const discountLine = o.discount > 0 ? `الخصم${o.discount_code ? ` (${o.discount_code})` : ""}: -${m.text(t.discount)}` : "";
   const day = new Intl.DateTimeFormat("ar-SY", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Damascus" }).format(new Date());
   const receipt = [
     `إيصال من ${store.name}`,
@@ -74,6 +81,7 @@ export async function sellInStore(input: {
     "",
     ...o.items.map((i) => `• ${i.title}${i.variantTitle ? ` (${i.variantTitle})` : ""} × ${i.qty} = ${m.text(m.unit(i.price) * i.qty)}`),
     "",
+    ...(discountLine ? [discountLine] : []),
     `المجموع: ${m.text(t.total)}`,
     credit ? "طريقة الدفع: بالآجل" : "تم الدفع",
     "",

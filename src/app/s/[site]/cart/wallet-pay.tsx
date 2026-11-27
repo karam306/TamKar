@@ -13,11 +13,13 @@ export function WalletPay({
   currency,
   whatsappUrl,
   wallet,
+  onSent,
 }: {
   number: number;
   total: number;
   currency: Currency;
   whatsappUrl: string;
+  onSent?: () => void;
   wallet: { id: WalletId; account: string; holder: string | null; qr: string | null };
 }) {
   const info = WALLETS[wallet.id];
@@ -62,7 +64,7 @@ export function WalletPay({
         </li>
       </ol>
 
-      <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="btn w-full !bg-[#25D366]">
+      <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="btn w-full !bg-[#25D366]" onClick={onSent}>
         تم الدفع، أرسل الطلب عبر واتساب
       </a>
       <p className="mt-3 text-center text-xs text-muted">يؤكد المحل طلبك بعد وصول الدفعة.</p>

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
 import { money, type Fx } from "@/lib/fx";
 import { searchProducts } from "@/lib/search";
+import { offerPrice, type QtyOffer } from "@/lib/offers";
 import type { CartItem, Currency, Variant } from "@/lib/types";
 import { sellInStore, type SaleResult } from "./actions";
 
@@ -16,9 +17,10 @@ export type PosProduct = {
   category: string | null;
   stock: number | null;
   variants: Variant[];
+  offers: QtyOffer[];
 };
 
-type Line = CartItem & { title: string; price: number; max: number | null };
+type Line = CartItem & { title: string; price: number; max: number | null; offers: QtyOffer[] };
 type Pay = "cash" | "sham_cash" | "syriatel_cash" | "mtn_cash" | "credit";
 
 const WALLET_NAMES: Record<string, string> = {
@@ -46,6 +48,7 @@ export function Sell({
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [showCustomer, setShowCustomer] = useState(false);
+  const [code, setCode] = useState("");
   const [error, setError] = useState("");
   const [done, setDone] = useState<Extract<SaleResult, { ok: true }> | null>(null);
   const [pending, start] = useTransition();
@@ -71,7 +74,7 @@ export function Sell({
       if (max != null && max <= 0) return ls;
       return [
         ...ls,
-        { productId: p.id, variantId: v?.id, qty: 1, title: v ? `${p.title} (${v.title})` : p.title, price: v?.price ?? p.price, max },
+        { productId: p.id, variantId: v?.id, qty: 1, title: v ? `${p.title} (${v.title})` : p.title, price: v?.price ?? p.price, max, offers: p.offers },
       ];
     });
     setOpen(null);
@@ -86,7 +89,11 @@ export function Sell({
     );
   }
 
-  const totals = m.totals(lines);
+  // Quantity offers: all variants of a product count together, like the database.
+  const perProduct = new Map<string, number>();
+  for (const l of lines) perProduct.set(l.productId, (perProduct.get(l.productId) ?? 0) + l.qty);
+  const unitOf = (l: Line) => offerPrice(l.price, l.offers, perProduct.get(l.productId) ?? 0);
+  const totals = m.totals(lines.map((l) => ({ price: unitOf(l), qty: l.qty })));
   const count = lines.reduce((s, l) => s + l.qty, 0);
 
   function finish() {
@@ -97,6 +104,7 @@ export function Sell({
         name,
         phone,
         pay,
+        code,
       });
       if (!res.ok) return setError(res.error);
       setDone(res);
@@ -110,6 +118,7 @@ export function Sell({
     setPhone("");
     setPay("cash");
     setShowCustomer(false);
+    setCode("");
     setQ("");
   }
 
@@ -221,7 +230,10 @@ export function Sell({
                 <li key={key(l)} className="flex items-center gap-2 py-2">
                   <span className="min-w-0 flex-1">
                     <span className="block truncate font-semibold">{l.title}</span>
-                    <span className="text-muted">{m.text(m.unit(l.price) * l.qty)}</span>
+                    <span className="text-muted">
+                      {m.text(m.unit(unitOf(l)) * l.qty)}
+                      {unitOf(l) < l.price && <span className="text-green-700"> · عرض الكمية</span>}
+                    </span>
                   </span>
                   <span className="flex items-center gap-1">
                     <button type="button" className="h-8 w-8 rounded-full border border-black/15 text-base" onClick={() => setQty(key(l), l.qty - 1)} aria-label="إنقاص">−</button>
@@ -272,6 +284,14 @@ export function Sell({
               </button>
             )}
 
+            <input
+              className="input"
+              dir="ltr"
+              placeholder="كود خصم (اختياري)"
+              value={code}
+              onChange={(e) => setCode(e.target.value.toUpperCase())}
+            />
+            {code && <p className="text-[12px] text-muted">يُطبَّق الخصم عند إتمام البيع، ويظهر في الإيصال.</p>}
             {error && <p className="text-[13px] text-red-700">{error}</p>}
             <div className="flex gap-2">
               <button type="button" className="btn flex-1 !py-3 text-base" disabled={pending} onClick={finish}>

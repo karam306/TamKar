@@ -52,6 +52,14 @@ export default async function SettingsPage() {
           </span>
           <span className="text-muted">←</span>
         </Link>
+        <Link href="/dashboard/settings/loyalty" className="card flex items-center gap-3 p-4 hover:shadow-md">
+          <span className="text-2xl">⭐</span>
+          <span className="flex-1">
+            <b className="block text-sm">نقاط الولاء</b>
+            <span className="text-[13px] text-muted">{store.shipping?.loyalty?.enabled ? "مفعّلة" : "يكسب الزبون نقاطاً مع كل طلب، ويستبدلها بخصم"}</span>
+          </span>
+          <span className="text-muted">←</span>
+        </Link>
         <Link href="/dashboard/invite" className="card flex items-center gap-3 p-4 hover:shadow-md">
           <span className="text-2xl">🎁</span>
           <span className="flex-1">

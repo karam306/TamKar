@@ -1,5 +1,6 @@
 "use server";
 
+import { cleanOffers } from "@/lib/offers";
 import { syncCatalogLater } from "@/lib/meta-managed";
 import { LIMIT_MSG, productRoom } from "@/lib/plan-guard";
 import { randomUUID } from "node:crypto";
@@ -181,6 +182,7 @@ export async function saveProduct(
       .eq("id", id)
       .eq("store_id", store.id);
     if (error) return { error: "تعذّر الحفظ، حاول مرة أخرى" };
+    await saveOffers(db, store.id, id, form);
     await deleteImages(
       store.id,
       ((old?.images as string[]) ?? []).filter((u) => !images.includes(u)),
@@ -197,6 +199,7 @@ export async function saveProduct(
     .select("id")
     .single();
   if (error || !data) return { error: "تعذّر الحفظ، حاول مرة أخرى" };
+  await saveOffers(db, store.id, data.id as string, form);
   syncCatalogLater(store.id);
   revalidatePath("/dashboard/products");
   refresh();
@@ -275,4 +278,12 @@ export async function bulkProducts(form: FormData) {
   syncCatalogLater(store.id);
   revalidatePath("/dashboard/products");
   refresh();
+}
+
+/** Quantity offers live in their own column (update 015); saved separately so products save before it. */
+async function saveOffers(db: Awaited<ReturnType<typeof requireAccess>>["db"], storeId: string, id: string, form: FormData) {
+  if (!form.has("qty_prices")) return;
+  const offers = cleanOffers(parseJSON(form.get("qty_prices"), []));
+  const { error } = await db.from("products").update({ qty_prices: offers }).eq("id", id).eq("store_id", storeId);
+  if (error) console.error("qty_prices not saved (run 015)", error.message);
 }

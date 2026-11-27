@@ -171,6 +171,10 @@ export default async function OrdersPage({
                         status={o.status}
                         pickup={o.fulfillment === "pickup"}
                       />
+                      {o.wa_status === "pending" && o.status === "new" && (
+                        <span className="badge mt-1 block w-fit bg-[#fff1e3] text-[#8a4b00]">بانتظار التأكيد</span>
+                      )}
+                      {o.in_store && <span className="badge mt-1 block w-fit bg-black/5 text-muted">في المحل</span>}
                     </td>
                     <td className="hidden p-2 text-muted sm:table-cell">
                       {o.items.reduce((s, i) => s + i.qty, 0)}

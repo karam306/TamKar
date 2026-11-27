@@ -113,6 +113,8 @@ export type ShippingSettings = {
   gift?: boolean;
   /** Dollar stores: today's rate, so customers see Syrian pounds. See lib/fx.ts. */
   fx?: Fx | null;
+  /** Loyalty points settings. See lib/loyalty.ts. */
+  loyalty?: { enabled: boolean; per: number; block: number; reward: number } | null;
 };
 
 /** Syrian e-wallets a customer can pay with by manual transfer. */
@@ -199,6 +201,8 @@ export type Product = {
   variants?: Variant[];
   collection_ids?: string[];
   specs?: { name: string; value: string }[];
+  /** Quantity offers (update 015): from `min` pieces, `off` percent off each piece. */
+  qty_prices?: { min: number; off: number }[];
 };
 
 export type ProductOption = { name: string; values: string[] };
@@ -260,6 +264,9 @@ export type OrderLine = {
   price: number;
   qty: number;
   image?: string | null;
+  /** Set when a quantity offer applied: the price before it and the percent off. */
+  listPrice?: number | null;
+  offer?: number | null;
 };
 
 export type OrderStatus =
@@ -282,6 +289,10 @@ export type Order = {
   refunded?: number | null;
   /** Sold on credit: the customer pays later, in parts (debt ledger). */
   on_credit?: boolean;
+  /** Update 015: "pending" until the customer opens WhatsApp with the order, then "sent". */
+  wa_status?: "pending" | "sent" | null;
+  /** Update 014: sold inside the shop. */
+  in_store?: boolean;
   customer_id?: string | null;
   source?: "online" | "manual";
   merchant_note?: string | null;

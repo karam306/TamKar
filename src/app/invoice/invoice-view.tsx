@@ -56,6 +56,7 @@ export function InvoiceView({ store, order: o }: { store: Pick<Store, "name" | "
               <td className="py-2">
                 {i.title}
                 {i.variantTitle && <div className="text-xs text-muted">{i.variantTitle}</div>}
+                {i.offer ? <div className="text-xs text-muted">عرض الكمية: خصم {i.offer}٪</div> : null}
               </td>
               <td className="py-2">{i.qty}</td>
               <td className="py-2">{m.price(i.price)}</td>

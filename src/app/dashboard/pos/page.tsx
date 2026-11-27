@@ -1,6 +1,7 @@
 import { PageHeader } from "@/components/admin-ui";
 import { requireAccess } from "@/lib/auth";
 import { liveFx } from "@/lib/fx";
+import { cleanOffers } from "@/lib/offers";
 import type { Variant } from "@/lib/types";
 import { storeWallets } from "@/lib/wallets";
 import { Sell, type PosProduct } from "./sell";
@@ -15,6 +16,9 @@ export default async function PosPage() {
     .eq("active", true)
     .order("created_at", { ascending: false })
     .limit(3000);
+  // Quantity offers (update 015), read on their own so selling works before it.
+  const { data: offerRows } = await db.from("products").select("id, qty_prices").eq("store_id", store.id).eq("active", true).limit(3000);
+  const offers = new Map((offerRows ?? []).map((r) => [r.id as string, cleanOffers(r.qty_prices)]));
   const products: PosProduct[] = (data ?? []).map((p) => ({
     id: p.id as string,
     title: p.title as string,
@@ -24,6 +28,7 @@ export default async function PosPage() {
     category: (p.category as string | null) ?? null,
     stock: p.stock == null ? null : Number(p.stock),
     variants: ((p.variants as Variant[] | null) ?? []).map((v) => ({ ...v, price: Number(v.price) })),
+    offers: offers.get(p.id as string) ?? [],
   }));
   return (
     <div>

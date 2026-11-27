@@ -51,7 +51,7 @@ export function whatsappOrderLink(
     "",
     ...order.items.map(
       (i) =>
-        `• ${i.title}${i.variantTitle ? ` (${i.variantTitle})` : ""} × ${i.qty} = ${m.text(m.unit(i.price) * i.qty)}`,
+        `• ${i.title}${i.variantTitle ? ` (${i.variantTitle})` : ""} × ${i.qty} = ${m.text(m.unit(i.price) * i.qty)}${i.offer ? ` (عرض الكمية: خصم ${i.offer}٪)` : ""}`,
     ),
     "",
     order.discount

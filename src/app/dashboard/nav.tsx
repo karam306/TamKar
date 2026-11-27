@@ -41,6 +41,7 @@ export const NAV: Item[] = [
     sub: [
       { href: "/dashboard/orders/new", label: "طلب يدوي جديد" },
       { href: "/dashboard/quotes", label: "عروض الأسعار" },
+      { href: "/dashboard/carts", label: "السلات المتروكة" },
       { href: "/dashboard/debts", label: "الديون" },
     ],
   },
@@ -78,6 +79,7 @@ export const SETTINGS: Item = {
   sub: [
     { href: "/dashboard/settings/shipping", label: "الاستلام والتوصيل" },
     { href: "/dashboard/settings/currency", label: "سعر الصرف" },
+    { href: "/dashboard/settings/loyalty", label: "نقاط الولاء" },
     { href: "/dashboard/settings/branches", label: "الفروع" },
     { href: "/dashboard/settings/team", label: "الموظفين" },
     { href: "/dashboard/invite", label: "ادعُ تاجراً" },
@@ -182,6 +184,7 @@ const TAB_PERM: Record<string, Perm> = {
   "/dashboard/orders/new": "orders",
   "/dashboard/quotes": "quotes",
   "/dashboard/debts": "orders",
+  "/dashboard/carts": "orders",
   "/dashboard/pos": "orders",
   "/dashboard/products/catalog": "products",
   "/dashboard/products": "products",

@@ -6,6 +6,7 @@ import { sendDeliveredEvent } from "@/lib/meta";
 import { redirect } from "next/navigation";
 import type { FormState } from "@/components/form-ui";
 import { requireAccess } from "@/lib/auth";
+import { awardPoints } from "@/lib/loyalty-server";
 import { createOrder } from "@/lib/data";
 import { supabaseAdmin } from "@/lib/supabase";
 import type { CartItem, Order, OrderStatus } from "@/lib/types";
@@ -44,6 +45,7 @@ export async function setOrderStatus(form: FormData) {
     if (status === "delivered") {
       const o = data as Order;
       after(() => sendDeliveredEvent(store, { ...o, total: Number(o.total) }));
+      await awardPoints(store, o);
     }
   }
   revalidatePath(`/dashboard/orders/${id}`);

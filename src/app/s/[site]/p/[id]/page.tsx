@@ -1,3 +1,4 @@
+import { offerText } from "@/lib/offers";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProductGallery } from "@/components/product-gallery";
@@ -48,6 +49,17 @@ export default async function ProductPage({ params }: Props) {
 
         <div className="flex flex-col gap-5">
           <h1 className="text-3xl leading-snug">{product.title}</h1>
+          {(product.qty_prices?.length ?? 0) > 0 && (
+            <div className="max-w-sm rounded-theme border border-primary/30 bg-primary/5 p-3 text-sm">
+              <div className="mb-1 font-semibold">عروض الكمية</div>
+              <ul className="space-y-0.5">
+                {product.qty_prices!.map((t) => (
+                  <li key={t.min}>{offerText(t)}</li>
+                ))}
+              </ul>
+              {hasVariants(product) && <div className="mt-1 text-xs text-muted">تُحسب كل الخيارات معاً.</div>}
+            </div>
+          )}
           {hasVariants(product) ? <VariantPicker product={product} /> : <SimpleBuy product={product} />}
           <a
             href={whatsappLink(store.whatsapp, `مرحباً، لدي سؤال عن: ${product.title}`)}

@@ -3,6 +3,9 @@ import { notFound } from "next/navigation";
 import { refresh, revalidatePath } from "next/cache";
 import { Card, PageHeader } from "@/components/admin-ui";
 import { requireAccess } from "@/lib/auth";
+import { liveLoyalty, loyaltyText } from "@/lib/loyalty";
+import { pointsOf } from "@/lib/loyalty-server";
+import { RedeemPoints } from "../redeem";
 import { formatPrice, whatsappLink } from "@/lib/format";
 import { normalizeWhatsapp } from "@/lib/templates";
 import type { Customer, Order } from "@/lib/types";
@@ -51,6 +54,7 @@ export default async function CustomerPage({
   ]);
   if (!data) notFound();
   const c = data as Customer;
+  const points = liveLoyalty(store) ? await pointsOf(store.id, c.phone) : null;
   const list = (orders ?? []) as Order[];
   const money = (n: number) => formatPrice(n, store.currency);
   const date = new Intl.DateTimeFormat("ar-SY", {
@@ -134,6 +138,49 @@ export default async function CustomerPage({
               </div>
             </div>
           </Card>
+          {(() => {
+            const l = liveLoyalty(store);
+            if (!l) return null;
+            return (
+              <Card title="نقاط الولاء">
+                {points === null ? (
+                  <p className="text-[13px] text-muted">تعمل النقاط بعد تشغيل التحديث 015 في قاعدة البيانات.</p>
+                ) : (
+                  <div className="space-y-3 text-[13px]">
+                    <div className="flex items-baseline justify-between">
+                      <span className="text-muted">الرصيد</span>
+                      <b className="text-xl">{points.balance}</b>
+                    </div>
+                    <p className="text-muted">{loyaltyText(l, store.currency)}</p>
+                    {points.balance >= l.block ? (
+                      <RedeemPoints
+                        customerId={c.id}
+                        phone={normalizeWhatsapp(c.phone)}
+                        name={c.name}
+                        store={store.name}
+                        unit={store.currency === "SYP" ? "ل.س" : "$"}
+                      />
+                    ) : (
+                      <p className="text-muted">يبقى {l.block - points.balance} نقطة حتى أول خصم.</p>
+                    )}
+                    {points.rows.length > 0 && (
+                      <ul className="divide-y divide-black/5">
+                        {points.rows.slice(0, 10).map((r) => (
+                          <li key={r.id as string} className="flex justify-between py-1.5">
+                            <span className="text-muted">{r.note}</span>
+                            <b className={Number(r.points) > 0 ? "text-[#29845a]" : ""}>
+                              {Number(r.points) > 0 ? "+" : ""}
+                              {r.points}
+                            </b>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                )}
+              </Card>
+            );
+          })()}
           <Card title="ملاحظات">
             <form action={saveNote} className="space-y-2">
               <input type="hidden" name="id" value={c.id} />

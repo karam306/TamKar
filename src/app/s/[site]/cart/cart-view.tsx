@@ -4,12 +4,16 @@ import { useEffect, useState, useTransition } from "react";
 import { useStore } from "@/components/store-context";
 import { StoreLink } from "@/components/store-ui";
 import { money } from "@/lib/fx";
+import { offerFor, offerPrice } from "@/lib/offers";
+import { pointsFor } from "@/lib/loyalty";
 import { contentId } from "@/lib/product-utils";
 import { track } from "@/components/tracking";
 import type { Currency, Fulfillment, PaymentMethod, Pricing } from "@/lib/types";
 import { WALLETS } from "@/lib/wallets";
 import {
   getCartLines,
+  markWhatsappSent,
+  saveCartDraft,
   placeOrder,
   quoteCart,
   type CartLine,
@@ -46,11 +50,12 @@ export function CartView({
   const [branch, setBranch] = useState("");
   // Pickup from the shop is the default; delivery only when the shop offers it.
   const [method, setMethod] = useState<Fulfillment>("pickup");
-  const { cart, setQty, clear, currency, ready, fx } = useStore();
+  const { cart, setQty, clear, currency, ready, fx, loyalty } = useStore();
   const m = money(currency, fx ?? null);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState("");
   const [done, setDone] = useState<{
+    id: string;
     number: number;
     total: number;
     payAmount?: number;
@@ -132,6 +137,7 @@ export function CartView({
         currency={done.payCurrency ?? currency}
         whatsappUrl={done.whatsappUrl}
         wallet={done.wallet}
+        onSent={() => void markWhatsappSent(site, done.id)}
       />
     );
   }
@@ -150,6 +156,7 @@ export function CartView({
           target="_blank"
           rel="noopener noreferrer"
           className="btn w-full !bg-[#25D366]"
+          onClick={() => void markWhatsappSent(site, done.id)}
         >
           أرسل الطلب عبر واتساب
         </a>
@@ -166,13 +173,17 @@ export function CartView({
   const lines = cart
     .map((i) => ({ ...i, info: details?.[keyOf(i.productId, i.variantId)] }))
     .filter((l): l is typeof l & { info: CartLine } => Boolean(l.info));
-  const subtotal = lines.reduce((s, l) => s + l.info.price * l.qty, 0);
+  // Quantity offers: every variant of a product counts together, like the database.
+  const perProduct = new Map<string, number>();
+  for (const l of lines) perProduct.set(l.productId, (perProduct.get(l.productId) ?? 0) + l.qty);
+  const unitOf = (l: (typeof lines)[number]) => offerPrice(l.info.price, l.info.offers, perProduct.get(l.productId) ?? 0);
+  const subtotal = lines.reduce((s, l) => s + unitOf(l) * l.qty, 0);
   const shown =
     pricing && Math.abs(pricing.subtotal - subtotal) < 0.01 ? pricing : null;
   // What the customer sees: with an exchange rate, every line is converted
   // first and the total is the sum of what is shown.
   const view = m.totals(
-    lines.map((l) => ({ price: l.info.price, qty: l.qty })),
+    lines.map((l) => ({ price: unitOf(l), qty: l.qty })),
     shown?.discount ?? 0,
     shown?.shipping ?? 0,
   );
@@ -228,6 +239,7 @@ export function CartView({
       );
       clear();
       setDone({
+        id: res.id,
         number: res.number,
         total: res.total,
         payAmount: res.payAmount,
@@ -263,8 +275,20 @@ export function CartView({
                   </div>
                 )}
                 <div className="text-sm text-primary">
-                  {m.price(l.info.price)}
+                  {unitOf(l) < l.info.price && (
+                    <span className="me-2 text-xs text-muted line-through">{m.text(m.unit(l.info.price))}</span>
+                  )}
+                  {m.price(unitOf(l))}
                 </div>
+                {(() => {
+                  const off = offerFor(l.info.offers, perProduct.get(l.productId) ?? 0);
+                  const next = (l.info.offers ?? []).find((t) => t.min > (perProduct.get(l.productId) ?? 0));
+                  return off ? (
+                    <div className="text-xs text-green-700">عرض الكمية: خصم {off}٪ على كل قطعة</div>
+                  ) : next ? (
+                    <div className="text-xs text-muted">أضف {next.min - (perProduct.get(l.productId) ?? 0)} لتحصل على خصم {next.off}٪</div>
+                  ) : null;
+                })()}
                 {!l.info.available && (
                   <div className="text-xs text-red-700">نفدت الكمية</div>
                 )}
@@ -370,6 +394,16 @@ export function CartView({
           />
           <input
             name="phone"
+            onBlur={(e) => {
+              // Saved for the shop if the customer leaves without ordering (abandoned carts).
+              const form = e.currentTarget.form;
+              const name = (form?.elements.namedItem("name") as HTMLInputElement | null)?.value ?? "";
+              void saveCartDraft(site, {
+                name,
+                phone: e.currentTarget.value,
+                items: cart.map(({ productId, variantId, qty }) => ({ productId, variantId, qty })),
+              });
+            }}
             required
             placeholder="رقم الهاتف المحمول (مثال: 0912345678)"
             className="input"
@@ -530,6 +564,11 @@ export function CartView({
                 {m.text(view.total, shown ? shown.total : subtotal)}
               </span>
             </div>
+            {loyalty && pointsFor(shown ? shown.total : subtotal, loyalty) > 0 && (
+              <p className="pt-1 text-xs text-muted">
+                ⭐ تحصل على {pointsFor(shown ? shown.total : subtotal, loyalty)} نقطة عند استلام طلبك.
+              </p>
+            )}
           </div>
           {payments.length > 1 ? (
             <div className="space-y-2">

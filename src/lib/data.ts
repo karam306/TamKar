@@ -1,5 +1,6 @@
 import "server-only";
 import { liveFx, type Fx } from "./fx";
+import { cleanOffers } from "./offers";
 import { searchProducts } from "./search";
 import { cache } from "react";
 import { demoCollections, demoProducts, demoStores } from "./demo-data";
@@ -146,9 +147,24 @@ export const getProduct = cache(
       .eq("id", id)
       .eq("active", true)
       .maybeSingle();
-    return data ? num(data as Product) : null;
+    return data ? (await withOffers([num(data as Product)]))[0] : null;
   },
 );
+
+/**
+ * Adds quantity offers (update 015). Read on their own so the store keeps working
+ * before the update is run: any error just means "no offers".
+ */
+async function withOffers(products: Product[]): Promise<Product[]> {
+  if (!products.length) return products;
+  const { data, error } = await supabasePublic()
+    .from("products")
+    .select("id, qty_prices")
+    .in("id", products.map((p) => p.id));
+  if (error || !data) return products;
+  const map = new Map(data.map((r) => [r.id as string, cleanOffers(r.qty_prices)]));
+  return products.map((p) => ({ ...p, qty_prices: map.get(p.id) ?? [] }));
+}
 
 /** Products for the cart page (only the ones in the cart). */
 export async function getProductsByIds(
@@ -169,7 +185,7 @@ export async function getProductsByIds(
     .eq("store_id", storeId)
     .eq("active", true)
     .in("id", valid);
-  return ((data as Product[]) ?? []).map(num);
+  return withOffers(((data as Product[]) ?? []).map(num));
 }
 
 export const getCollections = cache(

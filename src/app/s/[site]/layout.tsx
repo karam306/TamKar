@@ -9,6 +9,7 @@ import { CartButton, StoreLink } from "@/components/store-ui";
 import { StoreTracking } from "@/components/tracking";
 import { getStore } from "@/lib/data";
 import { liveFx } from "@/lib/fx";
+import { liveLoyalty } from "@/lib/loyalty";
 import { whatsappLink } from "@/lib/format";
 import { isOpen } from "@/lib/subscription";
 import type { MenuLink, StoreSocial } from "@/lib/types";
@@ -63,7 +64,7 @@ export default async function StoreLayout({ children, params }: Props) {
 
   return (
     <div data-theme={store.theme} style={style} className="flex min-h-screen flex-col bg-bg font-sans text-text">
-      <StoreProvider info={{ slug: store.slug, base, currency: store.currency, whatsapp: store.whatsapp, name: store.name, fx: liveFx(store) }}>
+      <StoreProvider info={{ slug: store.slug, base, currency: store.currency, whatsapp: store.whatsapp, name: store.name, fx: liveFx(store), loyalty: liveLoyalty(store) }}>
         <StoreTracking slug={store.slug} pixelId={(await storePixel(store))?.pixel ?? null} />
         <header className="sticky top-0 z-20 border-b border-black/5 bg-bg/95 backdrop-blur">
           <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4">

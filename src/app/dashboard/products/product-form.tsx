@@ -6,6 +6,7 @@ import { Field, SaveRow } from "@/components/form-ui";
 import { ImageUploader } from "@/components/image-uploader";
 import type { Collection, Product } from "@/lib/types";
 import { saveProduct, uploadImage } from "./actions";
+import { OffersEditor } from "./offers-editor";
 import { SpecsEditor } from "./specs-editor";
 import { VariantEditor } from "./variant-editor";
 
@@ -72,6 +73,8 @@ export function ProductForm({
             </section>
           </>
         )}
+
+        <OffersEditor initial={product?.qty_prices ?? []} />
 
         <SpecsEditor initial={product?.specs ?? []} presets={specPresets} />
 

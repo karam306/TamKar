@@ -124,8 +124,35 @@ export default async function OrderPage({
         )}
         <p className="-mt-3 mb-5 text-[13px] text-muted">
           {fmt.format(new Date(o.created_at))} ·{" "}
-          {o.source === "manual" ? "طلب يدوي" : "من المتجر الإلكتروني"}
+          {o.in_store ? "بيع في المحل" : o.source === "manual" ? "طلب يدوي" : "من المتجر الإلكتروني"}
         </p>
+
+        {o.wa_status === "pending" && o.status === "new" && (
+          <div className="card mb-4 border-r-4 border-[#e8a33c] p-4 text-[13px]">
+            <p className="mb-1 font-semibold">لم يرسل الزبون الطلب عبر واتساب بعد.</p>
+            <p className="mb-3 text-muted">
+              قد يكون أغلق الصفحة قبل الإرسال. أرسل إليه رسالة تأكيد قبل تجهيز الطلب، ثم غيّر حالته إلى «مؤكد» عندما يرد.
+            </p>
+            <a
+              href={whatsappLink(
+                normalizeWhatsapp(o.phone),
+                [
+                  `مرحباً ${o.customer_name}،`,
+                  `وصلنا طلبك رقم #${o.number} من ${store.name}:`,
+                  ...o.items.map((i) => `• ${i.title}${i.variantTitle ? ` (${i.variantTitle})` : ""} × ${i.qty}`),
+                  `المجموع: ${money(Number(o.total))}`,
+                  "",
+                  "هل تؤكد الطلب؟ يكفي أن ترد بكلمة «نعم».",
+                ].join("\n"),
+              )}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn inline-flex"
+            >
+              إرسال رسالة تأكيد للزبون
+            </a>
+          </div>
+        )}
 
         <div className="grid items-start gap-4 lg:grid-cols-[1fr_300px]">
           <div className="space-y-4">
@@ -158,6 +185,7 @@ export default async function OrderPage({
                     </div>
                     <span className="whitespace-nowrap text-muted">
                       {money(i.price)} × {i.qty}
+                      {i.offer ? <span className="text-green-700"> · عرض الكمية {i.offer}٪</span> : null}
                     </span>
                     <span className="w-20 text-left font-semibold">
                       {money(i.price * i.qty)}
