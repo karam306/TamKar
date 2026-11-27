@@ -1,3 +1,4 @@
+import { MadeWithKun, StoreLogo } from "@/components/doc-brand";
 import { formatPrice } from "@/lib/format";
 import type { Order, Store } from "@/lib/types";
 
@@ -9,10 +10,7 @@ export function InvoiceView({ store, order: o }: { store: Pick<Store, "name" | "
     <>
       <header className="mb-8 flex items-start justify-between border-b border-black/10 pb-6">
         <div>
-          {store.logo_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={store.logo_url} alt="" className="mb-2 h-12" />
-          ) : null}
+          <StoreLogo src={store.logo_url} />
           <div className="text-2xl font-bold">{store.name}</div>
           {store.city && <div className="text-muted">{store.city}</div>}
           <div dir="ltr" className="text-right text-muted">
@@ -88,6 +86,7 @@ export function InvoiceView({ store, order: o }: { store: Pick<Store, "name" | "
       </div>
       {o.notes && <p className="mt-6 text-muted">ملاحظات: {o.notes}</p>}
       <footer className="mt-12 text-center text-muted">شكراً لتسوقكم من {store.name}</footer>
+      <MadeWithKun />
     </>
   );
 }

@@ -75,6 +75,7 @@ export default async function SettingsPage() {
           city: store.city ?? "",
           currency: store.currency,
           delivery_note: store.delivery_note ?? "",
+          logo_url: store.logo_url ?? "",
         }}
       />
       <section className="space-y-2 card p-5 text-sm">

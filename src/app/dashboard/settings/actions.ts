@@ -16,6 +16,7 @@ export async function saveSettings(_: FormState, form: FormData): Promise<FormSt
   if (!/^\d{9,15}$/.test(whatsapp)) return { error: "رقم واتساب غير صحيح" };
   if (!["USD", "SYP"].includes(currency)) return { error: "اختر العملة" };
 
+  const logo = String(form.get("logo_url") ?? "");
   const { error } = await db
     .from("stores")
     .update({
@@ -25,6 +26,8 @@ export async function saveSettings(_: FormState, form: FormData): Promise<FormSt
       city: str(form, "city", 60) || null,
       currency,
       delivery_note: str(form, "delivery_note", 200) || null,
+      // Only our own uploads for this store are accepted as the logo.
+      logo_url: logo.startsWith(`/api/media/${store.id}/`) ? logo : null,
     })
     .eq("id", store.id);
   if (error) return { error: "تعذّر الحفظ، حاول مرة أخرى" };

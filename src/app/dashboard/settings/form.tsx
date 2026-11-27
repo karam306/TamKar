@@ -2,14 +2,16 @@
 
 import { useActionState } from "react";
 import { Field, FormMessage, SubmitButton } from "@/components/form-ui";
+import { LogoField } from "@/components/logo-field";
 import { saveSettings } from "./actions";
 
-type S = { name: string; tagline: string; whatsapp: string; city: string; currency: string; delivery_note: string };
+type S = { name: string; tagline: string; whatsapp: string; city: string; currency: string; delivery_note: string; logo_url: string };
 
 export function SettingsForm({ store }: { store: S }) {
   const [state, action] = useActionState(saveSettings, undefined);
   return (
     <form action={action} className="space-y-4 card p-5">
+      <LogoField initial={store.logo_url} />
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="اسم المتجر">
           <input name="name" required defaultValue={store.name} className="input" />
