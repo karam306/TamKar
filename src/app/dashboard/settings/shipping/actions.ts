@@ -3,8 +3,6 @@
 import { refresh, revalidatePath } from "next/cache";
 import type { FormState } from "@/components/form-ui";
 import { requireOwner } from "@/lib/auth";
-import { isPro, LIMITS } from "@/lib/plans";
-import { normalizeWhatsapp } from "@/lib/templates";
 
 const num = (v: unknown) => {
   const s = String(v ?? "").trim();
@@ -40,35 +38,8 @@ export async function saveShipping(
   ) {
     return { error: "يوجد سعر توصيل غير صحيح" };
   }
-  let rawBranches: {
-    id?: unknown;
-    name?: unknown;
-    note?: unknown;
-    whatsapp?: unknown;
-  }[] = [];
-  try {
-    rawBranches = JSON.parse(String(form.get("branches") ?? "[]"));
-  } catch {}
-  const branches = isPro(store)
-    ? rawBranches
-        .map((b) => ({
-          id:
-            String(b.id ?? "").slice(0, 12) ||
-            Math.random().toString(36).slice(2, 10),
-          name: String(b.name ?? "")
-            .trim()
-            .slice(0, 60),
-          note:
-            String(b.note ?? "")
-              .trim()
-              .slice(0, 200) || null,
-          whatsapp: normalizeWhatsapp(String(b.whatsapp ?? "")),
-        }))
-        .filter((b) => b.name)
-        .slice(0, LIMITS.pro.branches - 1)
-    : [];
-  if (branches.some((b) => !/^\d{9,15}$/.test(b.whatsapp)))
-    return { error: "يوجد فرع رقم واتسابه غير صحيح" };
+  // Branches are edited on their own page (Settings > Branches); keep them as they are.
+  const branches = store.shipping?.branches ?? [];
   const { error } = await db
     .from("stores")
     .update({

@@ -71,6 +71,7 @@ export const SETTINGS: Item = {
   icon: ICONS.settings,
   sub: [
     { href: "/dashboard/settings/shipping", label: "الاستلام والتوصيل" },
+    { href: "/dashboard/settings/branches", label: "الفروع" },
     { href: "/dashboard/settings/team", label: "الموظفين" },
     {
       href: "/dashboard/settings/advanced",
@@ -210,7 +211,7 @@ export function SideNav({
   return (
     <div className="flex h-full flex-col">
       <nav className="flex-1 overflow-y-auto p-3">
-        <NavList items={navFor(staff, perms)} />
+        <NavList items={staff ? navFor(true, perms) : [...NAV, SETTINGS]} />
         <div className="mt-5 px-2.5 text-xs font-semibold text-[#616161]">
           المتجر الإلكتروني
         </div>
@@ -224,11 +225,6 @@ export function SideNav({
           <span aria-hidden>↗</span>
         </a>
       </nav>
-      {!staff && (
-        <div className="p-3">
-          <NavList items={[SETTINGS]} />
-        </div>
-      )}
     </div>
   );
 }

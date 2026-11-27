@@ -40,6 +40,16 @@ export default async function SettingsPage() {
           </span>
           <span className="text-muted">←</span>
         </Link>
+        <Link href="/dashboard/settings/branches" className="card flex items-center gap-3 p-4 hover:shadow-md">
+          <span className="text-2xl">🏬</span>
+          <span className="flex-1">
+            <b className="block text-sm">الفروع {!isPro(store) && "🔒"}</b>
+            <span className="text-[13px] text-muted">
+              {store.shipping?.branches?.length ? `المحل الرئيسي + ${store.shipping.branches.length} فروع` : "لكل فرع رقم واتساب خاص تصله طلباته"}
+            </span>
+          </span>
+          <span className="text-muted">←</span>
+        </Link>
         <Link href="/dashboard/settings/team" className="card flex items-center gap-3 p-4 hover:shadow-md">
           <span className="text-2xl">👥</span>
           <span className="flex-1">

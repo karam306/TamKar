@@ -46,7 +46,7 @@ export default async function DashboardLayout({
       className="flex min-h-screen flex-col bg-[#1a1a1a] font-sans text-text"
     >
       {/* Top bar */}
-      <header className="flex h-14 shrink-0 items-center justify-between gap-3 px-3 text-white lg:px-4">
+      <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between gap-3 bg-[#1a1a1a] px-3 text-white lg:px-4">
         <div className="flex items-center gap-2">
           <MobileMenu
             storeName={store.name}
@@ -118,9 +118,10 @@ export default async function DashboardLayout({
         </div>
       </header>
 
-      <div className="flex min-h-0 flex-1 overflow-hidden lg:rounded-t-xl">
-        <aside className="hidden w-60 shrink-0 bg-[#ebebeb] lg:block">
-          <div className="sticky top-0 h-[calc(100vh-56px)]">
+      <div className="flex flex-1 lg:rounded-t-xl">
+        {/* Stays in place while the page scrolls (sticky under the top bar). */}
+        <aside className="sticky top-14 hidden h-[calc(100vh-56px)] w-60 shrink-0 self-start overflow-hidden bg-[#ebebeb] lg:block lg:rounded-tr-xl">
+          <div className="h-full">
             <SideNav
               storeName={store.name}
               storeLink={link}
@@ -129,7 +130,7 @@ export default async function DashboardLayout({
             />
           </div>
         </aside>
-        <div className="min-w-0 flex-1 bg-[#f1f1f1]">
+        <div className="min-w-0 flex-1 bg-[#f1f1f1] lg:rounded-tl-xl">
           <SubscriptionBanner
             status={store.status}
             plan={store.plan}
