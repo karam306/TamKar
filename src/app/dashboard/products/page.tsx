@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { StatusToggle } from "./status-toggle";
 import { EmptyState, PageHeader, Pager } from "@/components/admin-ui";
 import { requireAccess } from "@/lib/auth";
 import { formatPrice } from "@/lib/format";
@@ -186,11 +187,7 @@ export default async function ProductsPage({
                         </Link>
                       </td>
                       <td className="p-2">
-                        <span
-                          className={`badge ${p.active ? "bg-[#affebf] text-[#014b40]" : "bg-[#e3e3e3] text-[#616161]"}`}
-                        >
-                          {p.active ? "نشط" : "مسودة"}
-                        </span>
+                        <StatusToggle key={`${p.id}-${p.active}`} id={p.id} active={p.active} />
                       </td>
                       <td className="hidden p-2 sm:table-cell">
                         {stock === null ? (

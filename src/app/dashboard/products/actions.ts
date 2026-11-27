@@ -222,3 +222,19 @@ async function saveOffers(db: Awaited<ReturnType<typeof requireAccess>>["db"], s
   const { error } = await db.from("products").update({ qty_prices: offers }).eq("id", id).eq("store_id", storeId);
   if (error) console.error("qty_prices not saved (run 015)", error.message);
 }
+
+/** Show or hide one product straight from the product list. */
+export async function setProductActive(id: string, active: boolean): Promise<{ ok?: true; error?: string }> {
+  const { store, db } = await requireAccess("products");
+  if (!/^[0-9a-f-]{36}$/.test(String(id))) return { error: "المنتج غير موجود" };
+  const { data, error } = await db
+    .from("products")
+    .update({ active: Boolean(active) })
+    .eq("id", id)
+    .eq("store_id", store.id)
+    .select("id");
+  if (error || !data?.length) return { error: "تعذّر تغيير الحالة" };
+  syncCatalogLater(store.id);
+  revalidatePath("/dashboard/products");
+  return { ok: true };
+}

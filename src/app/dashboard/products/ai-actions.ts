@@ -147,12 +147,14 @@ export async function addListedProducts(rows: ListItem[]): Promise<{ ok?: string
   if (room <= 0) return { error: LIMIT_MSG };
   const take = clean.slice(0, room);
   const { error } = await db.from("products").insert(
-    take.map((r) => ({ store_id: store.id, title: r.title, price: r.price, category: r.category || null, active: true, images: [] })),
+    take.map((r) => ({ store_id: store.id, title: r.title, price: r.price, category: r.category || null, active: false, images: [] })),
   );
   if (error) return { error: "تعذّرت إضافة المنتجات، حاول مرة أخرى" };
   syncCatalogLater(store.id);
   revalidatePath("/dashboard/products");
   refresh();
   const skipped = clean.length - take.length;
-  return { ok: `أُضيف ${take.length} منتجاً.${skipped ? ` لم يُضف ${skipped} بسبب حد الباقة.` : ""} أضف الصور من صفحة كل منتج.` };
+  return {
+    ok: `أُضيف ${take.length} منتجاً كمسودة، فلن تظهر للزبائن بعد.${skipped ? ` لم يُضف ${skipped} بسبب حد الباقة.` : ""} أضف الصور، ثم فعّل كل منتج من مفتاح الحالة في قائمة المنتجات.`,
+  };
 }
