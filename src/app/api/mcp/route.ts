@@ -26,10 +26,13 @@ type Rpc = { jsonrpc: "2.0"; id?: string | number | null; method: string; params
 const reply = (id: Rpc["id"], result: unknown) => ({ jsonrpc: "2.0", id: id ?? null, result });
 const error = (id: Rpc["id"], code: number, message: string) => ({ jsonrpc: "2.0", id: id ?? null, error: { code, message } });
 
+/** The key, from Authorization or X-API-Key, with or without the word "Bearer". */
 function bearer(req: Request): string | null {
-  const h = req.headers.get("authorization") ?? "";
-  const m = /^Bearer\s+(.+)$/i.exec(h);
-  return m ? m[1] : req.headers.get("x-api-key");
+  for (const name of ["authorization", "x-api-key", "api-key"]) {
+    const v = (req.headers.get(name) ?? "").replace(/^Bearer\s+/i, "").trim();
+    if (v.startsWith("kun_")) return v;
+  }
+  return null;
 }
 
 async function handle(msg: Rpc, keyId: string): Promise<unknown | null> {
