@@ -7,6 +7,7 @@ import { refresh, revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import type { FormState } from "@/components/form-ui";
 import { requireAccess } from "@/lib/auth";
+import { supabaseAdmin } from "@/lib/supabase";
 import { deleteImages, saveImage } from "@/lib/media";
 import { cleanVariants, parseJSON, toNum, txt } from "@/lib/clean-product";
 
@@ -21,11 +22,23 @@ export async function uploadImage(
   }
 }
 
+/** The cost price lives in its own private table (update 018). Owner only. */
+async function saveCost(storeId: string, productId: string, form: FormData, owner: boolean) {
+  if (!owner || form.get("cost_field") !== "1") return;
+  const raw = toNum(form.get("cost"));
+  const cost = raw === null || Number.isNaN(raw) || raw < 0 ? null : Math.round(raw * 100) / 100;
+  const { error } = await supabaseAdmin()
+    .from("product_costs")
+    .upsert({ product_id: productId, store_id: storeId, cost, updated_at: new Date().toISOString() }, { onConflict: "product_id" });
+  if (error) console.error("cost not saved (run 018)", error.message);
+}
+
 export async function saveProduct(
   _: FormState,
   form: FormData,
 ): Promise<FormState> {
-  const { store, db } = await requireAccess("products");
+  const { store, db, role } = await requireAccess("products");
+  const owner = role === "owner";
   const id = String(form.get("id") ?? "");
   const title = txt(form.get("title"), 200);
   let price = toNum(form.get("price"));
@@ -103,6 +116,7 @@ export async function saveProduct(
       .eq("store_id", store.id);
     if (error) return { error: "تعذّر الحفظ، حاول مرة أخرى" };
     await saveOffers(db, store.id, id, form);
+    await saveCost(store.id, id, form, owner);
     await deleteImages(
       store.id,
       ((old?.images as string[]) ?? []).filter((u) => !images.includes(u)),
@@ -120,6 +134,7 @@ export async function saveProduct(
     .single();
   if (error || !data) return { error: "تعذّر الحفظ، حاول مرة أخرى" };
   await saveOffers(db, store.id, data.id as string, form);
+  await saveCost(store.id, data.id as string, form, owner);
   syncCatalogLater(store.id);
   revalidatePath("/dashboard/products");
   refresh();

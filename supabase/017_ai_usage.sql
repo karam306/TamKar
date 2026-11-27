@@ -10,3 +10,5 @@ create index if not exists ai_usage_store_month on public.ai_usage (store_id, cr
 
 -- Written and read only by the server (service role). No access from the browser.
 alter table public.ai_usage enable row level security;
+grant all on public.ai_usage to service_role;
+grant usage, select on sequence public.ai_usage_id_seq to service_role;

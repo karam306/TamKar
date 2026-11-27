@@ -20,6 +20,7 @@ const ICONS = {
   store:
     "M3 9l1.5-5h15L21 9M3 9h18v2a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0zM5 13v7h14v-7",
   analytics: "M4 20V10M10 20V4M16 20v-7M22 20H2",
+  accounts: "M4 4h16v16H4zM4 9h16M9 9v11M12.5 13h4M12.5 16.5h4",
   marketing:
     "M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1zM15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13",
   discounts:
@@ -57,6 +58,18 @@ export const NAV: Item[] = [
   { href: "/dashboard/customers", label: "الزبائن", icon: ICONS.customers },
   { href: "/dashboard/discounts", label: "الخصومات", icon: ICONS.discounts },
   { href: "/dashboard/analytics", label: "التقارير", icon: ICONS.analytics },
+  {
+    href: "/dashboard/accounts",
+    label: "الحسابات",
+    icon: ICONS.accounts,
+    sub: [
+      { href: "/dashboard/accounts/expenses", label: "المصاريف" },
+      { href: "/dashboard/accounts/cash", label: "إغلاق الصندوق" },
+      { href: "/dashboard/accounts/suppliers", label: "الموردون" },
+      { href: "/dashboard/accounts/purchases", label: "المشتريات" },
+      { href: "/dashboard/accounts/costs", label: "أسعار التكلفة" },
+    ],
+  },
   {
     href: "/dashboard/design",
     label: "شكل المتجر",

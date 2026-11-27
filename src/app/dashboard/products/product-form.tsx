@@ -19,7 +19,10 @@ export function ProductForm({
   optionPresets,
   specPresets,
   placeholders,
+  cost,
 }: {
+  /** The owner sees and edits the cost price; staff never get it (undefined). */
+  cost?: { value: number | null };
   product?: Product;
   currency: string;
   categories: string[];
@@ -32,6 +35,7 @@ export function ProductForm({
   const [withVariants, setWithVariants] = useState((product?.options?.length ?? 0) > 0);
   const [price, setPrice] = useState(product?.price != null ? String(product.price) : "");
   const unit = currency === "SYP" ? "ل.س" : "$";
+  const [costText, setCostText] = useState(cost?.value != null ? String(cost.value) : "");
   const formRef = useRef<HTMLFormElement>(null);
   const [specs, setSpecs] = useState({ key: 0, rows: product?.specs ?? [] });
   const set = (name: string, value: string) => {
@@ -89,6 +93,33 @@ export function ProductForm({
               </div>
             </section>
           </>
+        )}
+
+        {cost && (
+          <section className="card space-y-3 p-4">
+            <h2 className="text-sm font-semibold">سعر التكلفة</h2>
+            <Field
+              label={`كم كلّفك هذا المنتج؟ (${unit})`}
+              hint={
+                withVariants
+                  ? "يُطبَّق على كل الخيارات. لتكلفة مختلفة لكل خيار افتح الحسابات ← أسعار التكلفة."
+                  : "لا يظهر للزبائن ولا للموظفين. يُستخدم لحساب ربحك."
+              }
+            >
+              <input name="cost" inputMode="decimal" value={costText} onChange={(e) => setCostText(e.target.value)} className="input" dir="ltr" />
+            </Field>
+            {!withVariants && (() => {
+              const p = Number(price), c = Number(costText);
+              if (!costText.trim() || !price.trim() || !Number.isFinite(p) || !Number.isFinite(c) || p <= 0) return null;
+              const profit = p - c;
+              return (
+                <p className={`text-[13px] ${profit >= 0 ? "text-[#1a7f37]" : "text-red-700"}`}>
+                  الربح في كل قطعة: {profit.toLocaleString("en-US", { maximumFractionDigits: 2 })} {unit} ({Math.round((profit / p) * 100)}٪ من سعر البيع)
+                </p>
+              );
+            })()}
+            <input type="hidden" name="cost_field" value="1" />
+          </section>
         )}
 
         <OffersEditor initial={product?.qty_prices ?? []} />

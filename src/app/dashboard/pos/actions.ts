@@ -26,6 +26,8 @@ export async function sellInStore(input: {
   pay: "cash" | "sham_cash" | "syriatel_cash" | "mtn_cash" | "credit";
   /** A discount code, e.g. one made from loyalty points. */
   code?: string;
+  /** Which branch sold it (Pro), for the daily cash close. */
+  branch?: string;
 }): Promise<SaleResult> {
   const { store } = await requireAccess("orders");
   const items = (Array.isArray(input.items) ? input.items : [])
@@ -62,7 +64,8 @@ export async function sellInStore(input: {
     .eq("id", o.id)
     .eq("store_id", store.id);
   // Separate steps: these columns come with updates 013 and 014; the sale is saved either way.
-  const { error: e1 } = await db.from("orders").update({ in_store: true }).eq("id", o.id);
+  const branch = (store.shipping?.branches ?? []).find((b) => b.id === input.branch);
+  const { error: e1 } = await db.from("orders").update({ in_store: true, ...(branch ? { branch: branch.name } : {}) }).eq("id", o.id);
   if (e1) console.error("in_store not saved (run 014)", e1.message);
   // Loyalty points for a named customer (the sale is handed over now).
   if (phone) await awardPoints(store, { id: o.id, phone, total: o.total });

@@ -3,6 +3,7 @@ import { requireAccess } from "@/lib/auth";
 import { liveFx } from "@/lib/fx";
 import { cleanOffers } from "@/lib/offers";
 import type { Variant } from "@/lib/types";
+import { isPro } from "@/lib/plans";
 import { storeWallets } from "@/lib/wallets";
 import { Sell, type PosProduct } from "./sell";
 
@@ -38,6 +39,7 @@ export default async function PosPage() {
         currency={store.currency}
         fx={liveFx(store)}
         wallets={storeWallets(store).map((w) => w.id)}
+        branches={isPro(store) ? (store.shipping?.branches ?? []).map((b) => ({ id: b.id, name: b.name })) : []}
       />
     </div>
   );

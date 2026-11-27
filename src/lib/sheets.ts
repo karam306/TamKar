@@ -105,3 +105,15 @@ export async function buildSheet(name: string, headers: string[], rows: (string 
   ws.columns.forEach((c, i) => (c.width = Math.min(50, Math.max(12, headers[i]?.length + 4))));
   return Buffer.from(await wb.xlsx.writeBuffer());
 }
+
+/** Several sheets in one .xlsx file (right-to-left, bold headers). */
+export async function buildBook(sheets: { name: string; headers: string[]; rows: (string | number | null | undefined)[][] }[]): Promise<Buffer> {
+  const wb = new ExcelJS.Workbook();
+  for (const s of sheets) {
+    const ws = wb.addWorksheet(s.name, { views: [{ rightToLeft: true, state: "frozen", ySplit: 1 }] });
+    ws.addRow(s.headers).font = { bold: true };
+    s.rows.forEach((r) => ws.addRow(r.map((v) => (v == null ? "" : v))));
+    ws.columns.forEach((c, i) => (c.width = Math.min(50, Math.max(12, (s.headers[i]?.length ?? 8) + 4))));
+  }
+  return Buffer.from(await wb.xlsx.writeBuffer());
+}

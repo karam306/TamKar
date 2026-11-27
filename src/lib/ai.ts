@@ -76,7 +76,7 @@ async function toJpeg(input: Buffer, max: number): Promise<Img> {
  */
 export async function aiCall<T>(opts: {
   store: { id: string; plan?: string | null };
-  kind: "product" | "price_list" | "store";
+  kind: "product" | "price_list" | "store" | "invoice";
   system: string;
   text: string;
   images?: Img[];

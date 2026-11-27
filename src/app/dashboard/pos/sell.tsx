@@ -34,12 +34,24 @@ export function Sell({
   currency,
   fx,
   wallets,
+  branches = [],
 }: {
   products: PosProduct[];
   currency: Currency;
   fx: Fx | null;
   wallets: string[];
+  /** Pro shops with branches: which shop this sale belongs to (for the cash close). */
+  branches?: { id: string; name: string }[];
 }) {
+  const [branch, setBranch] = useState(() => {
+    if (typeof window === "undefined") return "";
+    try {
+      const b = localStorage.getItem("kun_pos_branch") ?? "";
+      return branches.some((x) => x.id === b) ? b : "";
+    } catch {
+      return "";
+    }
+  });
   const m = money(currency, fx);
   const [q, setQ] = useState("");
   const [open, setOpen] = useState<string | null>(null); // product showing its variants
@@ -105,6 +117,7 @@ export function Sell({
         phone,
         pay,
         code,
+        branch,
       });
       if (!res.ok) return setError(res.error);
       setDone(res);
@@ -256,6 +269,29 @@ export function Sell({
               <span className="text-[13px] text-muted">{count} قطعة</span>
               <span className="text-xl font-bold">{m.text(totals.total)}</span>
             </div>
+
+            {branches.length > 0 && (
+              <label className="flex items-center gap-2 text-[13px]">
+                <span className="text-muted">الفرع</span>
+                <select
+                  className="input !py-1.5"
+                  value={branch}
+                  onChange={(e) => {
+                    setBranch(e.target.value);
+                    try {
+                      localStorage.setItem("kun_pos_branch", e.target.value);
+                    } catch {}
+                  }}
+                >
+                  <option value="">المحل الرئيسي</option>
+                  {branches.map((b) => (
+                    <option key={b.id} value={b.id}>
+                      {b.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
 
             <div className="flex flex-wrap gap-1.5">
               {(["cash", ...wallets, "credit"] as Pay[]).map((p) => (

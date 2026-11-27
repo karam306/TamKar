@@ -53,10 +53,16 @@ export async function addPayment(_: FormState, form: FormData): Promise<FormStat
   if (pe) return { error: missing(pe.message) ? NEEDS_013 : "لم تُسجَّل الدفعة. أعد المحاولة." };
   const { due } = orderDue(o, pays ?? []);
   if (amount > due + 0.01) return { error: `المبلغ أكبر من المتبقي (${due}).` };
-  const { error } = await db
+  const { data: row, error } = await db
     .from("order_payments")
-    .insert({ store_id: store.id, order_id: id, amount, note, created_by: user.id });
+    .insert({ store_id: store.id, order_id: id, amount, note, created_by: user.id })
+    .select("id")
+    .single();
   if (error) return { error: missing(error.message) ? NEEDS_013 : "لم تُسجَّل الدفعة. أعد المحاولة." };
+  // How it was paid, for the daily cash close (column from update 018; the payment is saved either way).
+  const method = String(form.get("method") ?? "cash");
+  if (row && ["sham_cash", "syriatel_cash", "mtn_cash", "bank", "other"].includes(method))
+    await db.from("order_payments").update({ method }).eq("id", row.id);
   const left = Math.round((due - amount) * 100) / 100;
   await db
     .from("orders")

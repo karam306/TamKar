@@ -3,6 +3,7 @@ import { PageHeader } from "@/components/admin-ui";
 import { StoryButton } from "@/components/story-image";
 import { liveFx } from "@/lib/fx";
 import { requireAccess } from "@/lib/auth";
+import { supabaseAdmin } from "@/lib/supabase";
 import type { Product } from "@/lib/types";
 import { storeUrl } from "@/lib/urls";
 import { deleteProduct, duplicateProduct } from "../actions";
@@ -35,6 +36,19 @@ export default async function EditProductPage({
   };
   const { categories, collections, optionPresets, specPresets, placeholders } =
     await formData(m);
+  // The cost price is private to the owner (update 018).
+  const cost =
+    m.role === "owner"
+      ? {
+          value: await supabaseAdmin()
+            .from("product_costs")
+            .select("cost")
+            .eq("product_id", id)
+            .eq("store_id", m.store.id)
+            .maybeSingle()
+            .then(({ data: c }) => (c?.cost == null ? null : Number(c.cost))),
+        }
+      : undefined;
 
   return (
     <div>
@@ -85,6 +99,7 @@ export default async function EditProductPage({
         optionPresets={optionPresets}
         specPresets={specPresets}
         placeholders={placeholders}
+        cost={cost}
       />
       <details className="card mt-6 p-4 text-[13px]">
         <summary className="cursor-pointer font-semibold text-red-700">

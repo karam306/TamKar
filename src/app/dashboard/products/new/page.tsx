@@ -26,6 +26,7 @@ export default async function NewProductPage() {
         optionPresets={optionPresets}
         specPresets={specPresets}
         placeholders={placeholders}
+        cost={m.role === "owner" ? { value: null } : undefined}
       />
     </div>
   );
