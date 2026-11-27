@@ -47,6 +47,8 @@ type Data = {
   ref: string;
   /** "1" when the visitor came through a salesman's link (signup?ref=CODE): the question is skipped. */
   ref_link: string;
+  /** Store link of the merchant who invited them (signup?invite=SLUG). */
+  invite: string;
   email: string;
   password: string;
 };
@@ -68,6 +70,7 @@ const EMPTY: Data = {
   heard_from: "",
   ref: "",
   ref_link: "",
+  invite: "",
   email: "",
   password: "",
 };
@@ -148,6 +151,9 @@ export default function SignupPage() {
     // A salesman's personal link: signup?ref=CODE
     const ref = new URLSearchParams(window.location.search).get("ref")?.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12);
     if (ref) restored = { ...restored, ref, heard_from: "salesman", ref_link: "1" };
+    // Another merchant's invite link: signup?invite=SLUG (the "how did you hear" question is skipped).
+    const invite = new URLSearchParams(window.location.search).get("invite")?.toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 40);
+    if (invite && !ref) restored = { ...restored, invite, heard_from: "friend", ref_link: "1" };
     // Answers carried over from the homepage store preview: signup?store=NAME&type=ID&color=HEX
     const qs = new URLSearchParams(window.location.search);
     const qStore = qs.get("store")?.trim().slice(0, 40);

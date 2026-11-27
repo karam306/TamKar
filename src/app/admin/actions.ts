@@ -1,5 +1,6 @@
 "use server";
 
+import { sendTelegram, storeChat } from "@/lib/telegram";
 import { randomInt } from "node:crypto";
 import { refresh, revalidatePath } from "next/cache";
 import { BUSINESS_TYPES } from "@/lib/business-types";
@@ -112,9 +113,47 @@ export async function recordPayment(_: { error?: string; ok?: string } | undefin
   });
   if (error) return { error: "تعذّر تسجيل الدفعة" };
   await admin.from("stores").update({ paid_until: until, plan, status: "active" }).eq("id", id);
+  const bonus = amount > 0 ? await rewardInvite(id, until) : null;
   revalidatePath(`/admin/stores/${id}`);
   refresh();
-  return { ok: `✓ سُجّلت الدفعة. الاشتراك فعّال حتى ${until}` };
+  return { ok: `✓ سُجّلت الدفعة. الاشتراك فعّال حتى ${bonus?.until ?? until}${bonus ? `. ${bonus.note}` : ""}` };
+}
+
+/**
+ * Merchant invites: on the invited store's first paid payment, both stores get one free month.
+ * Runs once per store (referral_rewarded_at). Needs update 014; does nothing before it.
+ */
+async function rewardInvite(id: string, until: string): Promise<{ until: string; note: string } | null> {
+  const admin = supabaseAdmin();
+  const { data: row, error } = await admin
+    .from("store_admin")
+    .select("invited_by, referral_rewarded_at")
+    .eq("store_id", id)
+    .maybeSingle();
+  if (error || !row?.invited_by || row.referral_rewarded_at) return null;
+  // Claim the reward first, so a double click cannot give it twice.
+  const { data: claimed } = await admin
+    .from("store_admin")
+    .update({ referral_rewarded_at: new Date().toISOString() })
+    .eq("store_id", id)
+    .is("referral_rewarded_at", null)
+    .select("store_id");
+  if (!claimed?.length) return null;
+  const { data: inviter } = await admin.from("stores").select("id, name, plan, paid_until").eq("id", row.invited_by).maybeSingle();
+  const { data: me } = await admin.from("stores").select("name").eq("id", id).maybeSingle();
+  const mine = extendDate(until, 1);
+  await admin.from("stores").update({ paid_until: mine }).eq("id", id);
+  await admin.from("subscription_payments").insert({ store_id: id, amount: 0, currency: "USD", months: 1, method: "مكافأة دعوة", note: `شهر مجاني: انضم بدعوة من ${inviter?.name ?? "متجر"}`, paid_until: mine });
+  if (inviter) {
+    const theirs = extendDate(inviter.paid_until as string | null, 1);
+    await admin.from("stores").update({ paid_until: theirs, status: "active" }).eq("id", inviter.id);
+    await admin.from("subscription_payments").insert({ store_id: inviter.id, amount: 0, currency: "USD", months: 1, method: "مكافأة دعوة", note: `شهر مجاني: دعوة متجر ${me?.name ?? ""}`, paid_until: theirs });
+    const chat = await storeChat(inviter.id as string);
+    if (chat)
+      await sendTelegram(chat, `🎁 اشترك متجر ${me?.name ?? ""} بدعوتك، وأُضيف شهر مجاني إلى اشتراكك. أصبح اشتراكك فعّالاً حتى ${theirs}. شكراً لك.`).catch(() => {});
+    revalidatePath(`/admin/stores/${inviter.id}`);
+  }
+  return { until: mine, note: `🎁 مكافأة الدعوة: شهر مجاني لهذا المتجر${inviter ? ` ولمتجر ${inviter.name}` : ""}` };
 }
 
 /** One-click plan change from the store page. Keeps the paid-until date as it is. */

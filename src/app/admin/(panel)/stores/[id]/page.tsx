@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { isPro, PLAN_LABELS } from "@/lib/plans";
 import { Card, PageHeader } from "@/components/admin-ui";
@@ -176,6 +177,19 @@ export default async function AdminStorePage({ params }: { params: Promise<{ id:
                 </select>
                 <button className="btn btn-outline">احفظ</button>
               </form>
+              {s.invited_by && (
+                <div>
+                  <span className="text-muted">بدعوة من: </span>
+                  {(() => {
+                    const inv = all.find((x) => x.id === s.invited_by);
+                    return inv ? <Link href={`/admin/stores/${inv.id}`} className="text-primary underline">{inv.name}</Link> : "متجر محذوف";
+                  })()}
+                  <span className="text-muted">
+                    {" "}
+                    · {s.referral_rewarded_at ? "مُنح الشهر المجاني للطرفين" : "يُمنح الطرفان شهراً مجانياً تلقائياً عند تسجيل أول دفعة مدفوعة"}
+                  </span>
+                </div>
+              )}
               {s.heard_from && (
                 <div>
                   <span className="text-muted">مصدر المعرفة بنا: </span>

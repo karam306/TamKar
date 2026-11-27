@@ -10,6 +10,9 @@ export type AdminStore = {
   status: string;
   plan: string;
   paid_until: string | null;
+  /** Store that invited this one (update 014), and when both got their free month. */
+  invited_by?: string | null;
+  referral_rewarded_at?: string | null;
   currency: "USD" | "SYP";
   whatsapp: string;
   city: string | null;
@@ -58,6 +61,8 @@ export async function loadStores(): Promise<AdminStore[]> {
     salesman_id: (notes.get(s.id as string)?.salesman_id as string | null) ?? null,
     heard_from: (notes.get(s.id as string)?.heard_from as string | null) ?? null,
     telegram: Boolean(notes.get(s.id as string)?.telegram_chat_id),
+    invited_by: (notes.get(s.id as string)?.invited_by as string | null) ?? null,
+    referral_rewarded_at: (notes.get(s.id as string)?.referral_rewarded_at as string | null) ?? null,
     orders30: agg.get(s.id as string)?.n ?? 0,
     sales30: agg.get(s.id as string)?.s ?? 0,
     products: counts[i].count ?? 0,

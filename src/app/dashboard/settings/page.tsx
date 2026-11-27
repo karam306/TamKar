@@ -52,6 +52,14 @@ export default async function SettingsPage() {
           </span>
           <span className="text-muted">←</span>
         </Link>
+        <Link href="/dashboard/invite" className="card flex items-center gap-3 p-4 hover:shadow-md">
+          <span className="text-2xl">🎁</span>
+          <span className="flex-1">
+            <b className="block text-sm">ادعُ تاجراً</b>
+            <span className="text-[13px] text-muted">شهر مجاني لك ولكل تاجر يشترك عبر رابطك</span>
+          </span>
+          <span className="text-muted">←</span>
+        </Link>
         <Link href="/dashboard/settings/currency" className="card flex items-center gap-3 p-4 hover:shadow-md">
           <span className="text-2xl">💱</span>
           <span className="flex-1">

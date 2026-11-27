@@ -24,6 +24,7 @@ const ICONS = {
     "M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1zM15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13",
   discounts:
     "M9 15l6-6M9.5 9.5h.01M14.5 14.5h.01M4 12l1.5-1.5L5 8.5l2-.5.5-2 2 .5L12 4l2.5 2.5 2-.5.5 2 2 .5-.5 2L20 12l-1.5 1.5.5 2-2 .5-.5 2-2-.5L12 20l-2.5-2.5-2 .5-.5-2-2-.5.5-2z",
+  pos: "M4 7h16v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1zM4 7l2-3h12l2 3M9 11h6M9 15h4",
   settings:
     "M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19 12a7 7 0 0 0-.1-1.2l2-1.6-2-3.4-2.4 1a7 7 0 0 0-2-1.2L14 3h-4l-.5 2.6a7 7 0 0 0-2 1.2l-2.4-1-2 3.4 2 1.6a7 7 0 0 0 0 2.4l-2 1.6 2 3.4 2.4-1a7 7 0 0 0 2 1.2L10 21h4l.5-2.6a7 7 0 0 0 2-1.2l2.4 1 2-3.4-2-1.6c.1-.4.1-.8.1-1.2z",
 };
@@ -32,6 +33,7 @@ const ICONS = {
 // menus) live under Settings > Advanced settings.
 export const NAV: Item[] = [
   { href: "/dashboard", label: "الرئيسية", icon: ICONS.home },
+  { href: "/dashboard/pos", label: "بيع في المحل", icon: ICONS.pos },
   {
     href: "/dashboard/orders",
     label: "الطلبات",
@@ -78,6 +80,7 @@ export const SETTINGS: Item = {
     { href: "/dashboard/settings/currency", label: "سعر الصرف" },
     { href: "/dashboard/settings/branches", label: "الفروع" },
     { href: "/dashboard/settings/team", label: "الموظفين" },
+    { href: "/dashboard/invite", label: "ادعُ تاجراً" },
     {
       href: "/dashboard/settings/advanced",
       label: "إعدادات متقدمة",
@@ -179,6 +182,7 @@ const TAB_PERM: Record<string, Perm> = {
   "/dashboard/orders/new": "orders",
   "/dashboard/quotes": "quotes",
   "/dashboard/debts": "orders",
+  "/dashboard/pos": "orders",
   "/dashboard/products/catalog": "products",
   "/dashboard/products": "products",
   "/dashboard/collections": "products",

@@ -48,6 +48,7 @@ export async function signup(_: SignupState, form: FormData): Promise<SignupStat
   const wantsHelp = form.get("wants_help") === "yes";
   const heardFrom = str(form, "heard_from", 20);
   const refCode = str(form, "ref", 12).toUpperCase().replace(/[^A-Z0-9]/g, "");
+  const invite = str(form, "invite", 40).toLowerCase().replace(/[^a-z0-9-]/g, "");
 
   if (storeName.length < 2) return { error: "أدخل اسم المتجر", field: "store_name" };
   if (!/^[a-z0-9-]{3,40}$/.test(slug) || slug.startsWith("-") || slug.endsWith("-")) {
@@ -123,6 +124,17 @@ export async function signup(_: SignupState, form: FormData): Promise<SignupStat
     if (heard || salesmanId) {
       const { error: srcError } = await admin.from("store_admin").update({ heard_from: heard, salesman_id: salesmanId }).eq("store_id", newStore.id);
       if (srcError) console.error("signup: source not saved (run 010)", srcError.message);
+    }
+    if (invite && invite !== slug) {
+      // Invited by another merchant: both get a free month once this store pays (admin panel).
+      const { data: inviter } = await admin.from("stores").select("id, name").eq("slug", invite).maybeSingle();
+      if (inviter) {
+        const { error: invError } = await admin
+          .from("store_admin")
+          .update({ invited_by: inviter.id, heard_from: `دعوة من متجر ${inviter.name}` })
+          .eq("store_id", newStore.id);
+        if (invError) console.error("signup: invite not saved (run 014)", invError.message);
+      }
     }
   }
   const db = await supabaseUser();
