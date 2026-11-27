@@ -1,10 +1,12 @@
 import { MadeWithKun, StoreLogo } from "@/components/doc-brand";
-import { formatPrice } from "@/lib/format";
+import { money } from "@/lib/fx";
 import type { Order, Store } from "@/lib/types";
 
 /** The invoice itself, shared by the merchant's page and the customer's link. */
 export function InvoiceView({ store, order: o }: { store: Pick<Store, "name" | "city" | "whatsapp" | "logo_url" | "currency">; order: Order }) {
-  const money = (n: number) => formatPrice(n, store.currency);
+  // The invoice uses the rate the order was placed at, not today's.
+  const m = money(store.currency, o.fx ?? null);
+  const t = m.totals(o.items, Number(o.discount_amount ?? 0), o.fulfillment !== "pickup" ? Number(o.shipping_fee ?? 0) : 0);
   const date = new Intl.DateTimeFormat("ar-SY", { dateStyle: "long", timeZone: "Asia/Damascus" }).format(new Date(o.created_at));
   return (
     <>
@@ -56,8 +58,8 @@ export function InvoiceView({ store, order: o }: { store: Pick<Store, "name" | "
                 {i.variantTitle && <div className="text-xs text-muted">{i.variantTitle}</div>}
               </td>
               <td className="py-2">{i.qty}</td>
-              <td className="py-2">{money(i.price)}</td>
-              <td className="py-2 text-left">{money(i.price * i.qty)}</td>
+              <td className="py-2">{m.price(i.price)}</td>
+              <td className="py-2 text-left">{m.text(m.unit(i.price) * i.qty)}</td>
             </tr>
           ))}
         </tbody>
@@ -65,24 +67,25 @@ export function InvoiceView({ store, order: o }: { store: Pick<Store, "name" | "
       <div className="mr-auto w-64 space-y-1">
         <div className="flex justify-between">
           <span>المجموع الفرعي</span>
-          <span>{money(Number(o.subtotal ?? o.total))}</span>
+          <span>{m.text(t.subtotal)}</span>
         </div>
         {Number(o.discount_amount ?? 0) > 0 && (
           <div className="flex justify-between">
             <span>الخصم {o.discount_code && `(${o.discount_code})`}</span>
-            <span>-{money(Number(o.discount_amount))}</span>
+            <span>-{m.text(t.discount)}</span>
           </div>
         )}
         {o.fulfillment !== "pickup" && (
           <div className="flex justify-between">
             <span>التوصيل</span>
-            <span>{Number(o.shipping_fee ?? 0) ? money(Number(o.shipping_fee)) : "مجاني"}</span>
+            <span>{t.shipping ? m.text(t.shipping) : "مجاني"}</span>
           </div>
         )}
         <div className="flex justify-between border-t border-black/20 pt-1 text-lg font-bold">
           <span>المجموع</span>
-          <span>{money(Number(o.total))}</span>
+          <span>{m.text(t.total, Number(o.total))}</span>
         </div>
+        {o.fx && <div className="pt-1 text-[12px] text-muted">بسعر صرف {o.fx.rate} ل.س للدولار</div>}
       </div>
       {o.notes && <p className="mt-6 text-muted">ملاحظات: {o.notes}</p>}
       <footer className="mt-12 text-center text-muted">شكراً لتسوقكم من {store.name}</footer>

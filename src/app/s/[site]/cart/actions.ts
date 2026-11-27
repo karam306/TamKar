@@ -4,12 +4,14 @@ import { after } from "next/server";
 import { eventContext, sendPurchaseEvent } from "@/lib/meta";
 import { createOrder, getProductsByIds, getStore, quote } from "@/lib/data";
 import { whatsappOrderLink } from "@/lib/format";
+import { liveFx, money } from "@/lib/fx";
 import { isOpen } from "@/lib/subscription";
 import { storeWallets } from "@/lib/wallets";
 import { notifyNewOrder } from "@/lib/telegram";
 import { platformOrigin } from "@/lib/site-origin";
 import type {
   CartItem,
+  Currency,
   Fulfillment,
   OrderInput,
   Pricing,
@@ -22,6 +24,9 @@ export type PlaceOrderResult =
       id: string;
       number: number;
       total: number;
+      /** What the customer transfers: in pounds when the store uses an exchange rate. */
+      payAmount: number;
+      payCurrency: Currency;
       whatsappUrl: string;
       items: { productId: string; qty: number; price: number }[];
       /** Set when the customer chose to pay by e-wallet transfer: what to show them. */
@@ -71,6 +76,10 @@ export async function placeOrder(
     id: o.id,
     number: o.number,
     total: o.total,
+    ...(() => {
+      const m = money(store.currency, liveFx(store));
+      return { payAmount: m.totals(o.items, o.discount, o.shipping).total, payCurrency: m.cur };
+    })(),
     whatsappUrl: whatsappOrderLink(store, o),
     items: o.items.map((i) => ({
       productId: i.productId,

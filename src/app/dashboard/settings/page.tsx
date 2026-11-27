@@ -1,3 +1,4 @@
+import { liveFx } from "@/lib/fx";
 import Link from "next/link";
 import { ProGate } from "@/components/pro-gate";
 import { isPro, PLAN_LABELS } from "@/lib/plans";
@@ -48,6 +49,16 @@ export default async function SettingsPage() {
           <span className="flex-1">
             <b className="block text-sm">إشعارات تيليغرام</b>
             <span className="text-[13px] text-muted">{tgChat ? "✓ مربوط" : "لتصلك الطلبات الجديدة فوراً"}</span>
+          </span>
+          <span className="text-muted">←</span>
+        </Link>
+        <Link href="/dashboard/settings/currency" className="card flex items-center gap-3 p-4 hover:shadow-md">
+          <span className="text-2xl">💱</span>
+          <span className="flex-1">
+            <b className="block text-sm">سعر الصرف</b>
+            <span className="text-[13px] text-muted">
+              {liveFx(store) ? `الدولار = ${liveFx(store)!.rate} ل.س` : "أسعارك بالدولار، ويراها الزبون بالليرة"}
+            </span>
           </span>
           <span className="text-muted">←</span>
         </Link>

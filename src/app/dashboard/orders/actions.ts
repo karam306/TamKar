@@ -144,6 +144,15 @@ export async function createManualOrder(
       .eq("id", res.order.id)
       .eq("store_id", own.id);
   }
+  else if (form.get("credit") === "on") {
+    // Debt ledger (update 013). The order is saved either way.
+    const { error } = await db
+      .from("orders")
+      .update({ on_credit: true })
+      .eq("id", res.order.id)
+      .eq("store_id", own.id);
+    if (error) console.error("on_credit not saved (run 013)", error.message);
+  }
   revalidatePath("/dashboard/orders");
   refresh();
   redirect(`/dashboard/orders/${res.order.id}`);

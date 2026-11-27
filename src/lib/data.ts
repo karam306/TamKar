@@ -1,4 +1,5 @@
 import "server-only";
+import { liveFx, type Fx } from "./fx";
 import { searchProducts } from "./search";
 import { cache } from "react";
 import { demoCollections, demoProducts, demoStores } from "./demo-data";
@@ -253,6 +254,7 @@ export type CreateOrderResult =
         branch?: Branch | null;
         payment_method: PaymentMethod;
         gift?: GiftInfo | null;
+        fx?: Fx | null;
       };
     }
   | { ok: false; error: string };
@@ -536,6 +538,15 @@ export async function createOrder(
         payError.message,
       );
   }
+  const fx = liveFx(store);
+  if (fx) {
+    // Keep the rate the customer saw, so the invoice matches later rate changes.
+    const { error: fxError } = await supabaseAdmin()
+      .from("orders")
+      .update({ fx })
+      .eq("id", orderId);
+    if (fxError) console.error("fx not saved (run 013)", fxError.message);
+  }
   if (gift) {
     const { error: giftError } = await supabaseAdmin()
       .from("orders")
@@ -568,6 +579,7 @@ export async function createOrder(
       branch,
       payment_method: payment,
       gift,
+      fx,
       customer_name: v.name,
       phone: v.phone,
       city: v.city,

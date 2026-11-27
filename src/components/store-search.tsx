@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { formatPrice } from "@/lib/format";
+import { money } from "@/lib/fx";
 import { useStore } from "./store-context";
 
 type Hit = { id: string; title: string; price: number; compare: number | null; image: string | null };
@@ -14,7 +14,8 @@ type Hit = { id: string; title: string; price: number; compare: number | null; i
  * spelling differences and small mistakes (see lib/search.ts).
  */
 export function StoreSearch() {
-  const { slug, base, currency } = useStore();
+  const { slug, base, currency, fx } = useStore();
+  const m = money(currency, fx ?? null);
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
@@ -116,7 +117,7 @@ export function StoreSearch() {
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img src={h.image || "/demo/k1.svg"} alt="" className="h-12 w-12 shrink-0 rounded-theme bg-surface object-cover" />
                           <span className="flex-1 text-sm">{h.title}</span>
-                          <span className="text-sm font-semibold text-primary">{formatPrice(h.price, currency)}</span>
+                          <span className="text-sm font-semibold text-primary">{m.price(h.price)}</span>
                         </Link>
                       </li>
                     ))}

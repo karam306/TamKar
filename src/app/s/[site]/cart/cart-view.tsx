@@ -3,10 +3,10 @@
 import { useEffect, useState, useTransition } from "react";
 import { useStore } from "@/components/store-context";
 import { StoreLink } from "@/components/store-ui";
-import { formatPrice } from "@/lib/format";
+import { money } from "@/lib/fx";
 import { contentId } from "@/lib/product-utils";
 import { track } from "@/components/tracking";
-import type { Fulfillment, PaymentMethod, Pricing } from "@/lib/types";
+import type { Currency, Fulfillment, PaymentMethod, Pricing } from "@/lib/types";
 import { WALLETS } from "@/lib/wallets";
 import {
   getCartLines,
@@ -46,12 +46,15 @@ export function CartView({
   const [branch, setBranch] = useState("");
   // Pickup from the shop is the default; delivery only when the shop offers it.
   const [method, setMethod] = useState<Fulfillment>("pickup");
-  const { cart, setQty, clear, currency, ready } = useStore();
+  const { cart, setQty, clear, currency, ready, fx } = useStore();
+  const m = money(currency, fx ?? null);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState("");
   const [done, setDone] = useState<{
     number: number;
     total: number;
+    payAmount?: number;
+    payCurrency?: Currency;
     whatsappUrl: string;
     wallet: Extract<PlaceOrderResult, { ok: true }>["wallet"];
   } | null>(null);
@@ -125,8 +128,8 @@ export function CartView({
     return (
       <WalletPay
         number={done.number}
-        total={done.total}
-        currency={currency}
+        total={done.payAmount ?? done.total}
+        currency={done.payCurrency ?? currency}
         whatsappUrl={done.whatsappUrl}
         wallet={done.wallet}
       />
@@ -166,6 +169,13 @@ export function CartView({
   const subtotal = lines.reduce((s, l) => s + l.info.price * l.qty, 0);
   const shown =
     pricing && Math.abs(pricing.subtotal - subtotal) < 0.01 ? pricing : null;
+  // What the customer sees: with an exchange rate, every line is converted
+  // first and the total is the sum of what is shown.
+  const view = m.totals(
+    lines.map((l) => ({ price: l.info.price, qty: l.qty })),
+    shown?.discount ?? 0,
+    shown?.shipping ?? 0,
+  );
 
   if (lines.length === 0) {
     return (
@@ -220,6 +230,8 @@ export function CartView({
       setDone({
         number: res.number,
         total: res.total,
+        payAmount: res.payAmount,
+        payCurrency: res.payCurrency,
         whatsappUrl: res.whatsappUrl,
         wallet: res.wallet ?? null,
       });
@@ -251,7 +263,7 @@ export function CartView({
                   </div>
                 )}
                 <div className="text-sm text-primary">
-                  {formatPrice(l.info.price, currency)}
+                  {m.price(l.info.price)}
                 </div>
                 {!l.info.available && (
                   <div className="text-xs text-red-700">نفدت الكمية</div>
@@ -490,12 +502,12 @@ export function CartView({
           <div className="mt-2 space-y-1.5 border-t border-black/10 pt-4 text-sm">
             <div className="flex justify-between">
               <span>المجموع الفرعي</span>
-              <span>{formatPrice(subtotal, currency)}</span>
+              <span>{m.text(view.subtotal)}</span>
             </div>
             {shown && shown.discount > 0 && (
               <div className="flex justify-between text-green-700">
                 <span>الخصم {shown.code && `(${shown.code})`}</span>
-                <span>-{formatPrice(shown.discount, currency)}</span>
+                <span>-{m.text(view.discount)}</span>
               </div>
             )}
             {method === "delivery" && (
@@ -506,7 +518,7 @@ export function CartView({
                     ? "اختر المدينة"
                     : shown
                       ? shown.shipping
-                        ? formatPrice(shown.shipping, currency)
+                        ? m.text(view.shipping)
                         : "مجاني"
                       : "..."}
                 </span>
@@ -515,7 +527,7 @@ export function CartView({
             <div className="flex justify-between pt-1 text-lg">
               <span>المجموع</span>
               <span className="font-semibold text-primary">
-                {formatPrice(shown ? shown.total : subtotal, currency)}
+                {m.text(view.total, shown ? shown.total : subtotal)}
               </span>
             </div>
           </div>

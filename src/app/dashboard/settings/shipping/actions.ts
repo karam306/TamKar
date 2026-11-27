@@ -44,6 +44,8 @@ export async function saveShipping(
     .from("stores")
     .update({
       shipping: {
+        // Keep settings edited on other pages (exchange rate, and any added later).
+        ...(store.shipping ?? {}),
         delivery: form.get("delivery") === "on",
         pickup_note:
           String(form.get("pickup_note") ?? "")

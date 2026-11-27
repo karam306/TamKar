@@ -5,6 +5,7 @@ import type {
   PaymentMethod,
   Store,
 } from "./types";
+import { liveFx, money } from "./fx";
 import { WALLETS } from "./wallets";
 
 export function formatPrice(amount: number, currency: Currency): string {
@@ -41,23 +42,28 @@ export function whatsappOrderLink(
     order.payment_method && order.payment_method !== "cod"
       ? WALLETS[order.payment_method]
       : null;
+  // With an exchange rate the message is in pounds, line by line, like the cart.
+  const fx = liveFx(store);
+  const m = money(store.currency, fx);
+  const t = m.totals(order.items, order.discount ?? 0, order.shipping ?? 0);
   const lines = [
     `طلب جديد رقم #${order.number} من متجر ${store.name}`,
     "",
     ...order.items.map(
       (i) =>
-        `• ${i.title}${i.variantTitle ? ` (${i.variantTitle})` : ""} × ${i.qty} = ${formatPrice(i.price * i.qty, store.currency)}`,
+        `• ${i.title}${i.variantTitle ? ` (${i.variantTitle})` : ""} × ${i.qty} = ${m.text(m.unit(i.price) * i.qty)}`,
     ),
     "",
     order.discount
-      ? `الخصم${order.discount_code ? ` (${order.discount_code})` : ""}: -${formatPrice(order.discount, store.currency)}`
+      ? `الخصم${order.discount_code ? ` (${order.discount_code})` : ""}: -${m.text(t.discount)}`
       : "",
     order.fulfillment === "pickup"
       ? "طريقة الاستلام: من المحل"
       : order.shipping != null
-        ? `التوصيل: ${order.shipping ? formatPrice(order.shipping, store.currency) : "مجاني"}`
+        ? `التوصيل: ${order.shipping ? m.text(t.shipping) : "مجاني"}`
         : "",
-    `المجموع: ${formatPrice(order.total, store.currency)}`,
+    `المجموع: ${m.text(t.total, order.total)}`,
+    fx ? `سعر الصرف المعتمد: ${fx.rate} ل.س للدولار` : "",
     wallet
       ? `الدفع: ${wallet.name}. سأرسل لكم صورة إيصال التحويل`
       : "الدفع: عند الاستلام",

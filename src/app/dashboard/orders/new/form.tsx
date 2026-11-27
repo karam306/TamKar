@@ -306,6 +306,14 @@ export function ManualOrderForm({
             />
             دفع الزبون مسبقاً
           </label>
+          <label className="flex items-center gap-2 text-[13px]">
+            <input
+              type="checkbox"
+              name="credit"
+              className="h-4 w-4 accent-black"
+            />
+            بالآجل: يدفع الزبون لاحقاً أو على دفعات
+          </label>
         </section>
       </div>
 

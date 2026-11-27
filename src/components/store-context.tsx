@@ -1,9 +1,10 @@
 "use client";
 
 import { createContext, useCallback, useContext, useMemo, useSyncExternalStore } from "react";
+import type { Fx } from "@/lib/fx";
 import type { CartItem, Currency } from "@/lib/types";
 
-type StoreInfo = { slug: string; base: string; currency: Currency; whatsapp: string; name: string };
+type StoreInfo = { slug: string; base: string; currency: Currency; whatsapp: string; name: string; fx?: Fx | null };
 
 type Ctx = StoreInfo & {
   cart: CartItem[];

@@ -4,6 +4,7 @@ import https from "node:https";
 import { unstable_cache } from "next/cache";
 import { supabaseAdmin } from "./supabase";
 import { formatPrice, giftLines } from "./format";
+import { money, type Fx } from "./fx";
 import type {
   Currency,
   GiftInfo,
@@ -177,6 +178,9 @@ export async function notifyNewOrder(
     branch?: { name: string } | null;
     payment_method?: PaymentMethod | null;
     gift?: GiftInfo | null;
+    discount?: number;
+    shipping?: number;
+    fx?: Fx | null;
   },
   dashboardOrigin: string,
 ) {
@@ -193,7 +197,9 @@ export async function notifyNewOrder(
           `• ${i.title}${i.variantTitle ? ` (${i.variantTitle})` : ""} × ${i.qty}`,
       ),
       "",
-      `المجموع: ${formatPrice(o.total, cur)}`,
+      o.fx
+        ? `المجموع: ${money(cur, o.fx).totals(o.items, o.discount ?? 0, o.shipping ?? 0).total.toLocaleString("en-US")} ل.س (${formatPrice(o.total, cur)}، بسعر ${o.fx.rate})`
+        : `المجموع: ${formatPrice(o.total, cur)}`,
       pickup
         ? `🏪 الاستلام من المحل${o.branch ? `: ${o.branch.name}` : ""}`
         : `🚚 التوصيل: ${o.city ?? ""}، ${o.address ?? ""}`,

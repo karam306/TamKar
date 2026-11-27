@@ -56,6 +56,9 @@ export default async function ProductsPage({
         title="المنتجات"
         actions={
           <>
+            <Link href="/dashboard/products/catalog" className="btn btn-outline">
+              كتالوج PDF
+            </Link>
             <Link href="/dashboard/products/import" className="btn btn-outline">
               استيراد وتصدير
             </Link>

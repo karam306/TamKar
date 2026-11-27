@@ -39,13 +39,17 @@ export const NAV: Item[] = [
     sub: [
       { href: "/dashboard/orders/new", label: "طلب يدوي جديد" },
       { href: "/dashboard/quotes", label: "عروض الأسعار" },
+      { href: "/dashboard/debts", label: "الديون" },
     ],
   },
   {
     href: "/dashboard/products",
     label: "المنتجات",
     icon: ICONS.products,
-    sub: [{ href: "/dashboard/collections", label: "المجموعات" }],
+    sub: [
+      { href: "/dashboard/collections", label: "المجموعات" },
+      { href: "/dashboard/products/catalog", label: "كتالوج PDF" },
+    ],
   },
   { href: "/dashboard/customers", label: "الزبائن", icon: ICONS.customers },
   { href: "/dashboard/discounts", label: "الخصومات", icon: ICONS.discounts },
@@ -71,6 +75,7 @@ export const SETTINGS: Item = {
   icon: ICONS.settings,
   sub: [
     { href: "/dashboard/settings/shipping", label: "الاستلام والتوصيل" },
+    { href: "/dashboard/settings/currency", label: "سعر الصرف" },
     { href: "/dashboard/settings/branches", label: "الفروع" },
     { href: "/dashboard/settings/team", label: "الموظفين" },
     {
@@ -173,6 +178,8 @@ const TAB_PERM: Record<string, Perm> = {
   "/dashboard/orders": "orders",
   "/dashboard/orders/new": "orders",
   "/dashboard/quotes": "quotes",
+  "/dashboard/debts": "orders",
+  "/dashboard/products/catalog": "products",
   "/dashboard/products": "products",
   "/dashboard/collections": "products",
   "/dashboard/customers": "customers",

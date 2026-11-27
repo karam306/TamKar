@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { createPortal } from "react-dom";
-import { formatPrice } from "@/lib/format";
+import { money } from "@/lib/fx";
 import {
   contentId,
   hasVariants,
@@ -180,16 +180,17 @@ export function Price({
   from?: boolean;
   className?: string;
 }) {
-  const { currency } = useStore();
+  const { currency, fx } = useStore();
+  const m = money(currency, fx ?? null);
   return (
     <span className={`flex flex-wrap items-baseline gap-2 ${className}`}>
       <span className="font-semibold text-primary">
         {from && <span className="text-sm font-normal text-muted">من </span>}
-        {formatPrice(amount, currency)}
+        {m.price(amount)}
       </span>
       {compare && compare > amount ? (
         <span className="text-sm text-muted line-through">
-          {formatPrice(compare, currency)}
+          {m.text(m.unit(compare))}
         </span>
       ) : null}
     </span>

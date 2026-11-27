@@ -1,3 +1,4 @@
+import type { Fx } from "./fx";
 export type ThemeId = "classic" | "bold" | "soft";
 export type Currency = "USD" | "SYP";
 
@@ -110,6 +111,8 @@ export type ShippingSettings = {
   payments?: PaymentSettings;
   /** Customers can send a delivery order as a gift to someone else. */
   gift?: boolean;
+  /** Dollar stores: today's rate, so customers see Syrian pounds. See lib/fx.ts. */
+  fx?: Fx | null;
 };
 
 /** Syrian e-wallets a customer can pay with by manual transfer. */
@@ -277,6 +280,8 @@ export type Order = {
   payment_status?: "pending" | "paid" | "partially_refunded" | "refunded";
   /** Money given back to the customer through returns (update 011). */
   refunded?: number | null;
+  /** Sold on credit: the customer pays later, in parts (debt ledger). */
+  on_credit?: boolean;
   customer_id?: string | null;
   source?: "online" | "manual";
   merchant_note?: string | null;
@@ -290,6 +295,8 @@ export type Order = {
   /** How the customer said they will pay. Missing on older orders (cash). */
   payment_method?: PaymentMethod | null;
   gift?: GiftInfo | null;
+  /** The exchange rate the order was placed at (dollar stores). */
+  fx?: Fx | null;
   created_at: string;
 };
 
@@ -316,4 +323,6 @@ export type Quote = {
   status: "sent" | "accepted" | "declined";
   share_token: string | null;
   created_at: string;
+  /** The exchange rate the quote was made at (dollar stores). */
+  fx?: Fx | null;
 };

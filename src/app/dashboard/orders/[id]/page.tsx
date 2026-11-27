@@ -3,6 +3,10 @@ import { notFound } from "next/navigation";
 import { Card, PageHeader } from "@/components/admin-ui";
 import { requireAccess } from "@/lib/auth";
 import { formatPrice, whatsappLink } from "@/lib/format";
+import { money as fxMoney } from "@/lib/fx";
+import { supabaseAdmin } from "@/lib/supabase";
+import type { OrderPayment } from "@/lib/debts";
+import { CreditCard } from "@/app/dashboard/debts/credit-card";
 import { normalizeWhatsapp } from "@/lib/templates";
 import type { Order, OrderReturn } from "@/lib/types";
 
@@ -52,6 +56,14 @@ export default async function OrderPage({
       .order("created_at"),
   ]);
   const returns = (returnRows ?? []) as OrderReturn[];
+  // Debt ledger payments; null until update 013 is run.
+  const { data: payRows, error: payErr } = await supabaseAdmin()
+    .from("order_payments")
+    .select("id, order_id, amount, note, created_at")
+    .eq("order_id", id)
+    .eq("store_id", store.id)
+    .order("created_at");
+  const payments = payErr ? null : ((payRows ?? []) as OrderPayment[]);
   const refunded = Number(o_refunded(data));
   if (!data) notFound();
   const o = data as Order;
@@ -191,6 +203,16 @@ export default async function OrderPage({
                   <span>المجموع</span>
                   <span>{money(Number(o.total))}</span>
                 </div>
+                {o.fx && (
+                  <div className="flex justify-between text-[13px] text-muted">
+                    <span>بالليرة، بسعر {o.fx.rate}</span>
+                    <span>
+                      {fxMoney(store.currency, o.fx).text(
+                        fxMoney(store.currency, o.fx).totals(o.items, Number(o.discount_amount ?? 0), o.fulfillment !== "pickup" ? Number(o.shipping_fee ?? 0) : 0).total,
+                      )}
+                    </span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span>
                     <LivePaidLabel />
@@ -232,6 +254,8 @@ export default async function OrderPage({
               </div>
               <PaidButton id={o.id} />
             </Card>
+
+            <CreditCard order={o} payments={payments} money={money} />
 
             {returns.length > 0 && (
               <Card title="↩ المرتجعات والتبديل">

@@ -1,5 +1,6 @@
 "use server";
 
+import { liveFx } from "@/lib/fx";
 import { randomBytes } from "node:crypto";
 import { refresh, revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -90,6 +91,12 @@ export async function createQuote(
     return {
       error: `تعذّر حفظ العرض (${error?.code ?? ""}: ${(error?.message ?? "").slice(0, 80)})`,
     };
+  }
+  const fx = liveFx(store);
+  if (fx) {
+    // The quote keeps today's rate. Needs update 013; the quote is saved either way.
+    const { error: fxError } = await db.from("quotes").update({ fx }).eq("id", data.id);
+    if (fxError) console.error("quote fx not saved (run 013)", fxError.message);
   }
   revalidatePath("/dashboard/quotes");
   redirect(`/dashboard/quotes/${data.id}?created=1`);

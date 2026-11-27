@@ -1,3 +1,6 @@
+import { FxForm } from "@/app/dashboard/settings/currency/form";
+import { Card } from "@/components/admin-ui";
+import { liveFx } from "@/lib/fx";
 import Link from "next/link";
 import { requireMerchant } from "@/lib/auth";
 import { formatPrice } from "@/lib/format";
@@ -100,6 +103,30 @@ export default async function DashboardHome({
           <h1 className="text-2xl">متجرك جاهز</h1>
           <p className="mt-1 opacity-90">أضف منتجاتك وشارك الرابط مع زبائنك.</p>
         </div>
+      )}
+
+      {role === "owner" && store.currency === "USD" && (
+        <Card
+          title="سعر الدولار اليوم"
+          action={<Link href="/dashboard/settings/currency" className="text-[13px] font-semibold text-[#005bd3] hover:underline">إعدادات سعر الصرف</Link>}
+        >
+          {(() => {
+            const fx = liveFx(store);
+            const stale = fx?.updated_at && Date.now() - new Date(fx.updated_at).getTime() > 20 * 3600 * 1000;
+            return (
+              <>
+                <p className="mb-3 text-[13px] text-muted">
+                  {!fx
+                    ? "أسعارك تظهر للزبائن بالدولار. اكتب سعر الصرف ليروها بالليرة."
+                    : stale
+                      ? "لم يُحدَّث السعر منذ يوم. حدّثه ليرى زبائنك أسعار اليوم."
+                      : "يرى زبائنك الأسعار بالليرة حسب هذا السعر."}
+                </p>
+                <FxForm fx={fx} sample={10} compact />
+              </>
+            );
+          })()}
+        </Card>
       )}
 
       <div className="grid gap-3 sm:grid-cols-3">

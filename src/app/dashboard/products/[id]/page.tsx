@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/admin-ui";
+import { StoryButton } from "@/components/story-image";
+import { liveFx } from "@/lib/fx";
 import { requireAccess } from "@/lib/auth";
 import type { Product } from "@/lib/types";
 import { storeUrl } from "@/lib/urls";
@@ -54,6 +56,11 @@ export default async function EditProductPage({
                 نسخ
               </button>
             </form>
+            <StoryButton
+              product={{ title: product.title, price: product.price, compare: product.compare_at_price, image: product.images?.[0] ?? null }}
+              store={{ name: m.store.name, logo: m.store.logo_url ?? null, color: m.store.primary_color ?? null, currency: m.store.currency, fx: liveFx(m.store) }}
+              link={`${storeUrl(m.store.slug)}/p/${product.id}`}
+            />
             <a
               href={`${storeUrl(m.store.slug)}/p/${product.id}`}
               target="_blank"
