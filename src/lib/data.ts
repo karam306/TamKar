@@ -139,14 +139,14 @@ export const getProduct = cache(
           (p) => p.store_id === storeId && p.id === id && p.active,
         ) ?? null
       );
-    if (!/^[0-9a-f-]{36}$/.test(id)) return null;
-    const { data } = await supabasePublic()
-      .from("products")
-      .select(PRODUCT_COLUMNS)
-      .eq("store_id", storeId)
-      .eq("id", id)
-      .eq("active", true)
-      .maybeSingle();
+    // Short links (/p/1a2b3c4d, the first 8 characters of the id) for status images and messages.
+    const short = /^[0-9a-f]{8}$/.test(id);
+    if (!short && !/^[0-9a-f-]{36}$/.test(id)) return null;
+    let q = supabasePublic().from("products").select(PRODUCT_COLUMNS).eq("store_id", storeId).eq("active", true);
+    q = short
+      ? q.gte("id", `${id}-0000-0000-0000-000000000000`).lte("id", `${id}-ffff-ffff-ffff-ffffffffffff`)
+      : q.eq("id", id);
+    const { data } = await q.limit(1).maybeSingle();
     return data ? (await withOffers([num(data as Product)]))[0] : null;
   },
 );

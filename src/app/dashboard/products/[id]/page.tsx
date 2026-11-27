@@ -73,7 +73,7 @@ export default async function EditProductPage({
             <StoryButton
               product={{ title: product.title, price: product.price, compare: product.compare_at_price, image: product.images?.[0] ?? null }}
               store={{ name: m.store.name, logo: m.store.logo_url ?? null, color: m.store.primary_color ?? null, currency: m.store.currency, fx: liveFx(m.store) }}
-              link={`${storeUrl(m.store.slug)}/p/${product.id}`}
+              link={`${storeUrl(m.store.slug)}/p/${product.id.slice(0, 8)}`}
             />
             <a
               href={`${storeUrl(m.store.slug)}/p/${product.id}`}
